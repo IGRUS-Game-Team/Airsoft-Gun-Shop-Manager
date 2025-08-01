@@ -7,11 +7,16 @@ namespace StarterAssets
 {
 	public class StarterAssetsInputs : MonoBehaviour
 	{
+		
 		[Header("Character Input Values")]
 		public Vector2 move;
 		public Vector2 look;
 		public bool jump;
 		public bool sprint;
+
+		//public bool drop;
+		//public bool set;
+		//public bool hold;
 
 		[Header("Movement Settings")]
 		public bool analogMovement;
@@ -28,10 +33,14 @@ namespace StarterAssets
 
 		public void OnLook(InputValue value)
 		{
-			if(cursorInputForLook)
+			if(cursorInputForLook && !MonitorUIModeManager.Instance.getInUIMode())
 			{
 				LookInput(value.Get<Vector2>());
 			}
+			// if(cursorInputForLook)
+			// {
+			// 	LookInput(value.Get<Vector2>());
+			// }
 		}
 
 		public void OnJump(InputValue value)
@@ -43,6 +52,20 @@ namespace StarterAssets
 		{
 			SprintInput(value.isPressed);
 		}
+
+
+		// public void OnHold(InputValue value)
+		// {
+		// 	HoldInput(value.isPressed);
+		// }
+		// public void OnDrop(InputValue value)
+		// {
+		// 	DropInput(value.isPressed);
+		// }
+		// public void OnSet(InputValue value)
+		// {
+		// 	SetInput(value.isPressed);
+		// }
 #endif
 
 
@@ -65,9 +88,25 @@ namespace StarterAssets
 		{
 			sprint = newSprintState;
 		}
+		// public void HoldInput(bool newHoldState)
+		// {
+		// 	hold = newHoldState;
+		// }
+		
+		// public void SetInput(bool newSetState)
+		// {
+		// 	set = newSetState;
+		// }
+		// public void DropInput(bool newDropState)
+		// {
+		// 	drop = newDropState;
+		// }
+		
+		
 		
 		private void OnApplicationFocus(bool hasFocus)
 		{
+			if (MonitorUIModeManager.Instance.getInUIMode()) return;
 			SetCursorState(cursorLocked);
 		}
 
