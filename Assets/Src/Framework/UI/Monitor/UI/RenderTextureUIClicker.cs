@@ -37,7 +37,6 @@ public class RenderTextureUIClicker : MonoBehaviour
             Debug.Log("Hit something else: " + hit.collider.name);
             return;
         }
-        Debug.Log("도달");
         // 1. UV 좌표 얻기 (0~1)
         Vector2 uv = hit.textureCoord;
         Debug.Log(uv);
@@ -61,7 +60,6 @@ public class RenderTextureUIClicker : MonoBehaviour
         foreach (var r in results)
         {
             ExecuteEvents.Execute(r.gameObject, ped, ExecuteEvents.pointerClickHandler);
-            Debug.Log("아왜안됨");
         }
     }
 
