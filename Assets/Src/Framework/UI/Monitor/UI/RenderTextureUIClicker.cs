@@ -20,10 +20,11 @@ public class RenderTextureUIClicker : MonoBehaviour
 
     void Update()
     {
-        if (!Input.GetMouseButtonDown(0))
+        if (!Input.GetMouseButtonDown(0) || !MonitorUIModeManager.Instance.getInUIMode())
         {
             return;
         }
+        Debug.Log(MonitorUIModeManager.Instance.getInUIMode() + "ㅇ");
         Ray ray = MonitorCam.ScreenPointToRay(Input.mousePosition);
         Debug.DrawRay(ray.origin, ray.direction * 100f, Color.red, 1f);
         if (!Physics.Raycast(ray, out RaycastHit hit))
