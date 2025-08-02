@@ -14,4 +14,12 @@ public class MonitorPanelManager : MonoBehaviour
         panelBank.SetActive(index == 3);
         panelManagement.SetActive(index == 4);
     }
+
+    public void ReturnMainPanel()
+    {
+        panelMain.SetActive(true);
+        panelStockOrder.SetActive(false);
+        panelBank.SetActive(false);
+        panelManagement.SetActive(false);
+    }
 }
