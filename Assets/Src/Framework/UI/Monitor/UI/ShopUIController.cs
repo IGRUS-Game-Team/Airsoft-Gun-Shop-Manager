@@ -12,11 +12,11 @@ public class ShopUIController : MonoBehaviour
     [SerializeField] Transform contentRoot;          // ScrollView/Viewport/Content
     [SerializeField] ItemCardView itemCardPrefab;    // 프리팹
 
-//public void OnClickFilter_All() => Populate(ItemCategory.All);
-public void OnClickFilter_MainWeapon() => Populate(ItemCategory.MainWeapon);
-public void OnClickFilter_ProtectiveGear() => Populate(ItemCategory.ProtectiveGear);
-public void OnClickFilter_Consumable() => Populate(ItemCategory.Consumable);
-public void OnClickFilter_Exhibition() => Populate(ItemCategory.Exhibition);
+    //public void OnClickFilter_All() => Populate(ItemCategory.All);
+    public void OnClickFilter_MainWeapon() => Populate(ItemCategory.MainWeapon);
+    public void OnClickFilter_ProtectiveGear() => Populate(ItemCategory.ProtectiveGear);
+    public void OnClickFilter_Consumable() => Populate(ItemCategory.Consumable);
+    public void OnClickFilter_Exhibition() => Populate(ItemCategory.Exhibition);
     List<ItemCardView> spawnedCards = new();
 
     void Start()
