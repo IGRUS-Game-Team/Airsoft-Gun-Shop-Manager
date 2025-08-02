@@ -7,6 +7,10 @@ public class MonitorPanelManager : MonoBehaviour
     [SerializeField] GameObject panelBank;
     [SerializeField] GameObject panelManagement;
 
+    void Start()
+    {
+        ReturnMainPanel();
+    }
     public void ShowPanel(int index)
     {
         panelMain.SetActive(index == 1);
