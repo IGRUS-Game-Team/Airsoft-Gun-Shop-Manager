@@ -11,6 +11,7 @@ public class ShopUIController : MonoBehaviour
     [SerializeField] ItemDatabase database;
     [SerializeField] Transform contentRoot;          // ScrollView/Viewport/Content
     [SerializeField] ItemCardView itemCardPrefab;    // 프리팹
+    [SerializeField] MonitorShopCartManager cartManager;
 
     //public void OnClickFilter_All() => Populate(ItemCategory.All);
     public void OnClickFilter_MainWeapon() => Populate(ItemCategory.MainWeapon);
@@ -33,6 +34,12 @@ public class ShopUIController : MonoBehaviour
             if (item.category != itemCategory) continue;
             var card = Instantiate(itemCardPrefab, contentRoot);
             card.Setup(item);
+           
+            //card.onAddToCart.AddListener(cartManager.AddItem); //
+            card.onAddToCart.AddListener((data, amount) =>
+            {
+                cartManager.AddItem(data, amount);
+            });
             spawnedCards.Add(card);
         }
     }
