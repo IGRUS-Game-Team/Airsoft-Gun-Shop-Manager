@@ -112,7 +112,6 @@ namespace StarterAssets
 
 		private void Update()
 		{
-			if (MonitorUIModeManager.Instance.getInUIMode()) return; 
 			JumpAndGravity();
 			GroundedCheck();
 			Move();
@@ -120,7 +119,6 @@ namespace StarterAssets
 
 		private void LateUpdate()
 		{
-			if (MonitorUIModeManager.Instance.getInUIMode()) return; 
 			CameraRotation();
 		}
 
