@@ -1,12 +1,13 @@
 using UnityEngine;
 using System.Collections.Generic;
+using StarterAssets;
 
 public class SaveManager : MonoBehaviour
 {
     public static SaveManager Instance;
 
-    //GameState gameState;
-    //PlayerController playerController;
+    GameState gameState;
+    FirstPersonController playerController;
     MonitorShopCartManager cartManager;
     //RoomManager roomManager;
 
@@ -19,9 +20,9 @@ public class SaveManager : MonoBehaviour
         }
         Instance = this;
 
-        //gameState = FindObjectOfType<GameState>();
-        //playerController = FindObjectOfType<PlayerController>();
-        cartManager = FindAnyObjectByType<MonitorShopCartManager>();
+        gameState = FindFirstObjectByType<GameState>();
+        playerController = FindFirstObjectByType<FirstPersonController>();
+        cartManager = FindFirstObjectByType<MonitorShopCartManager>();
         //roomManager = FindObjectOfType<RoomManager>();
     }
 
@@ -31,9 +32,9 @@ public class SaveManager : MonoBehaviour
 
         GameSaveData data = new GameSaveData();
 
-        // data.playerMoney = gameState.Money;
-        // data.playerPosition = playerController.transform.position;
-        // data.cartData = cartManager.GetCartData();
+        data.playerMoney = gameState.Money;
+        data.playerPosition = playerController.transform.position;
+        data.cartData = cartManager.GetCartData();
         // data.unlockedRooms = roomManager.GetUnlockedRoomIds();
 
         ES3.Save("GameSave", data);
@@ -54,9 +55,9 @@ public class SaveManager : MonoBehaviour
 
         GameSaveData data = ES3.Load<GameSaveData>("GameSave");
 
-        // gameState.Money = data.playerMoney;
-        // playerController.transform.position = data.playerPosition;
-        // cartManager.LoadCartData(data.cartData);
+        gameState.SetMoney(data.playerMoney);
+        playerController.transform.position = data.playerPosition;
+        cartManager.LoadCartData(data.cartData);
         // roomManager.LoadUnlockedRooms(data.unlockedRooms);
 
         Debug.Log("게임 불러오기 완료");

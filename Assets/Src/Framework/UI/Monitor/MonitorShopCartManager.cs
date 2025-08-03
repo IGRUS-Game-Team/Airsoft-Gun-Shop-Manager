@@ -9,6 +9,7 @@ public class MonitorShopCartManager : MonoBehaviour
     [SerializeField] CartItemCardView cartItemCardPrefab;
     [SerializeField] TextMeshProUGUI totalAmountText;
     [SerializeField] TextMeshProUGUI totalValueText;
+    [SerializeField] private ItemDatabase itemDatabase;
 
     private Dictionary<ItemData, int> cart = new(); // ItemData → 수량
     private Dictionary<ItemData, CartItemCardView> spawnedViews = new();
@@ -77,7 +78,40 @@ public class MonitorShopCartManager : MonoBehaviour
         totalAmountText.text = totalAmount.ToString();
         totalValueText.text = $"${totalValue:F2}";
     }
-    
+
+    public List<CartSaveData> GetCartData()
+    {
+        var list = new List<CartSaveData>();
+
+        foreach (var kvp in cart)
+        {
+            var data = new CartSaveData
+            {
+                itemId = kvp.Key.ItemId,
+                amount = kvp.Value
+            };
+
+            list.Add(data);
+        }
+
+        return list;
+    }
+    public void LoadCartData(List<CartSaveData> cartSaveDatas)
+    {
+        cart.Clear();
+
+        foreach (var saveData in cartSaveDatas)
+        {
+            var item = itemDatabase.items.Find(i => i.ItemId == saveData.itemId);
+            if (item != null)
+                cart[item] = saveData.amount;
+            else
+                Debug.LogWarning($"itemId {saveData.itemId} 없음");
+        }
+
+        UpdateCartUI();
+    }
+
     private void OnPlusClicked(ItemData item)
     {
         if (!cart.ContainsKey(item)) return;

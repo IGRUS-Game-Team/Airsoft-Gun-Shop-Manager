@@ -5,7 +5,7 @@ using UnityEngine.UI;
 public class SceneInitializer : MonoBehaviour
 {
     [SerializeField] GameObject loadingUI;
-    [SerializeField] Slider progressBar; // optional
+    //[SerializeField] Slider progressBar; // optional
 
     private void Start()
     {
