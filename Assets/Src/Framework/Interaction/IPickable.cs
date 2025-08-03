@@ -17,6 +17,8 @@ public interface IPickable : IInteractable
     /// 오브젝트를 놓습니다.
     /// </summary>
     void SetDown();
-
+    /// <summary>
+    /// 오브젝트를 던집니다.
+    /// </summary>
     void ThrowObject();
 }
