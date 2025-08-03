@@ -54,7 +54,7 @@ private void UpdateCartUI()
 
     spawnedViews.Clear();
 
-    // ✔️ 누적값 초기화!
+    // 누적값 초기화!
     totalAmount = 0;
     totalValue = 0;
 
@@ -65,7 +65,7 @@ private void UpdateCartUI()
         spawnedViews[kvp.Key] = view;
 
         totalAmount += kvp.Value;
-        totalValue += kvp.Key.baseCost * kvp.Value; // 💰 총 가격 계산
+        totalValue += kvp.Key.baseCost * kvp.Value; // 총 가격 계산
     }
 
     totalAmountText.text = totalAmount.ToString();
