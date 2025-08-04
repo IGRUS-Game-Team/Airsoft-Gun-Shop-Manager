@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 /// <summary>
 /// RaycastDetector.cs 박정민
@@ -19,6 +20,12 @@ public class RaycastDetector : MonoBehaviour
     void Update()
     {
         HitObject = null;
+
+        // UI 클릭 시 3D 레이캐스트 무시
+        if (EventSystem.current != null && EventSystem.current.IsPointerOverGameObject())
+        {
+            return;
+        }
 
         if (Camera.main == null) return; //카메라 없으면 update 탈출하도록 탈출조건 설정했습니다.
 
