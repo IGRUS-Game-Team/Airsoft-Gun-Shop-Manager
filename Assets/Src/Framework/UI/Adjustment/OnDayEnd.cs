@@ -35,6 +35,7 @@ public class OnDayEnd : MonoBehaviour
     {
         audioSource.PlayOneShot(AdjustmentAppearSound);
 
+
         AdjustmentCanvas.SetActive(true); 
         BackgroundImage.SetActive(true); 
         StartCoroutine(ShowDelayText());
@@ -47,6 +48,7 @@ public class OnDayEnd : MonoBehaviour
         {
             yield return new WaitForSeconds(.4f);
             audioSource.PlayOneShot(UIAppearSound);
+
             text.gameObject.SetActive(true);
         }
     }
