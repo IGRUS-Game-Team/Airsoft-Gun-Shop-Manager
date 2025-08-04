@@ -20,11 +20,11 @@ public class NpcState_PickWait : IState
         // 1) 랜덤 시간(1~3초) 만큼 대기하도록 종료 시각 계산
         waitEndTime = Time.time + Random.Range(1f, 3f);
         // 2) 이동 중지
-        npcController.agent.isStopped = true;
+        npcController.Agent.isStopped = true;
         // 3) 서 있는 애니메이션 재생
-        npcController.animator.Play(StandingAnim);
+        npcController.Animator.Play(StandingAnim);
         // 4) NavMeshAgent 자동 회전 해제
-        npcController.agent.updateRotation = false;
+        npcController.Agent.updateRotation = false;
     }
 
     // 매 프레임 호출: 선반 바라보기 유지, 대기 종료 후 다음 상태로 전환
@@ -46,7 +46,7 @@ public class NpcState_PickWait : IState
     // 상태 종료 시 호출: 자동 회전 복원
     public void Exit()
     {
-        npcController.agent.updateRotation = true;
+        npcController.Agent.updateRotation = true;
     }
 
     // 손쉽게 선반(또는 슬롯 부모)을 바라보도록 회전을 보정
