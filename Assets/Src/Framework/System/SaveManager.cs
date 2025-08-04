@@ -11,6 +11,8 @@ public class SaveManager : MonoBehaviour
     private MonitorShopCartManager cartManager;
     // private RoomManager roomManager;
 
+    private bool isInitialized = false;
+
     private void Awake()
     {
         if (Instance != null && Instance != this)
@@ -20,49 +22,62 @@ public class SaveManager : MonoBehaviour
         }
 
         Instance = this;
-        DontDestroyOnLoad(gameObject); // 씬 이동 시 유지
+        DontDestroyOnLoad(gameObject);
     }
 
-    private void Start()
+    private void Update()
     {
-
-        string currentScene = UnityEngine.SceneManagement.SceneManager.GetActiveScene().name;
-        if (currentScene != "MainMenu") // ← 실제 인게임 씬 이름으로 교체
+        // 아직 초기화되지 않았고, 인게임 씬일 때만 시도
+        if (!isInitialized && IsInGameScene())
         {
-            Debug.Log("현재 씬이 인게임이 아님. Save/Load 생략.");
-            return;
+            TryInitialize();
+
+            if (isInitialized)
+            {
+                if (string.IsNullOrEmpty(ES3SlotManager.selectedSlotPath))
+                {
+                    Debug.LogWarning("슬롯 없음 - 세이브/로드 생략");
+                    return;
+                }
+
+                if (ES3.KeyExists("GameSave", ES3SlotManager.selectedSlotPath))
+                {
+                    LoadGame();
+                }
+                else
+                {
+                    SaveGame();
+                }
+            }
         }
-        // 게임 오브젝트들이 다 로드된 이후에 참조 시도
+    }
+
+    private bool IsInGameScene()
+    {
+        string currentScene = UnityEngine.SceneManagement.SceneManager.GetActiveScene().name;
+        return currentScene != "MainMenu";
+    }
+
+    private void TryInitialize()
+    {
         gameState = FindFirstObjectByType<GameState>();
         playerController = FindFirstObjectByType<FirstPersonController>();
         cartManager = FindFirstObjectByType<MonitorShopCartManager>();
-        // roomManager = FindFirstObjectByType<RoomManager>();
 
-        // // 인게임 진입 후 슬롯 선택돼 있으면 자동 저장
-        // if (!string.IsNullOrEmpty(ES3SlotManager.selectedSlotPath))
-        // {
-        //     Debug.Log("▶ 인게임 씬 시작됨 - 자동 저장 실행");
-        //     SaveGame();
-        // }
-        if (string.IsNullOrEmpty(ES3SlotManager.selectedSlotPath))
+        if (gameState != null && playerController != null && cartManager != null)
         {
-            Debug.LogWarning("슬롯 없음 - 세이브/로드 생략");
-            return;
-        }
-
-        if (ES3.KeyExists("GameSave", ES3SlotManager.selectedSlotPath))
-        {
-            LoadGame();
+            isInitialized = true;
+            Debug.Log("SaveManager 초기화 완료");
         }
         else
         {
-            SaveGame(); // 신규 슬롯이면 저장
+            Debug.LogWarning("SaveManager 초기화 대기 중...");
+                    if (gameState == null) Debug.LogWarning("→ GameState가 null입니다");
+        if (playerController == null) Debug.LogWarning("→ FirstPersonController가 null입니다");
+        if (cartManager == null) Debug.LogWarning("→ MonitorShopCartManager가 null입니다");
         }
     }
 
-    /// <summary>
-    /// 메인 메뉴에서 슬롯 생성 + 씬 전환
-    /// </summary>
     public void NewGame()
     {
         string newSlotName = "slot_" + DateTime.Now.ToString("yyyyMMdd_HHmmss");
@@ -70,31 +85,27 @@ public class SaveManager : MonoBehaviour
 
         if (!ES3.FileExists(slotPath))
         {
-            ES3.Save("Created", true, slotPath); // 더미 키로 파일 생성
+            ES3.Save("Created", true, slotPath);
             Debug.Log("슬롯 파일 생성됨: " + slotPath);
         }
 
         ES3SlotManager.selectedSlotPath = slotPath;
         Debug.Log("선택된 슬롯 경로: " + slotPath);
-
-        
     }
 
     public void SaveGame()
     {
-        if (gameState == null || playerController == null || cartManager == null)
+        if (!isInitialized)
         {
-            Debug.LogWarning("SaveGame 실패: 게임 오브젝트 참조 누락");
+            Debug.LogWarning("SaveGame 실패: 아직 초기화되지 않음");
             return;
         }
 
         if (string.IsNullOrEmpty(ES3SlotManager.selectedSlotPath))
         {
-            Debug.LogError("SaveGame 실패: 슬롯 경로가 설정되지 않음");
+            Debug.LogError("SaveGame 실패: 슬롯 경로 없음");
             return;
         }
-
-        Debug.Log("저장 시작");
 
         GameSaveData data = new GameSaveData
         {
@@ -105,23 +116,20 @@ public class SaveManager : MonoBehaviour
         };
 
         ES3.Save("GameSave", data, ES3SlotManager.selectedSlotPath);
-
         Debug.Log("게임 저장 완료");
     }
 
     public void LoadGame()
     {
-        Debug.Log("불러오기 시작");
-
-        if (gameState == null || playerController == null || cartManager == null)
+        if (!isInitialized)
         {
-            Debug.LogWarning("LoadGame 실패: 게임 오브젝트 참조 누락");
+            Debug.LogWarning("LoadGame 실패: 아직 초기화되지 않음");
             return;
         }
 
         if (string.IsNullOrEmpty(ES3SlotManager.selectedSlotPath))
         {
-            Debug.LogError("LoadGame 실패: 선택된 슬롯 없음");
+            Debug.LogError("LoadGame 실패: 슬롯 경로 없음");
             return;
         }
 
@@ -138,6 +146,6 @@ public class SaveManager : MonoBehaviour
         cartManager.LoadCartData(data.cartData);
         // roomManager.LoadUnlockedRooms(data.unlockedRooms);
 
-        Debug.Log("✅ 게임 불러오기 완료");
+        Debug.Log("게임 불러오기 완료");
     }
 }
