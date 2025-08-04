@@ -4,12 +4,11 @@ using Microsoft.Unity.VisualStudio.Editor;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using StarterAssets;
 
 /// <summary>
 /// OnDayEnd.cs 이지연
-/// OnDayEnd 오브젝트에 붙은 스크립트로, 
-/// 오브젝트(ex box, monitor 등)의 선택됨 유무를 판단하는 클래스입니다.
-/// </summary>
+/// OnDayEnd 오브젝트에 붙은 스크립트로, 액션맵 통해 enter 감지하면 Text가 0.4초마다 나타나는 기능입니다.
 
 public class OnDayEnd : MonoBehaviour
 {
@@ -18,20 +17,26 @@ public class OnDayEnd : MonoBehaviour
     [SerializeField] Transform TextGroup;
     [SerializeField] AudioClip AdjustmentAppearSound;
     [SerializeField] AudioSource audioSource;
+    [SerializeField] StarterAssets.StarterAssetsInputs playerInput;
 
     private bool isAdjustmentCanvasActive = false;
 
     void Update()
     {
-        if (!isAdjustmentCanvasActive && Input.GetKeyDown(KeyCode.Return))
+        if (playerInput.DayEnd && !isAdjustmentCanvasActive)
         {
-            audioSource.PlayOneShot(AdjustmentAppearSound);
-
-            AdjustmentCanvas.SetActive(true);
-            BackgroundImage.SetActive(true);
-            StartCoroutine(ShowDelayText());
-            isAdjustmentCanvasActive = true;
+            OnEnterDayEnd();
         }
+    }
+
+    void OnEnterDayEnd()
+    {
+        audioSource.PlayOneShot(AdjustmentAppearSound);
+
+        AdjustmentCanvas.SetActive(true);
+        BackgroundImage.SetActive(true);
+        StartCoroutine(ShowDelayText());
+        isAdjustmentCanvasActive = true;
     }
 
     IEnumerator ShowDelayText()
