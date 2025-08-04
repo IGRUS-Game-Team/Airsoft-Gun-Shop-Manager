@@ -5,8 +5,8 @@ using UnityEngine.AI;
 public class NpcController : MonoBehaviour
 {
     /* --- 컴포넌트 캐싱 --- */
-    public NavMeshAgent Agent { get; private set; }   // 경로 탐색·이동을 담당
-    public Animator Animator { get; private set; }    // 애니메이션 제어를 담당
+    public NavMeshAgent agent { get; private set; }   // 경로 탐색·이동을 담당
+    public Animator animator { get; private set; }    // 애니메이션 제어를 담당
 
     /* --- 상태 머신 --- */
     public StateMachine stateMachine { get; private set; }  // 상태 전환 로직
@@ -21,12 +21,9 @@ public class NpcController : MonoBehaviour
     public bool DoorProcessed { get; set; } = false;
 
     /* --- 내부 플래그 --- */
-    public bool hasItemInHand { get; set; } = false;  // 손에 물건 소지 여부
+    public bool hasItemInHand { get; private set; } = false;  // 손에 물건 소지 여부
     public bool inStore       { get; set; } = false;          // 매장 내부 여부
     public bool isLeaving     { get; set; } = false;          // 퇴장 중 여부
-
-    /* ---------- 결제 완료 플래그 ---------- */
-    public bool PaymentDone { get; private set; }
 
     /* --- 인스펙터 주입 --- */
     [SerializeField] private GameObject cashPrefab;    // 현금 프리팹
@@ -40,13 +37,13 @@ public class NpcController : MonoBehaviour
     public GameObject CashPrefab    => cashPrefab;    // 현금 프리팹
     public GameObject CardPrefab    => cardPrefab;    // 카드 프리팹
     public Transform HandTransform  => handSocket;    // 손 소켓 Transform
-    public void OnPaymentCompleted() => PaymentDone = true;
 
     // Awake: 컴포넌트와 상태 머신 초기화
     private void Awake()
     {
-        Agent = GetComponent<NavMeshAgent>();
-        Animator = GetComponentInChildren<Animator>();
+        agent = GetComponent<NavMeshAgent>();
+        animator = GetComponentInChildren<Animator>();
+        handSocket = animator.GetBoneTransform(HumanBodyBones.RightHand);
         stateMachine = new StateMachine();
     }
 
@@ -79,8 +76,8 @@ public class NpcController : MonoBehaviour
     public void SetQueueTarget(Transform node)
     {
         QueueTarget         = node;
-        Agent.isStopped     = false;
-        Agent.SetDestination(node.position);
+        agent.isStopped     = false;
+        agent.SetDestination(node.position);
     }
 
     // 바라볼 대상을 설정
@@ -132,11 +129,16 @@ public class NpcController : MonoBehaviour
         }
 
         // 랜덤 선택: 현금 또는 카드
-        GameObject prefab = Random.value < 0.5f ? cashPrefab : cardPrefab;
+        GameObject prefab = Random.value < 0.5f
+            ? cashPrefab
+            : cardPrefab;
 
         // 손 소켓에 인스턴스화
         spawnedObject = Instantiate(prefab, handSocket);
         spawnedObject.transform.localPosition = Vector3.zero;
+        spawnedObject.transform.localRotation = Quaternion.identity;
+
+        hasItemInHand = true;  // 소지 플래그 설정
     }
 
     // 손에 든 오브젝트 제거 및 소지 상태 해제

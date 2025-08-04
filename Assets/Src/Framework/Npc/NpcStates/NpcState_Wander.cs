@@ -25,10 +25,10 @@ public class NpcState_Wander : IState
     // 상태 진입 시 호출
     public void Enter()
     {
-        npcController.Agent.isStopped = false;      // 이동 재개
+        npcController.agent.isStopped = false;      // 이동 재개
         PickNextDestination();                       // 첫 배회 지점 선택 및 이동
         wanderEndTime = Time.time + maxWanderTime;  // 배회 종료 시각 계산
-        npcController.Animator.Play(WalkingAnim);   // 걷기 애니메이션 실행
+        npcController.animator.Play(WalkingAnim);   // 걷기 애니메이션 실행
     }
 
     // 매 프레임 호출
@@ -43,15 +43,15 @@ public class NpcState_Wander : IState
         }
 
         // 이동 중이면 도착 검사 건너뜀
-        if (npcController.Agent.pathPending)
+        if (npcController.agent.pathPending)
         {
             return;
         }
 
         // 도착 여부 판단: 남은 거리와 속도 체크
         bool arrived = 
-            npcController.Agent.remainingDistance <= 0.1f &&
-            npcController.Agent.velocity.sqrMagnitude < 0.01f;
+            npcController.agent.remainingDistance <= 0.1f &&
+            npcController.agent.velocity.sqrMagnitude < 0.01f;
         if (!arrived)
         {
             return;
@@ -88,7 +88,7 @@ public class NpcState_Wander : IState
         Transform targetPoint = wanderPoints[index];
 
         // NavMeshAgent에 목적지 지정
-        npcController.Agent.SetDestination(targetPoint.position);
+        npcController.agent.SetDestination(targetPoint.position);
 
         // 다음 이동 전 대기 시간 설정
         nextMoveTime = Time.time + Random.Range(minIdle, maxIdle);

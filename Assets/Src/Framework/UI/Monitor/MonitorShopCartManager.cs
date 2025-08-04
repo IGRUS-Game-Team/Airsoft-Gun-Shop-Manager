@@ -9,7 +9,7 @@ public class MonitorShopCartManager : MonoBehaviour
     [SerializeField] CartItemCardView cartItemCardPrefab;
     [SerializeField] TextMeshProUGUI totalAmountText;
     [SerializeField] TextMeshProUGUI totalValueText;
-
+    
     private Dictionary<ItemData, int> cart = new(); // ItemData → 수량
     private Dictionary<ItemData, CartItemCardView> spawnedViews = new();
     private float totalValue = 0;
@@ -47,62 +47,28 @@ public class MonitorShopCartManager : MonoBehaviour
         Debug.Log("장바구니 비움");
     }
 
-    private void UpdateCartUI()
+private void UpdateCartUI()
+{
+    foreach (Transform child in cartContentRoot)
+        Destroy(child.gameObject);
+
+    spawnedViews.Clear();
+
+    // 누적값 초기화!
+    totalAmount = 0;
+    totalValue = 0;
+
+    foreach (var kvp in cart)
     {
-        foreach (Transform child in cartContentRoot)
-            Destroy(child.gameObject);
+        var view = Instantiate(cartItemCardPrefab, cartContentRoot);
+        view.Setup(kvp.Key, kvp.Value);
+        spawnedViews[kvp.Key] = view;
 
-        spawnedViews.Clear();
-
-        // 누적값 초기화!
-        totalAmount = 0;
-        totalValue = 0;
-
-        foreach (var kvp in cart)
-        {
-            var view = Instantiate(cartItemCardPrefab, cartContentRoot);
-            float partTotalCost = kvp.Key.baseCost * kvp.Value;
-            view.Setup(kvp.Key, kvp.Value, partTotalCost);
-
-            view.OnPlusClicked = OnPlusClicked;
-            view.OnMinusClicked = OnMinusClicked;
-            view.OnDeleteClicked = OnDeleteClicked;
-
-            spawnedViews[kvp.Key] = view;
-
-            totalAmount += kvp.Value;
-            totalValue += kvp.Key.baseCost * kvp.Value; // 총 가격 계산
-        }
-
-        totalAmountText.text = totalAmount.ToString();
-        totalValueText.text = $"${totalValue:F2}";
-    }
-    
-    private void OnPlusClicked(ItemData item)
-    {
-        if (!cart.ContainsKey(item)) return;
-        if (cart[item] >= 99) return;
-        cart[item]++;
-
-        UpdateCartUI();
+        totalAmount += kvp.Value;
+        totalValue += kvp.Key.baseCost * kvp.Value; // 총 가격 계산
     }
 
-    private void OnMinusClicked(ItemData item)
-    {
-        if (!cart.ContainsKey(item)) return;
-
-        cart[item]--;
-        if (cart[item] <= 0)
-            cart.Remove(item);
-
-        UpdateCartUI();
-    }
-
-    private void OnDeleteClicked(ItemData item)
-    {
-        if (!cart.ContainsKey(item)) return;
-
-        cart.Remove(item);
-        UpdateCartUI();
-    }
+    totalAmountText.text = totalAmount.ToString();
+    totalValueText.text = $"${totalValue:F2}";
+}
 }

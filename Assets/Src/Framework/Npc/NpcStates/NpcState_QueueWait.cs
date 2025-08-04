@@ -23,11 +23,11 @@ public class NpcState_QueueWait : IState
 
     public void Enter()
     {
-        npcController.Agent.ResetPath();                             // 이전 이동 경로 완전 초기화
-        npcController.Agent.isStopped      = true;                   // 이동 정지
-        npcController.Agent.updateRotation = false;                  // 자동 회전 중단
+        npcController.agent.ResetPath();                             // 이전 이동 경로 완전 초기화
+        npcController.agent.isStopped      = true;                   // 이동 정지
+        npcController.agent.updateRotation = false;                  // 자동 회전 중단
         npcController.transform.LookAt(queueManager.CounterTransform); // 카운터 방향으로 회전
-        npcController.Animator.Play(StandingAnim);                   // 대기 애니메이션 실행
+        npcController.animator.Play(StandingAnim);                   // 대기 애니메이션 실행
     }
 
     public void Tick()
@@ -35,23 +35,23 @@ public class NpcState_QueueWait : IState
         // 1) 자리가 변경된 경우 → 걷기 애니메이션, 새 자리로 이동
         if (npcController.QueueTarget != this.myNode)
         {
-            npcController.Agent.ResetPath();                             // 경로 재설정
-            npcController.Agent.isStopped      = false;                  // 이동 재개
-            npcController.Agent.SetDestination(npcController.QueueTarget.position); // 새 자리 목적지 설정
-            npcController.Animator.Play(WalkingAnim);                    // 걷기 애니메이션 실행
+            npcController.agent.ResetPath();                             // 경로 재설정
+            npcController.agent.isStopped      = false;                  // 이동 재개
+            npcController.agent.SetDestination(npcController.QueueTarget.position); // 새 자리 목적지 설정
+            npcController.animator.Play(WalkingAnim);                    // 걷기 애니메이션 실행
             this.myNode = npcController.QueueTarget;                     // 현재 자리 업데이트
             return;                                                      // 이동만 처리하고 종료
         }
 
         // 2) 도착 여부 판단: 경로 계산 완료 + 거리 허용 범위 이내
-        bool arrived = npcController.Agent.pathPending == false &&
-                       npcController.Agent.remainingDistance <= ArrivalDistance;
+        bool arrived = npcController.agent.pathPending == false &&
+                       npcController.agent.remainingDistance <= ArrivalDistance;
 
         // 3) 도착했으면 대기 애니메이션으로 전환
         if (arrived)
         {
-            npcController.Agent.isStopped = true;        // 완전 정지
-            npcController.Animator.Play(StandingAnim);   // 대기 애니메이션 재생
+            npcController.agent.isStopped = true;        // 완전 정지
+            npcController.animator.Play(StandingAnim);   // 대기 애니메이션 재생
         }
 
         // 4) 맨 앞이고 물건을 들고 있으면 결제 상태로 전환
@@ -69,6 +69,6 @@ public class NpcState_QueueWait : IState
 
     public void Exit()
     {
-        npcController.Agent.updateRotation = true;         // 자동 회전 복원
+        npcController.agent.updateRotation = true;         // 자동 회전 복원
     }
 }

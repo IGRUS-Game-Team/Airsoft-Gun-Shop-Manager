@@ -45,7 +45,7 @@ public class NpcState_ToQueue : IState
         // 3) 자리 확보 성공: 목표 노드 설정 및 애니메이션 실행
         this.queueSpot = assignedSpot;                
         npcController.SetQueueTarget(assignedSpot);   
-        npcController.Animator.Play(WalkingAnim);
+        npcController.animator.Play(WalkingAnim);
     }
 
     // 매 프레임 호출: 이동 보정, 도착 시 대기 상태로 전환
@@ -55,22 +55,22 @@ public class NpcState_ToQueue : IState
         npcController.FaceLookTarget(540f);
 
         // 2) 아직 경로 계산 중이면 대기
-        if (npcController.Agent.pathPending)
+        if (npcController.agent.pathPending)
         {
             return;
         }
 
         // 3) 도착 여부 체크: 남은 거리가 거의 0이고 속도도 거의 0
         bool arrived = 
-            npcController.Agent.remainingDistance < 0.05f &&
-            npcController.Agent.velocity.sqrMagnitude < 0.01f;
+            npcController.agent.remainingDistance < 0.05f &&
+            npcController.agent.velocity.sqrMagnitude < 0.01f;
         if (!arrived)
         {
             return;
         }
 
         // 4) 노드 도착 시 이동 중지하고 줄 대기 상태로 전환
-        npcController.Agent.isStopped = true;
+        npcController.agent.isStopped = true;
         npcController.stateMachine.SetState(
             new NpcState_QueueWait(
                 npcController, 
