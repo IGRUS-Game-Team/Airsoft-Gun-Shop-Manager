@@ -3,11 +3,14 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 #endif
 
+//박정민 8/4 추가
+//ui 상호작용 시 커서 잠금 해제 기능 추가
+//TODO : 커서 잠금 기능 하나의 클래스로 만들어서 그 클래스에서 모든 UI 설정 담당하도록 해야함.
 namespace StarterAssets
 {
 	public class StarterAssetsInputs : MonoBehaviour
 	{
-		
+
 		[Header("Character Input Values")]
 		public Vector2 move;
 		public Vector2 look;
@@ -33,7 +36,7 @@ namespace StarterAssets
 
 		public void OnLook(InputValue value)
 		{
-			if(cursorInputForLook && !MonitorUIModeManager.Instance.getInUIMode())
+			if (cursorInputForLook && (!MonitorUIModeManager.Instance.getInUIMode() || InGameSettingManager.Instance.GetIsSettingOpen()))
 			{
 				LookInput(value.Get<Vector2>());
 			}
@@ -72,7 +75,7 @@ namespace StarterAssets
 		public void MoveInput(Vector2 newMoveDirection)
 		{
 			move = newMoveDirection;
-		} 
+		}
 
 		public void LookInput(Vector2 newLookDirection)
 		{
@@ -92,7 +95,7 @@ namespace StarterAssets
 		// {
 		// 	hold = newHoldState;
 		// }
-		
+
 		// public void SetInput(bool newSetState)
 		// {
 		// 	set = newSetState;
@@ -101,12 +104,12 @@ namespace StarterAssets
 		// {
 		// 	drop = newDropState;
 		// }
-		
-		
-		
+
+
+
 		private void OnApplicationFocus(bool hasFocus)
 		{
-			if (MonitorUIModeManager.Instance.getInUIMode()) return;
+			if (MonitorUIModeManager.Instance.getInUIMode() || InGameSettingManager.Instance.GetIsSettingOpen()) return;
 			SetCursorState(cursorLocked);
 		}
 
@@ -115,5 +118,5 @@ namespace StarterAssets
 			Cursor.lockState = newState ? CursorLockMode.Locked : CursorLockMode.None;
 		}
 	}
-	
+
 }
