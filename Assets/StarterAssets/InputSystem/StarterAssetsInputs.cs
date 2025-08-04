@@ -15,6 +15,10 @@ namespace StarterAssets
 		public bool sprint;
 		public bool DayEnd;
 
+		//public bool drop;
+		//public bool set;
+		//public bool hold;
+
 		[Header("Movement Settings")]
 		public bool analogMovement;
 

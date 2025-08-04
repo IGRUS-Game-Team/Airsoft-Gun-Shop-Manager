@@ -8,7 +8,8 @@ using StarterAssets;
 
 /// <summary>
 /// OnDayEnd.cs 이지연
-/// OnDayEnd 오브젝트에 붙은 스크립트로, 액션맵 통해 enter 감지하면 Text가 0.4초마다 나타나는 기능입니다.
+/// OnDayEnd 오브젝트에 붙은 스크립트로, 액션맵 통해 enter 감지하면 Text가 0.4초마다 나타나는 기능입니다. 
+
 
 public class OnDayEnd : MonoBehaviour
 {
