@@ -15,21 +15,21 @@ public class NpcState_ToCounter : IState
 
     public void Enter()
     {
-        npc.agent.isStopped = false;
-        npc.agent.SetDestination(counterNode.position);
-        npc.animator.Play(Walk);
+        npc.Agent.isStopped = false;
+        npc.Agent.SetDestination(counterNode.position);
+        npc.Animator.Play(Walk);
     }
 
     public void Tick()
     {
-        if (npc.agent.pathPending) return;
+        if (npc.Agent.pathPending) return;
 
         bool arrived =
-            npc.agent.remainingDistance <= 0.05f &&
-            npc.agent.velocity.sqrMagnitude < 0.01f;
+            npc.Agent.remainingDistance <= 0.05f &&
+            npc.Agent.velocity.sqrMagnitude < 0.01f;
         if (!arrived) return;
 
-        npc.agent.isStopped = true;
+        npc.Agent.isStopped = true;
 
         // 계산대 바라보도록 회전
         npc.transform.LookAt(counterNode);
