@@ -15,6 +15,7 @@ namespace StarterAssets
 		public bool sprint;
 		public bool dayEnd; // enter 액션
 
+	
 		//public bool drop;
 		//public bool set;
 		//public bool hold;
