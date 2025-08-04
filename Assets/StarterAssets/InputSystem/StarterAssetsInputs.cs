@@ -13,7 +13,7 @@ namespace StarterAssets
 		public Vector2 look;
 		public bool jump;
 		public bool sprint;
-		public bool DayEnd;
+		public bool dayEnd; // enter 액션
 
 		//public bool drop;
 		//public bool set;
@@ -93,7 +93,7 @@ namespace StarterAssets
 
 		public void DayEndInput(bool newDayEndState)
 		{
-			DayEnd = newDayEndState;
+			dayEnd = newDayEndState;
 		}
 
 		// public void HoldInput(bool newHoldState)
