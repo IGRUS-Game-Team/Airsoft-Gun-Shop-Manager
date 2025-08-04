@@ -11,12 +11,13 @@ public class ShopUIController : MonoBehaviour
     [SerializeField] ItemDatabase database;
     [SerializeField] Transform contentRoot;          // ScrollView/Viewport/Content
     [SerializeField] ItemCardView itemCardPrefab;    // 프리팹
+    [SerializeField] MonitorShopCartManager cartManager;
 
-//public void OnClickFilter_All() => Populate(ItemCategory.All);
-public void OnClickFilter_MainWeapon() => Populate(ItemCategory.MainWeapon);
-public void OnClickFilter_ProtectiveGear() => Populate(ItemCategory.ProtectiveGear);
-public void OnClickFilter_Consumable() => Populate(ItemCategory.Consumable);
-public void OnClickFilter_Exhibition() => Populate(ItemCategory.Exhibition);
+    //public void OnClickFilter_All() => Populate(ItemCategory.All);
+    public void OnClickFilter_MainWeapon() => Populate(ItemCategory.MainWeapon);
+    public void OnClickFilter_ProtectiveGear() => Populate(ItemCategory.ProtectiveGear);
+    public void OnClickFilter_Consumable() => Populate(ItemCategory.Consumable);
+    public void OnClickFilter_Exhibition() => Populate(ItemCategory.Exhibition);
     List<ItemCardView> spawnedCards = new();
 
     void Start()
@@ -33,6 +34,12 @@ public void OnClickFilter_Exhibition() => Populate(ItemCategory.Exhibition);
             if (item.category != itemCategory) continue;
             var card = Instantiate(itemCardPrefab, contentRoot);
             card.Setup(item);
+           
+            //card.onAddToCart.AddListener(cartManager.AddItem); //
+            card.onAddToCart.AddListener((data, amount) =>
+            {
+                cartManager.AddItem(data, amount);
+            });
             spawnedCards.Add(card);
         }
     }

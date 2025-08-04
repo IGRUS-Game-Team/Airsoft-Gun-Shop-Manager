@@ -15,28 +15,10 @@ public class ItemCardView : MonoBehaviour
 
     private ItemData data;
     private int amount = 0;
-
-
-
-    // public class AddToCartEventArgs : EventArgs //커스텀 이벤트 아규먼트 정의
-    // {
-    //     public ItemData itemData;
-    //     public int amount;
-
-    //     public AddToCartEventArgs(ItemData itemData, int amount)
-    //     {
-    //         this.itemData = itemData;
-    //         this.amount = amount;
-    //     }
-    // }
-    //public event EventHandler<AddToCartEventArgs> onAddToCart;
-    //public Action<ItemData, int> onAddToCart;
     public UnityEvent<ItemData, int> onAddToCart;
 
     void Awake()
-    {
-        //onAddToCart += Test_OnSpacePressed; <-  잘못된 방식
-        
+    {        
         onAddToCart.AddListener(Test_OnSpacePressed);
     }
     public void Setup(ItemData item)
@@ -65,8 +47,9 @@ public class ItemCardView : MonoBehaviour
         totalText.text = $"${(data.baseCost * a):F2}";
     }
 
-    private void Test_OnSpacePressed(ItemData itemData, int a) 
+    private void Test_OnSpacePressed(ItemData itemData, int a)
     {
-        Debug.Log("구독자의 스페이스바!");
+        UpdateAmount(0);
+        amount = 0;
     }
 }
