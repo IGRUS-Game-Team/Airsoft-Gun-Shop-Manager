@@ -145,7 +145,11 @@ public class SaveManager : MonoBehaviour
         playerController.transform.position = data.playerPosition;
         cartManager.LoadCartData(data.cartData);
         // roomManager.LoadUnlockedRooms(data.unlockedRooms);
-
+        Debug.Log("불러오기 시작");
+        Debug.Log("현재 플레이어 오브젝트: " + playerController.name);
+        Debug.Log("불러온 위치 값: " + data.playerPosition);
+        Debug.Log("위치 적용 후: " + playerController.transform.position);
         Debug.Log("게임 불러오기 완료");
+        
     }
 }
