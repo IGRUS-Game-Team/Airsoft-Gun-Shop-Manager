@@ -3,6 +3,7 @@ using UnityEngine;
 public class MonitorInteractionBehaviour : MonoBehaviour, IInspectable
 {
     [SerializeField] Camera monitorUICam;
+    [SerializeField] RenderTextureUIClicker uiClicker;
 
     public void Interact()
     {
@@ -17,6 +18,8 @@ public class MonitorInteractionBehaviour : MonoBehaviour, IInspectable
             return;
         }
         MonitorUIModeManager.Instance.EnterUIMode(monitorUICam);
+        uiClicker.SetEnterTime(); 
+        
     }
 
     public void ExitInspection()

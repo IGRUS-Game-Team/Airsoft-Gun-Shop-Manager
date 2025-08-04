@@ -117,6 +117,15 @@ public partial class @PlayerInteraction: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""ExitUI"",
+                    ""type"": ""Button"",
+                    ""id"": ""cddeec8d-0e11-4ac4-ba06-285a809eb08f"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -152,6 +161,17 @@ public partial class @PlayerInteraction: IInputActionCollection2, IDisposable
                     ""action"": ""DropBox"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""5a7f4f3b-e162-4b6a-a780-787b6a001578"",
+                    ""path"": ""<Keyboard>/escape"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""ExitUI"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -163,6 +183,7 @@ public partial class @PlayerInteraction: IInputActionCollection2, IDisposable
         m_Player_Interaction = m_Player.FindAction("Interaction", throwIfNotFound: true);
         m_Player_ThrowBox = m_Player.FindAction("ThrowBox", throwIfNotFound: true);
         m_Player_DropBox = m_Player.FindAction("DropBox", throwIfNotFound: true);
+        m_Player_ExitUI = m_Player.FindAction("ExitUI", throwIfNotFound: true);
     }
 
     ~@PlayerInteraction()
@@ -246,6 +267,7 @@ public partial class @PlayerInteraction: IInputActionCollection2, IDisposable
     private readonly InputAction m_Player_Interaction;
     private readonly InputAction m_Player_ThrowBox;
     private readonly InputAction m_Player_DropBox;
+    private readonly InputAction m_Player_ExitUI;
     /// <summary>
     /// Provides access to input actions defined in input action map "Player".
     /// </summary>
@@ -269,6 +291,10 @@ public partial class @PlayerInteraction: IInputActionCollection2, IDisposable
         /// Provides access to the underlying input action "Player/DropBox".
         /// </summary>
         public InputAction @DropBox => m_Wrapper.m_Player_DropBox;
+        /// <summary>
+        /// Provides access to the underlying input action "Player/ExitUI".
+        /// </summary>
+        public InputAction @ExitUI => m_Wrapper.m_Player_ExitUI;
         /// <summary>
         /// Provides access to the underlying input action map instance.
         /// </summary>
@@ -304,6 +330,9 @@ public partial class @PlayerInteraction: IInputActionCollection2, IDisposable
             @DropBox.started += instance.OnDropBox;
             @DropBox.performed += instance.OnDropBox;
             @DropBox.canceled += instance.OnDropBox;
+            @ExitUI.started += instance.OnExitUI;
+            @ExitUI.performed += instance.OnExitUI;
+            @ExitUI.canceled += instance.OnExitUI;
         }
 
         /// <summary>
@@ -324,6 +353,9 @@ public partial class @PlayerInteraction: IInputActionCollection2, IDisposable
             @DropBox.started -= instance.OnDropBox;
             @DropBox.performed -= instance.OnDropBox;
             @DropBox.canceled -= instance.OnDropBox;
+            @ExitUI.started -= instance.OnExitUI;
+            @ExitUI.performed -= instance.OnExitUI;
+            @ExitUI.canceled -= instance.OnExitUI;
         }
 
         /// <summary>
@@ -385,5 +417,12 @@ public partial class @PlayerInteraction: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnDropBox(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "ExitUI" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnExitUI(InputAction.CallbackContext context);
     }
 }

@@ -18,51 +18,73 @@ public class RenderTextureUIClicker : MonoBehaviour
     [SerializeField] GraphicRaycaster uiRaycaster;
     [SerializeField] EventSystem eventSystem;
 
+    [SerializeField] float clickDelay = 0.15f;
+
+    private float enterTime = -999f;
+
+
     void Update()
     {
-        if (!Input.GetMouseButtonDown(0))
+        if (!Input.GetMouseButtonDown(0) || !MonitorUIModeManager.Instance.getInUIMode())
         {
             return;
         }
+
+        // 진입 후 딜레이 이전이면 클릭 무시
+        if (Time.time - enterTime < clickDelay)
+        {
+            Debug.Log("UI 진입 직후 클릭 무시됨");
+            return;
+        }
+
         Ray ray = MonitorCam.ScreenPointToRay(Input.mousePosition);
         Debug.DrawRay(ray.origin, ray.direction * 100f, Color.red, 1f);
+
         if (!Physics.Raycast(ray, out RaycastHit hit))
         {
             Debug.Log("No Physics Hit");
             return;
         }
+
         if (hit.collider.gameObject != monitorScreen.gameObject)
         {
             Debug.Log("Hit something else: " + hit.collider.name);
             return;
         }
-        Debug.Log("도달");
+
         // 1. UV 좌표 얻기 (0~1)
         Vector2 uv = hit.textureCoord;
-        Debug.Log(uv);
+        Debug.Log("UV: " + uv);
 
-        // 2. UV -> Canvas 스크린좌표로 변환
+        // 2. UV → Canvas 좌표로 변환
         Vector2 canvasSize = monitorCanvasRt.sizeDelta;
         Vector2 local = new Vector2(
             (uv.x * canvasSize.x) - canvasSize.x * 0.5f,
             (uv.y * canvasSize.y) - canvasSize.y * 0.5f);
 
-
         Vector2 screenPos = RectTransformUtility.WorldToScreenPoint(
             KioskCam,
             monitorCanvasRt.TransformPoint(local));
-        Debug.Log(screenPos);
+
+        Debug.Log("ScreenPos: " + screenPos);
+
         // 3. GraphicRaycaster로 클릭 전달
         PointerEventData ped = new PointerEventData(eventSystem) { position = screenPos };
         var results = new List<RaycastResult>();
         uiRaycaster.Raycast(ped, results);
         Debug.Log($"Raycast hit count: {results.Count}");
+
+        if (!MonitorUIModeManager.Instance.getInUIMode()) return;
+
         foreach (var r in results)
         {
             ExecuteEvents.Execute(r.gameObject, ped, ExecuteEvents.pointerClickHandler);
-            Debug.Log("아왜안됨");
         }
     }
 
 
+public void SetEnterTime()
+{
+    enterTime = Time.time;
+}
 }

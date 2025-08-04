@@ -38,7 +38,7 @@ public class BoxInteractionBehaviour : MonoBehaviour, IPickable
     {
         if (!holdData.isHeld) return;
 
-        Vector3 placePos = FindObjectOfType<PlacePreview>().PreviewPosition + Vector3.up * 0.5f;
+        Vector3 placePos = FindAnyObjectByType<PlacePreview>().PreviewPosition + Vector3.up * 0.5f;
         holdData.transform.position = placePos;
         holdData.transform.rotation = Quaternion.identity;
 
