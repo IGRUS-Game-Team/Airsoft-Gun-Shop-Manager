@@ -55,7 +55,7 @@ public class MonitorShopCartManager : MonoBehaviour
 
         spawnedViews.Clear();
 
-        // 누적값 초기화!
+        // 누적값 초기화
         totalAmount = 0;
         totalValue = 0;
 
