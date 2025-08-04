@@ -48,13 +48,14 @@ public class NpcState_OfferPayment : IState
         paymentContext = new PaymentContext
         {
             totalPrice = 0f,                             // TODO: 실제 가격 로직
-            method     = Random.value < 0.5f ? PaymentType.Cash : PaymentType.Card,
-            payer      = npcController                   // 본인을 payer로 지정
+            method = Random.value < 0.5f ? PaymentType.Cash : PaymentType.Card,
+            payer = npcController                   // 본인을 payer로 지정
         };
 
         // (2) NavMeshAgent 이동·회전 중단
-        npcController.agent.isStopped      = true;       // 이동 정지
-        npcController.agent.updateRotation = false;      // 자동 회전 끔
+        npcController.Agent.isStopped = true;       // 이동 정지
+        npcController.Agent.updateRotation = false;      // 자동 회전 끔
+        npcController.Animator.SetTrigger("OfferPayment");
     }
 
     // 매 프레임: 몸을 계산대 쪽으로 돌리고, 다 돌면 결제 물건을 생성
@@ -89,20 +90,13 @@ public class NpcState_OfferPayment : IState
             // 4-2) 앞으로 Tick에서 더 돌리지 않음
             rotationComplete = true;
         }
-
-        // (5) 정확히 맞춘 그 프레임에만 결제 물건을 손에 생성
-        if (!itemSpawned && rotationComplete)
-        {
-            SpawnPaymentItem();
-            itemSpawned = true;
-        }
     }
 
     // 상태 종료: NavMeshAgent 회전·이동 제어를 원래대로 복원
     public void Exit()
     {
-        npcController.agent.updateRotation = true;       // 자동 회전 복구
-        npcController.agent.isStopped      = false;      // 이동 재개
+        npcController.Agent.updateRotation = true;       // 자동 회전 복구
+        npcController.Agent.isStopped      = false;      // 이동 재개
     }
 
     /* ---------- 내부 보조 메서드 ---------- */
@@ -136,6 +130,13 @@ public class NpcState_OfferPayment : IState
     {
         // (1) 줄 관리 매니저에 맨 앞 결제 완료 알림
         queueManager.DequeueFront();
+
+        // (1-a) 손 프리팹 제거 & 플래그 해제
+        npcController.HideMoneyOrCard();
+
+        // (1-b) PaymentDone 플래그 세팅
+        npcController.OnPaymentCompleted();
+
 
         // (2) NPC를 퇴장 상태로 전환
         npcController.stateMachine.SetState(new NpcState_Leave(npcController));

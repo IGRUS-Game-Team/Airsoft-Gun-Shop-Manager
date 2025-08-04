@@ -21,9 +21,9 @@ public class NpcState_PickItem : IState
     public void Enter()
     {
         // 이동 중지
-        npcController.agent.isStopped = true;
+        npcController.Agent.isStopped = true;
         // 기존 경로 초기화
-        npcController.agent.ResetPath();
+        npcController.Agent.ResetPath();
 
         // 대상 슬롯의 높이를 가져옴
         float itemHeight = npcController.targetShelfSlot.position.y;
@@ -44,7 +44,7 @@ public class NpcState_PickItem : IState
         }
 
         // 애니메이션 재생
-        npcController.animator.Play(animationName);
+        npcController.Animator.Play(animationName);
     }
 
     // 매 프레임 호출: 손에 물건이 생기면 다음 상태로 전환

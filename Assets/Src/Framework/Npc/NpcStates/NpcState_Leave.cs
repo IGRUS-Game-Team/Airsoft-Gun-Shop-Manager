@@ -36,16 +36,16 @@ public class NpcState_Leave : IState
 
         /* ---------- NavMeshAgent 재설정 ---------- */
 
-        npcController.agent.ResetPath();                    // 3) 이전 경로 초기화
-        npcController.agent.updateRotation = true;          // 4) 이동 중 자동 회전 켬
-        npcController.agent.isStopped      = false;         // 5) 이동 가능 상태로 전환
+        npcController.Agent.ResetPath();                    // 3) 이전 경로 초기화
+        npcController.Agent.updateRotation = true;          // 4) 이동 중 자동 회전 켬
+        npcController.Agent.isStopped      = false;         // 5) 이동 가능 상태로 전환
 
-        npcController.agent.SetDestination(                 // 6) 목적지: 출구
+        npcController.Agent.SetDestination(                 // 6) 목적지: 출구
             npcController.exitPoint.position);
 
         /* ---------- 애니메이션 ---------- */
 
-        npcController.animator.Play(WalkingAnim);           // 7) 걷기 애니메이션 시작
+        npcController.Animator.Play(WalkingAnim);           // 7) 걷기 애니메이션 시작
     }
 
     // 퇴장 상태는 이동만 하면 되므로 매 프레임 로직 없음
