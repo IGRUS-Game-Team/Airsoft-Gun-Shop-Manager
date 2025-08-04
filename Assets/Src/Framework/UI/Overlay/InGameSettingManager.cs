@@ -12,6 +12,10 @@ public class InGameSettingManager : MonoBehaviour
         else Destroy(gameObject);
     }
 
+    public bool GetIsSettingOpen()
+    {
+        return IsSettingOpen;
+    }
     public void SetSetting()
     {
         if (!IsSettingOpen) OpenSetting();
@@ -21,12 +25,16 @@ public class InGameSettingManager : MonoBehaviour
     {
         IsSettingOpen = true;
         IngameSettingUI.SetActive(true);
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
     }
 
     private void CloseSetting()
     {
         IsSettingOpen = false;
         IngameSettingUI.SetActive(false);
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
     }
 
 }

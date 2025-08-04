@@ -3,6 +3,10 @@
 using UnityEngine.InputSystem;
 #endif
 
+// 박정민 8/4 추가
+// update, lastupdate 구문에 모니터ui진입시, esc setting창 진입 시 못움직이게
+// return 조건 설정
+
 namespace StarterAssets
 {
 	[RequireComponent(typeof(CharacterController))]
@@ -64,7 +68,7 @@ namespace StarterAssets
 		private float _jumpTimeoutDelta;
 		private float _fallTimeoutDelta;
 
-	
+
 #if ENABLE_INPUT_SYSTEM
 		private PlayerInput _playerInput;
 #endif
@@ -78,11 +82,11 @@ namespace StarterAssets
 		{
 			get
 			{
-				#if ENABLE_INPUT_SYSTEM
+#if ENABLE_INPUT_SYSTEM
 				return _playerInput.currentControlScheme == "KeyboardMouse";
-				#else
+#else
 				return false;
-				#endif
+#endif
 			}
 		}
 
@@ -112,7 +116,8 @@ namespace StarterAssets
 
 		private void Update()
 		{
-			if (MonitorUIModeManager.Instance.getInUIMode()) return; 
+			if (MonitorUIModeManager.Instance.getInUIMode()) return;
+			if (InGameSettingManager.Instance.GetIsSettingOpen()) return;
 			JumpAndGravity();
 			GroundedCheck();
 			Move();
@@ -120,7 +125,8 @@ namespace StarterAssets
 
 		private void LateUpdate()
 		{
-			if (MonitorUIModeManager.Instance.getInUIMode()) return; 
+			if (MonitorUIModeManager.Instance.getInUIMode()) return;
+			if (InGameSettingManager.Instance.GetIsSettingOpen()) return;
 			CameraRotation();
 		}
 
@@ -138,7 +144,7 @@ namespace StarterAssets
 			{
 				//Don't multiply mouse input by Time.deltaTime
 				float deltaTimeMultiplier = IsCurrentDeviceMouse ? 1.0f : Time.deltaTime;
-				
+
 				_cinemachineTargetPitch += _input.look.y * RotationSpeed * deltaTimeMultiplier;
 				_rotationVelocity = _input.look.x * RotationSpeed * deltaTimeMultiplier;
 
