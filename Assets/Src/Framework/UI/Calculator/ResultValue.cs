@@ -39,7 +39,7 @@ public class ResultValue : MonoBehaviour
     public void OnCalculatorInput(string buttonText) //호출한 버튼의 기호
     {
 
-        if (!IsValidInput(buttonText)) return;//숫자 입력 제약사항
+        if (IsValidInput(buttonText)==false) return;//숫자 입력 제약사항
         ProcessButton(buttonText);//버튼 상호작용
         UpdateDisplay(); //화면 갱신
 
@@ -49,28 +49,59 @@ public class ResultValue : MonoBehaviour
     // 숫자 입력시 제약사항
     private bool IsValidInput(string buttonText)
     {
-        if (isInitialState && buttonText == "0") return false; // 0이 처음에 오면 안됨
-        if (buttonText == "·")
+        Debug.Log("검수 시작");
+        if (isInitialState && buttonText == "0")//0 시작 불가
         {
-            if (isInitialState) return false; // 맨앞 소수점 불가
-            if (hasDot) return false; // 이미 소수점 존재한다면 불가
+            return false;
+        }
+        
+        if (buttonText == ".")//소수점 제약
+        {
+            if (isInitialState)//소수점 시작 불가
+            {
+                Debug.Log("소수점 시작");
+                return false;
+            }
+
+            if (hasDot) //이미 소수점 존재x
+            {
+                Debug.Log("이미 소수점 존재");
+                return false; 
+            }
+            
         }
         //문제없으면
         return true;
     }
 
     //숫자, 소수점 버튼을 눌렀을 때
-    private void ProcessButton(string buttonText)
+    //숫자, 소수점 버튼을 눌렀을 때
+private void ProcessButton(string buttonText)
+{
+    Debug.Log("버튼 클릭 시");
+     
+    if (buttonText == "·")//소수점 표시를 .으로 변환
     {
-        if (isInitialState) //초기 상태 -> 변경 상태
-        {
-            currentValue = buttonText;
-            isInitialState = false;
-        }
-        else { currentValue += buttonText; } //string + string = string?
-
-        if (buttonText == "·") hasDot = true; //소수점 입력시 bool 수정
+        buttonText = ".";
     }
+     
+    if (isInitialState) //초기 상태 -> 변경 상태
+    {
+        currentValue = buttonText;
+        isInitialState = false;
+    }
+    else
+    {
+        currentValue += buttonText;
+    }
+    
+    // 소수점이 추가된 경우에만 hasDot을 true로 설정
+    if (buttonText == ".")
+    {
+        hasDot = true;
+        Debug.Log(". 입력 및 hasDot true");
+    }
+}
 
 
     //result화면에 업데이트
