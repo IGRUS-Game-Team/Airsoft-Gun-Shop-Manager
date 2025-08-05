@@ -15,26 +15,18 @@ public class PaymentInteractionBehaviour : MonoBehaviour, IInteractable
     {
         // 1)  카드/현금을 손에 든 NPC 찾기
         NpcController npc = GetComponentInParent<NpcController>();
-        Debug.Log($"npc = {npc}");
-        if (npc == null)
-        {
-            Debug.LogWarning("PaymentInteractionBehaviour: 부모 체인에 NpcController가 없습니다!");
-            return;
-        }
 
         // 2) 이동 잠그기 + 회전 고정
         NavMeshAgent agent = npc.Agent;          // NpcController에 public 프로퍼티가 있다고 가정
-        Debug.Log($"agent = {agent}");
-        agent.isStopped      = true;
+        agent.isStopped = true;
         agent.updateRotation = false;
 
         // 3) Standing 애니메이션 재생
         Animator anim = npc.Animator;
-        Debug.Log($"anim = {anim}");
         anim.Play(standingStateName);
-
-        // 4) 로그(선택) + 이후 로직(타임아웃·상태머신 전환 등) 추가 가능
-        Debug.Log($"[{npc.name}] 결제 대기(Standing) 상태 진입");
+        
+        // 4) “결제 시도”만 기록해 두고 실제 결제는 계산 로직에서 호출
+        CounterManager.I.MarkPendingPayment(npc);
         
     }
 }

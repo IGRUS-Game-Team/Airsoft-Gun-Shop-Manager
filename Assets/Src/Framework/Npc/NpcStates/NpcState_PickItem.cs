@@ -52,25 +52,22 @@ public class NpcState_PickItem : IState
     {
         // 아직 물건을 집지 못했으면 대기
         if (!npcController.hasItemInHand)
-        {
             return;
-        }
 
-        // 줄 관리 매니저가 없으면 다시 찾기
+        // ① 혹시 아이템이 아직 켜져 있으면 여기서도 한 번 더 숨김
+        if (npcController.heldItem != null &&
+            npcController.heldItem.activeSelf)
+            npcController.heldItem.SetActive(false);
+
         if (queueManager == null)
-        {
             queueManager = Object.FindFirstObjectByType<QueueManager>();
-        }
 
-        // 매니저가 있으면 줄서기 상태로, 없으면 퇴장 상태로 전환
         if (queueManager != null)
-        {
-            npcController.stateMachine.SetState(new NpcState_ToQueue(npcController, queueManager));
-        }
+            npcController.stateMachine.SetState(
+                new NpcState_ToQueue(npcController, queueManager));
         else
-        {
-            npcController.stateMachine.SetState(new NpcState_Leave(npcController));
-        }
+            npcController.stateMachine.SetState(
+                new NpcState_Leave(npcController));
     }
 
     // 상태 종료 시 호출: 별도 정리할 작업 없음
