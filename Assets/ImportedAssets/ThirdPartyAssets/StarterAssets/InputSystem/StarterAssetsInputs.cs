@@ -16,10 +16,7 @@ namespace StarterAssets
 		public Vector2 look;
 		public bool jump;
 		public bool sprint;
-
-		//public bool drop;
-		//public bool set;
-		//public bool hold;
+		public bool dayEnd; // enter 액션
 
 		[Header("Movement Settings")]
 		public bool analogMovement;
@@ -56,6 +53,10 @@ namespace StarterAssets
 			SprintInput(value.isPressed);
 		}
 
+		public void OnDayEnd(InputValue value)
+		{
+			DayEndInput(value.isPressed);
+		}
 
 		// public void OnHold(InputValue value)
 		// {
@@ -104,7 +105,10 @@ namespace StarterAssets
 		// {
 		// 	drop = newDropState;
 		// }
-
+		public void DayEndInput(bool newDayEndState)
+		{
+			dayEnd = newDayEndState;
+		}
 
 
 		private void OnApplicationFocus(bool hasFocus)
