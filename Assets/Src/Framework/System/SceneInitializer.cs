@@ -27,7 +27,7 @@ public class SceneInitializer : MonoBehaviour
     {
         // FindObjectOfType 또는 수동 참조
         //SaveManager.Instance.Init(); 
-        MonitorShopCartManager cart = FindFirstObjectByType<MonitorShopCartManager>();
+        //MonitorShopCartManager cart = FindFirstObjectByType<MonitorShopCartManager>();
         // PlayerController player = FindObjectOfType<PlayerController>();
         // RoomManager room = FindObjectOfType<RoomManager>();
 

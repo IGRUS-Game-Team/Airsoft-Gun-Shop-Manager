@@ -5,7 +5,9 @@ using UnityEngine;
 public class GameSaveData
 {
     public float playerMoney;
-    public Vector3 playerPosition;
+    public PlayerSaveData playerData;
     public List<CartSaveData> cartData = new();
     //public List<string> unlockedRooms = new(); //해금되는 방
+
+    public List<BoxSaveData> boxDataList = new();
 }
