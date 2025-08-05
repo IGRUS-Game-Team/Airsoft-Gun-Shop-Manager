@@ -18,12 +18,15 @@ public class PaymentInteractionBehaviour : MonoBehaviour, IInteractable
 
         // 2) 이동 잠그기 + 회전 고정
         NavMeshAgent agent = npc.Agent;          // NpcController에 public 프로퍼티가 있다고 가정
-        agent.isStopped      = true;
+        agent.isStopped = true;
         agent.updateRotation = false;
 
         // 3) Standing 애니메이션 재생
         Animator anim = npc.Animator;
         anim.Play(standingStateName);
+        
+        // 4) “결제 시도”만 기록해 두고 실제 결제는 계산 로직에서 호출
+        CounterManager.I.MarkPendingPayment(npc);
         
     }
 }

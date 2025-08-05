@@ -13,8 +13,15 @@ public class CounterManager : MonoBehaviour
     [SerializeField] GameObject cashPrefab;
     [SerializeField] GameObject cardPrefab;
 
+    [Header("스캐너, 봉투 위치, 스캔 효과음")]
+    [SerializeField] Transform scannerPoint;    // ★바코드 위치
+    [SerializeField] Transform bagPoint;        // ★봉투 위치
+    [SerializeField] AudioClip  beepClip;       // ★삑 효과음
+
     readonly Dictionary<NpcController, Transform> npcToSlot = new();
     readonly Dictionary<NpcController, GameObject> npcToPay = new();
+    readonly Dictionary<NpcController, int> npcBaggedCount = new();
+    readonly HashSet<NpcController> pendingPay = new();   // ★추가: 결제 대기 목록
 
     void Awake()
     {
@@ -44,7 +51,28 @@ public class CounterManager : MonoBehaviour
             worldSize.y / s.y,
             worldSize.z / s.z
         );
+
+        item.gameObject.AddComponent<CheckoutItemBehaviour>().Init(this, npc, scannerPoint, bagPoint, beepClip);
+
         return slot;
+    }
+
+    /* ─ 상품 한 개가 봉투에 완전히 들어갔을 때 호출 ─ */
+    public void OnItemBagged(NpcController npc)                         // ★추가
+    {
+        if (!npcBaggedCount.ContainsKey(npc))
+            npcBaggedCount[npc] = 0;
+        npcBaggedCount[npc]++;
+
+        // 필요하다면: 모든 상품이 담긴 후 카드/현금에 반짝 효과 주기 등
+    }
+
+    public void MarkPendingPayment(NpcController npc) => pendingPay.Add(npc);    // ★추가
+
+    /* ─ 플레이어가 카드/현금을 클릭해 결제 대기 ─ */
+    public void Pay(NpcController npc)                                  // ★추가
+    {
+        CompletePayment(npc);   // 슬롯 · 돈/카드 정리 및 줄 전진
     }
 
     /* ─ 현금/카드 생성 ─ */
