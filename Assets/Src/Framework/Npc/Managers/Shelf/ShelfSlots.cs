@@ -14,9 +14,9 @@ public class ShelfSlot : MonoBehaviour
     // --------― 기존 인터페이스 호환용 --------
     public bool IsReserved => ParentGroup != null && ParentGroup.IsReserved;
 
-    public bool TryReserve()  => ParentGroup != null && ParentGroup.TryReserve();
+    public bool TryReserve() => ParentGroup != null && ParentGroup.TryReserve();
 
-    public void Release()     => ParentGroup?.Release();
+    public void Release() => ParentGroup?.Release();
     // ---------------------------------------
 
     private void Awake()
@@ -24,5 +24,14 @@ public class ShelfSlot : MonoBehaviour
         ParentGroup = GetComponentInParent<ShelfGroup>(true);
         if (ParentGroup == null)
             Debug.LogWarning($"{name} : 부모 ShelfGroup 없음!");
+    }
+    
+    public GameObject PopItem()
+    {
+        if (transform.childCount == 0) return null;        // 빈 슬롯
+
+        Transform itemTf = transform.GetChild(0);          // 첫 번째 자식 = 진열된 상품
+        itemTf.SetParent(null);                            // 슬롯에서 떼어내고
+        return itemTf.gameObject;                          // 호출자에게 넘겨 줌
     }
 }
