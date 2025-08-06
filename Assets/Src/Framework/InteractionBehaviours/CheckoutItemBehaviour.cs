@@ -14,7 +14,7 @@ public class CheckoutItemBehaviour : MonoBehaviour, IInteractable
     Transform       scanner, bag;
     AudioClip       beep;
 
-    const float speed = 1.5f;   // 이동 속도 1.5 m/s
+    const float speed = 12f;   // 이동 속도
     bool moving, beeped;
 
     public CheckoutItemBehaviour Init(
