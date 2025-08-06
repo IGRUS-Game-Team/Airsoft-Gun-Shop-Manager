@@ -8,7 +8,7 @@ public class TimeUI : MonoBehaviour
 {   //총 플레이타임을 초로 누적시켜서 계산
     [SerializeField] TextMeshProUGUI hourAndMinute;
     [Header("현실 1초 게임 1분")]
-    [SerializeField] int totalGameMinutes = 1390; //현실 1초, 게임 1분
+    [SerializeField] public int totalGameMinutes = 1390; //현실 1초, 게임 1분
     float timer = 0f;//현실 1초를 재기 위한 타이머
     
     const int MINUTES_PER_HOUR = 60; //하루 분
