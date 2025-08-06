@@ -402,6 +402,7 @@ GameObject:
   - component: {fileID: 334458700}
   - component: {fileID: 334458699}
   - component: {fileID: 334458698}
+  - component: {fileID: 334458702}
   m_Layer: 0
   m_Name: SaveHandler
   m_TagString: Untagged
@@ -473,6 +474,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   spawner: {fileID: 392175069}
+--- !u!114 &334458702
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 334458696}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 38a6c849914bcc3408b6f90eec82518e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &356196123
 PrefabInstance:
   m_ObjectHideFlags: 0

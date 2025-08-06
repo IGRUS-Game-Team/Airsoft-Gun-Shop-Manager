@@ -2,7 +2,13 @@ using UnityEngine;
 
 public class GameTimeSaveHandler : MonoBehaviour, ISaveable
 {
-    TimeUI timeUI = FindFirstObjectByType<TimeUI>();
+    TimeUI timeUI;
+
+    void Awake()
+    {
+        timeUI = FindFirstObjectByType<TimeUI>(); 
+    }
+    
 
     public object CaptureData()
     {
