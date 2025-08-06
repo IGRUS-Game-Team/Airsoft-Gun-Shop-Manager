@@ -1,0 +1,23 @@
+using UnityEngine;
+
+public class GameTimeSaveHandler : MonoBehaviour, ISaveable
+{
+    TimeUI timeUI = FindFirstObjectByType<TimeUI>();
+
+    public object CaptureData()
+    {
+        return new GameTimeSaveData
+        {
+            totalGameMinutes = timeUI.totalGameMinutes
+        };
+    }
+
+    public void RestoreData(object data)
+    {
+        GameTimeSaveData loaded = data as GameTimeSaveData;
+        if (loaded == null) return;
+
+        timeUI.totalGameMinutes = loaded.totalGameMinutes;
+        timeUI.ForceUpdate(); // 시간 UI 갱신용 함수 (아래에 정의함)
+    }
+}
