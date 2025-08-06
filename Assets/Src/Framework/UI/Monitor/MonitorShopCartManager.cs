@@ -81,14 +81,17 @@ public class MonitorShopCartManager : MonoBehaviour
 
     public List<CartSaveData> GetCartData()
     {
-        var list = new List<CartSaveData>();
+        List<CartSaveData> list = new List<CartSaveData>();
 
         foreach (var kvp in cart)
         {
             var data = new CartSaveData
             {
                 itemId = kvp.Key.ItemId,
-                amount = kvp.Value
+                amount = kvp.Value,
+                unitPrice = kvp.Key.baseCost,
+                itemName = kvp.Key.displayName,
+                category = kvp.Key.category
             };
 
             list.Add(data);

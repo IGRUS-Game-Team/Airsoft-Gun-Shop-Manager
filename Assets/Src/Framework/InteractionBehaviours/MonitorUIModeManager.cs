@@ -34,7 +34,8 @@ public class MonitorUIModeManager : MonoBehaviour
         // 카메라 전환
         previousCam.gameObject.SetActive(false);
         monitorCam.gameObject.SetActive(true);
-
+        CharacterController characterController = player.GetComponent<CharacterController>();
+        characterController.enabled = false;
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
         inUIMode = true;
@@ -54,6 +55,8 @@ public class MonitorUIModeManager : MonoBehaviour
 
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
+        CharacterController characterController = player.GetComponent<CharacterController>();
+        characterController.enabled = true;
         inUIMode = false;
     }
 }

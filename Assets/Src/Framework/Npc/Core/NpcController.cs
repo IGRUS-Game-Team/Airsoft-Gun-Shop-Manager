@@ -21,8 +21,9 @@ public class NpcController : MonoBehaviour
     public bool DoorProcessed { get; set; } = false;
 
     /* --- 내부 플래그 --- */
+    public GameObject  heldItem      { get; set; } = null;
     public bool hasItemInHand { get; set; } = false;  // 손에 물건 소지 여부
-    public bool inStore       { get; set; } = false;          // 매장 내부 여부
+    public bool inStore { get; set; } = false;          // 매장 내부 여부
     public bool isLeaving     { get; set; } = false;          // 퇴장 중 여부
 
     /* ---------- 결제 완료 플래그 ---------- */
@@ -116,16 +117,17 @@ public class NpcController : MonoBehaviour
         targetShelfGroup = null;
         stateMachine.SetState(new NpcState_Leave(this));
     }
-
-    // 물건 집기 애니메이션 완료 시 호출
-    public void OnPickAnimationFinished()
-    {
-        hasItemInHand = true;
-    }
-
+    
     // 손에 현금 또는 카드를 생성하고 소지 상태로 전환
     public void ShowMoneyOrCard()
     {
+        // 손에 잡은 상품이 아직 비활성 상태로 있으면 완전히 제거
+        if (heldItem != null)
+        {
+            Destroy(heldItem);
+            heldItem = null;
+        }
+
         if (spawnedObject != null)
         {
             return;  // 이미 소지 중이면 중복 생성 방지
