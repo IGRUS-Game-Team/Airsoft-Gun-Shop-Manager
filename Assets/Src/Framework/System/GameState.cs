@@ -37,13 +37,13 @@ public class GameState : MonoBehaviour
     {
         money = value;
     }
-    public void AddMoney(int amount)
+    public void AddMoney(float amount)
     {
         money += amount;
         //UpdateMoneyUI();
     }
 
-    public bool SpendMoney(int amount)
+    public bool SpendMoney(float amount)
     {
         if (money >= amount)
         {
