@@ -10,11 +10,11 @@ public class TimeUI : MonoBehaviour
     [Header("현실 1초 게임 1분")]
     [SerializeField] public int totalGameMinutes = 1390; //현실 1초, 게임 1분
     float timer = 0f;//현실 1초를 재기 위한 타이머
-    
+
     const int MINUTES_PER_HOUR = 60; //하루 분
     const int HOURS_PER_DAY = 24; //하루 시간
-    
-    
+
+
     [Header("다음날로 넘어갈 때 사용되는 스크립트")]
     public UnityEvent OnDayChanged; // Inspector에서 설정 가능
 
@@ -26,7 +26,7 @@ public class TimeUI : MonoBehaviour
     void Update()
     {
         timer += Time.deltaTime;//0.016초
-        
+
         if (timer >= 1f)
         {
             totalGameMinutes++;
@@ -49,5 +49,14 @@ public class TimeUI : MonoBehaviour
 
         // {인덱스:디폴트 숫자}
         hourAndMinute.text = string.Format("{0:00}:{1:00}", hours, minutes);
+    }
+
+    public void ForceUpdate()
+    {
+        UpdateTimeDisplay();
+    }
+    public float GetTotalPlayTimeInRealSeconds()
+    {
+        return totalGameMinutes * 1f; // 현실 1초 = 게임 1분일 경우
     }
 }
