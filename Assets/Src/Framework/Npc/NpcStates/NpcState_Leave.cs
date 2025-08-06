@@ -29,7 +29,7 @@ public class NpcState_Leave : IState
     {
         if (reservedSlot != null)                           // 1) 슬롯이 있으면
         {
-            reservedSlot.Release();                         //    예약 해제
+            reservedSlot.ParentGroup?.Release();            //    예약 해제
         }
 
         npcController.isLeaving = true;                     // 2) NPC를 '퇴장 중'으로 표시
