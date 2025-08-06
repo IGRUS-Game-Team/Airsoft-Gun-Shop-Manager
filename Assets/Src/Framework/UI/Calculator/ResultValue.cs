@@ -6,12 +6,14 @@ using UnityEngine;
 /// <summary>
 /// 장지원 8.3 계산기 결괏값 화면
 /// 버튼이 입력, 삭제하는 이벤트를 주면 그에 맞춰 text를 변경해준다.
+/// 추후 책임 분산을 위한 리펙토링 예정
 /// </summary>
 
 public class ResultValue : MonoBehaviour
 {
+    public static event Action<string> OnInputValueChanged;
     private string currentValue = "0"; // 현재 result값을 string으로 관리
-    private TextMeshProUGUI resultText; // 계산기 결과값 text
+    TextMeshProUGUI resultText; // 계산기 결과값 text
     private bool hasDot = false; // 소수점 존재 여부
     private bool isInitialState = true; // 현재 아무것도 입력하지 않은 상태인지 여부
 
@@ -79,12 +81,12 @@ public class ResultValue : MonoBehaviour
 private void ProcessButton(string buttonText)
 {
     Debug.Log("버튼 클릭 시");
-     
+    
     if (buttonText == "·")//소수점 표시를 .으로 변환
     {
         buttonText = ".";
     }
-     
+    
     if (isInitialState) //초기 상태 -> 변경 상태
     {
         currentValue = buttonText;
@@ -105,7 +107,12 @@ private void ProcessButton(string buttonText)
 
 
     //result화면에 업데이트
-    private void UpdateDisplay() => resultText.text = currentValue;
+    private void UpdateDisplay()
+    {
+        resultText.text = currentValue;
+        Debug.Log($"화면 업데이트 및 이벤트 발생: '{currentValue}'");
+        OnInputValueChanged?.Invoke(currentValue);
+    } 
 
 
     // Clear 버튼이 눌렸을 때 호출되는 이벤트
@@ -120,4 +127,3 @@ private void ProcessButton(string buttonText)
 
     
 }
-
