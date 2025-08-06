@@ -3,7 +3,7 @@ using UnityEngine;
 [CreateAssetMenu(menuName="Shop/Item")]
 public class ItemData : ScriptableObject
 {
-    public string ItemId; //아이템 고유 번호
+    public int ItemId; //아이템 고유 번호
     public string displayName; //표시 이름
     public ItemCategory category; //카테고리 (무기, 방어구, 소모품 등등)
     public float baseCost; //원가(재고관리모니터에서 뜨는 가격)

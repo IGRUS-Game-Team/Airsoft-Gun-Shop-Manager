@@ -23,7 +23,7 @@ public class BoxSpawner : MonoBehaviour
     /// </summary>
     /// <param name="prefabName">Resources/Prefabs/ 안의 프리팹 이름</param>
     /// <param name="count">몇 개 생성할지</param>
-    public void BoxDrop(string itemId, int amount, ItemCategory category, string itemName)
+    public void BoxDrop(int itemId, int amount, ItemCategory category, string itemName)
     {
         for (int i = 0; i < amount; i++)
         {
@@ -37,5 +37,18 @@ public class BoxSpawner : MonoBehaviour
             if (container != null)
                 container.Setup(itemId, category, itemName);
         }
+    }
+
+    public void RestoreBox(BoxSaveData data)
+    {
+        Vector3 offset = new Vector3(Random.Range(-spawnRange, spawnRange), 0, Random.Range(-spawnRange, spawnRange));
+        Vector3 spawnPos = data.position + offset;
+
+        GameObject box = Instantiate(deliveryBoxPrefab, spawnPos, data.rotation, parentsBox);
+        box.name = $"Box_{data.itemId}_{data.itemName}_{data.category}";
+
+        var container = box.GetComponent<BoxItemContainer>();
+        if (container != null)
+            container.Setup(data.itemId, data.category, data.itemName);
     }
 }
