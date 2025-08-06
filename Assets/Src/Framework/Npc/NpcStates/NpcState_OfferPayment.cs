@@ -128,17 +128,7 @@ public class NpcState_OfferPayment : IState
     // 플레이어가 아이템을 클릭해서 결제를 완료했을 때 호출
     private void OnPaid()
     {
-        // (1) 줄 관리 매니저에 맨 앞 결제 완료 알림
-        queueManager.DequeueFront();
-
-        // (1-a) 손 프리팹 제거 & 플래그 해제
-        npcController.HideMoneyOrCard();
-
-        // (1-b) PaymentDone 플래그 세팅
-        npcController.OnPaymentCompleted();
-
-
-        // (2) NPC를 퇴장 상태로 전환
+        CounterManager.I.CompletePayment(npcController);   // ★변경: 매니저에게 위임
         npcController.stateMachine.SetState(new NpcState_Leave(npcController));
     }
 }
