@@ -14,7 +14,8 @@ public class GameTimeSaveHandler : MonoBehaviour, ISaveable
     {
         return new GameTimeSaveData
         {
-            totalGameMinutes = timeUI.totalGameMinutes
+            totalGameMinutes = timeUI.totalGameMinutes,
+            accumulatedRealSeconds = timeUI.GetTotalPlayTimeInRealSeconds()
         };
     }
 

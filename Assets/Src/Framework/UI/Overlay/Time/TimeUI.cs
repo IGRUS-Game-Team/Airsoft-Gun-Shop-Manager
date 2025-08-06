@@ -50,9 +50,13 @@ public class TimeUI : MonoBehaviour
         // {인덱스:디폴트 숫자}
         hourAndMinute.text = string.Format("{0:00}:{1:00}", hours, minutes);
     }
-    
+
     public void ForceUpdate()
     {
         UpdateTimeDisplay();
+    }
+    public float GetTotalPlayTimeInRealSeconds()
+    {
+        return totalGameMinutes * 1f; // 현실 1초 = 게임 1분일 경우
     }
 }
