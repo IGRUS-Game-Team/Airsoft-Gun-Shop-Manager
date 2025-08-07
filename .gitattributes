@@ -20,3 +20,11 @@
 
 # Meta files - LFS에서 제외하고 텍스트로 처리 (충돌 해결 용이)
 *.meta -filter=lfs diff merge=unityyamlmerge text eol=lf
+
+# Unity YAML 병합 설정 (선택사항이지만 추천)
+*.unity merge=unityyamlmerge text eol=lf
+*.prefab merge=unityyamlmerge text eol=lf
+*.mat merge=unityyamlmerge text eol=lf
+*.asset merge=unityyamlmerge text eol=lf
+*.controller merge=unityyamlmerge text eol=lf
+*.anim merge=unityyamlmerge text eol=lf
