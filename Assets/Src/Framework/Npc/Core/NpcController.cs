@@ -146,6 +146,8 @@ public class NpcController : MonoBehaviour
         // 손 소켓에 인스턴스화
         spawnedObject = Instantiate(prefab, handSocket);
         spawnedObject.transform.localPosition = Vector3.zero;
+        
+        hasItemInHand = true;
     }
 
     // 손에 든 오브젝트 제거 및 소지 상태 해제
