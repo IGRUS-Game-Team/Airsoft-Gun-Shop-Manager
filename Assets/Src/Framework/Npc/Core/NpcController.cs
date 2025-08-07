@@ -15,16 +15,16 @@ public class NpcController : MonoBehaviour
     public Transform targetShelfSlot { get; set; }   // 접근할 선반 슬롯
     public ShelfGroup targetShelfGroup { get; private set; } // 접근할 세로 칸
     public Transform exitPoint { get; set; }   // 퇴장 지점
-    public DoorTrigger door          { get; private set; }   // 입구 트리거
-    public Transform QueueTarget     { get; private set; }   // 줄서기 목표 노드
-    public Transform LookTarget      { get; private set; }   // 바라볼 대상
+    public DoorTrigger door { get; private set; }   // 입구 트리거
+    public Transform QueueTarget { get; private set; }   // 줄서기 목표 노드
+    public Transform LookTarget { get; private set; }   // 바라볼 대상
     public bool DoorProcessed { get; set; } = false;
 
     /* --- 내부 플래그 --- */
-    public GameObject  heldItem      { get; set; } = null;
+    public GameObject heldItem { get; set; } = null;
     public bool hasItemInHand { get; set; } = false;  // 손에 물건 소지 여부
     public bool inStore { get; set; } = false;          // 매장 내부 여부
-    public bool isLeaving     { get; set; } = false;          // 퇴장 중 여부
+    public bool isLeaving { get; set; } = false;          // 퇴장 중 여부
 
     /* ---------- 결제 완료 플래그 ---------- */
     public bool PaymentDone { get; private set; }
@@ -36,12 +36,19 @@ public class NpcController : MonoBehaviour
 
     /* --- 내부 관리용 --- */
     private GameObject spawnedObject;   // 손에 쥔 오브젝트 레퍼런스
-    private Transform  doorPoint;       // 이동 목적지(출입문)
-    
-    public GameObject CashPrefab    => cashPrefab;    // 현금 프리팹
-    public GameObject CardPrefab    => cardPrefab;    // 카드 프리팹
-    public Transform HandTransform  => handSocket;    // 손 소켓 Transform
-    public void OnPaymentCompleted() => PaymentDone = true;
+    private Transform doorPoint;       // 이동 목적지(출입문)
+
+    public GameObject CashPrefab => cashPrefab;    // 현금 프리팹
+    public GameObject CardPrefab => cardPrefab;    // 카드 프리팹
+    public Transform HandTransform => handSocket;    // 손 소켓 Transform
+    // public void OnPaymentCompleted() => PaymentDone = true;
+
+    public void OnPaymentCompleted() // 추가 : 구매 완료 -> 떠나기 : 상태 전환 
+    {
+        Debug.Log("결제 완료 -> 떠나기 전환");
+        PaymentDone = true;
+        stateMachine.SetState(new NpcState_Leave(this));
+    }
 
     // Awake: 컴포넌트와 상태 머신 초기화
     private void Awake()
@@ -79,8 +86,8 @@ public class NpcController : MonoBehaviour
     // 줄서기 목표 노드를 설정하고 이동 재개
     public void SetQueueTarget(Transform node)
     {
-        QueueTarget         = node;
-        Agent.isStopped     = false;
+        QueueTarget = node;
+        Agent.isStopped = false;
         Agent.SetDestination(node.position);
     }
 
@@ -110,7 +117,7 @@ public class NpcController : MonoBehaviour
         DoorProcessed = true;
 
         this.exitPoint = exitPoint;
-        isLeaving      = true;
+        isLeaving = true;
 
         // 세로 칸 예약 해제
         targetShelfGroup?.Release();
@@ -149,8 +156,8 @@ public class NpcController : MonoBehaviour
         if (spawnedObject != null)
         {
             Destroy(spawnedObject);
-            spawnedObject   = null;
-            hasItemInHand   = false;
+            spawnedObject = null;
+            hasItemInHand = false;
         }
     }
 
@@ -178,4 +185,5 @@ public class NpcController : MonoBehaviour
             target,
             speedDegPerSec * Time.deltaTime);
     }
+
 }

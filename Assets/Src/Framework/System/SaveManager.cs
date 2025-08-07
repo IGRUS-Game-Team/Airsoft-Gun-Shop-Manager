@@ -11,7 +11,8 @@ public class SaveManager : MonoBehaviour
     private GameState gameState;
     private FirstPersonController playerController;
     private MonitorShopCartManager cartManager;
-
+    private TimeUI timeUI;
+    
     private bool isInitialized = false;
     private List<ISaveable> saveables = new();
 
@@ -64,6 +65,7 @@ public class SaveManager : MonoBehaviour
         gameState = FindFirstObjectByType<GameState>();
         playerController = FindFirstObjectByType<FirstPersonController>();
         cartManager = FindFirstObjectByType<MonitorShopCartManager>();
+        timeUI = FindFirstObjectByType<TimeUI>();
 
         saveables = FindObjectsOfType<MonoBehaviour>().OfType<ISaveable>().ToList();
 
