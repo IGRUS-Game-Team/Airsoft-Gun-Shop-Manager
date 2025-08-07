@@ -86,15 +86,20 @@ public class CounterManager : MonoBehaviour
     /* ─ 현금/카드 생성 ─ */
     public void ShowPaymentObject(NpcController npc, Transform handSocket)
     {
-        if (npcToPay.ContainsKey(npc)) return;           // 중복 방지
+        if (npcToPay.ContainsKey(npc)) return;  // 중복 생성 방지
 
         GameObject prefab = Random.value < 0.5f ? cashPrefab : cardPrefab;
-        GameObject payObj = Instantiate(prefab, handSocket);
+
+        // handSocket의 위치와 회전 그대로 복사
+        GameObject payObj = Instantiate(prefab, handSocket.position, handSocket.rotation, handSocket);
+
+        // 로컬 위치 및 회전 초기화
         payObj.transform.localPosition = Vector3.zero;
+        payObj.transform.localRotation = Quaternion.identity;
 
         npcToPay[npc] = payObj;
     }
-
+    
     /* ─ 슬롯 반납 전용 ─ */
     public void ReturnSlot(Transform slot) => pool.Enqueue(slot);
 
