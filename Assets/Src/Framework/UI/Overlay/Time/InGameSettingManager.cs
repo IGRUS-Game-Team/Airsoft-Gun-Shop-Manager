@@ -5,7 +5,8 @@ public class InGameSettingManager : MonoBehaviour
     [SerializeField] GameObject IngameSettingUI;
     public static InGameSettingManager Instance;
 
-    private bool IsSettingOpen = false;
+    private bool IsSettingOpen = false; //세팅이 활성화 상태일때 , 디폴트 비활성화
+    
     private void Awake()
     {
         if (Instance == null) Instance = this;
@@ -16,10 +17,10 @@ public class InGameSettingManager : MonoBehaviour
     {
         return IsSettingOpen;
     }
-    public void SetSetting()
+    public void SetSetting() 
     {
         if (!IsSettingOpen) OpenSetting();
-        else CloseSetting();
+        else CloseSetting(); //커서x
     }
     private void OpenSetting()
     {
@@ -34,7 +35,7 @@ public class InGameSettingManager : MonoBehaviour
         IsSettingOpen = false;
         IngameSettingUI.SetActive(false);
         Cursor.lockState = CursorLockMode.Locked;
-        Cursor.visible = false;
+        Cursor.visible = false; //커서 안보임
     }
 
 }
