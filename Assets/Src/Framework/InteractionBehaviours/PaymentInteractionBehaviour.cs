@@ -5,7 +5,7 @@ using UnityEngine.AI;
 /// 플레이어가 카드·현금을 클릭했을 때 호출되는 스크립트.
 /// 부모 체인에서 NpcController를 찾아 ‘결제 대기’ 동작을 실행합니다.
 /// </summary>
-[RequireComponent(typeof(Collider))]        // Raycast에 맞도록 Collider 필수
+//[RequireComponent(typeof(Collider))]        // Raycast에 맞도록 Collider 필수
 public class PaymentInteractionBehaviour : MonoBehaviour, IInteractable
 {
     [Tooltip("Standing 애니메이터 상태 이름")]
