@@ -9,7 +9,7 @@ public class CashRegisterUI : MonoBehaviour
     [SerializeField] private TextMeshProUGUI givingText;
 
     private float currentGiven = 0f;
-    private float targetChange = 0f;
+    [SerializeField] private float targetChange = 0f;
 
     public void SetValues(float received, float total)
     {
@@ -25,8 +25,12 @@ public class CashRegisterUI : MonoBehaviour
 
     public void AddGivenAmount(float amount)
     {
+        if (currentGiven + amount > targetChange)
+        {
+            // TODO : 경고문 뜨게 하기
+            return;
+        }
         currentGiven += amount;
-        currentGiven = Mathf.Min(currentGiven, targetChange); // 과도한 지급 방지
         givingText.text = $"${currentGiven:0.00}";
     }
 
