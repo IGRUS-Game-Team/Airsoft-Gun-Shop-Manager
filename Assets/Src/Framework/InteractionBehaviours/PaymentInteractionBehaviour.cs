@@ -15,6 +15,7 @@ public class PaymentInteractionBehaviour : MonoBehaviour, IInteractable
     {
         // 1)  카드/현금을 손에 든 NPC 찾기
         NpcController npc = GetComponentInParent<NpcController>();
+        if (npc == null) return; //----추가 : 장지원
 
         // 2) 이동 잠그기 + 회전 고정
         NavMeshAgent agent = npc.Agent;          // NpcController에 public 프로퍼티가 있다고 가정
@@ -24,9 +25,10 @@ public class PaymentInteractionBehaviour : MonoBehaviour, IInteractable
         // 3) Standing 애니메이션 재생
         Animator anim = npc.Animator;
         anim.Play(standingStateName);
-        
-        // 4) “결제 시도”만 기록해 두고 실제 결제는 계산 로직에서 호출
-        CounterManager.I.MarkPendingPayment(npc);
+
+        // 4) “결제 시도”만 기록해 두고 실제 결제는 계산 로직에서 호출 ------변경: 계산로직 : 장지원
+        //CounterManager.I.MarkPendingPayment(npc);
+        CounterManager.I.StartCalculatorPayment(npc);
         
     }
 }

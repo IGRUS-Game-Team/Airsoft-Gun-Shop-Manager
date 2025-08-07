@@ -12,21 +12,21 @@ public class CalculatorOk : MonoBehaviour
     Button OkButton;
     public static event Action FailedCompare; //에러 메세지 이벤트 : 비교 실패
     public static event Action SuccessCompare; //다음 장면 이벤트 : 비교 성공
-    
+
     private string totalPrice = "5";
     private string inputPrice = "0";
 
     //읽기 전용 프로퍼티
     public string TotalPrice => totalPrice;// 계산값
     public string InputPrice => inputPrice;// 입력값
-    
-//set 함수 
+
+    //set 함수 
     public void SetTotalPrice(string newPrice)
     {
         totalPrice = newPrice;
     }
 
-//set 함수 
+    //set 함수 
     public void SetInputPrice(string newPrice)
     {
         Debug.Log("값 받기"); //왜 나오는거냐고
@@ -71,5 +71,7 @@ public class CalculatorOk : MonoBehaviour
             //왜 이벤트가 실행이 안되는거지?
         }
     }
-    
+
+
+
 }
