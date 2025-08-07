@@ -16,22 +16,31 @@ public class AudioHandler : MonoBehaviour
             InteractionController.Instance.OnDrop += PlayDropSound;
             InteractionController.Instance.OnThrowBox += PlayThrowSound;
         }
-        else Debug.Log("이벤트가 존재하징낳음");
+        else Debug.Log("이벤트가 존재하지 않습니다");
     }
 
     void PlayPickUpSound()
     {
-        AudioManager.Instance.PlayBoxPickUpSound();
+        if (PlayerObjectHoldController.Instance.heldObject != null)
+        {
+           AudioManager.Instance.PlayBoxPickUpSound();
+        }
     }
 
     void PlayDropSound()
     {
-        AudioManager.Instance.PlayBoxDropSound();
+        if (PlayerObjectHoldController.Instance.heldObject != null)
+        {
+          AudioManager.Instance.PlayBoxDropSound();
+        }
     }
 
     void PlayThrowSound()
     {
-        AudioManager.Instance.PlayBoxThrowSound();
+        if (PlayerObjectHoldController.Instance.heldObject != null)
+        {
+            AudioManager.Instance.PlayBoxThrowSound();
+        }
     }
 
     void OnDestroy()
