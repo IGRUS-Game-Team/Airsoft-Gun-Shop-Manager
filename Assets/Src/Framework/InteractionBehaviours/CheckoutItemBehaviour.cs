@@ -13,6 +13,7 @@ public class CheckoutItemBehaviour : MonoBehaviour, IInteractable
     NpcController   owner;
     Transform       scanner, bag;
     AudioClip       beep;
+    float           price;         // ★추가
 
     const float speed = 12f;   // 이동 속도
     bool moving, beeped;
@@ -28,6 +29,7 @@ public class CheckoutItemBehaviour : MonoBehaviour, IInteractable
         bag = bagPos;
         beep = clip;
         isInitialized = true;
+        price = GetComponent<ProductPrice>()?.Price ?? 0f;
         return this;
     }
 
@@ -63,6 +65,8 @@ public class CheckoutItemBehaviour : MonoBehaviour, IInteractable
             {
                 src.PlayOneShot(beep);
                 beeped = true;
+
+                // CashRegister.Instance.AddPrice(price);   // ← 계산기 담당이 만든 메서드명으로 교체
             }
 
             // ② 봉투에 닿으면 파괴 + “상품 담김” 알림
