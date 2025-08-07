@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 
 // 카운터 앞에 줄을 세우고 이동·시선을 관리한다.
@@ -45,23 +46,23 @@ public class QueueManager : MonoBehaviour
 
 
         // spots 배열이 비어 있으면, 자식 오브젝트 중 이름에 "spot"이 들어간 Transform을 자동 수집
-        if (spots == null || spots.Length == 0)
-        {
-            List<Transform> foundSpots = new List<Transform>();
+        // if (spots == null || spots.Length == 0)
+        // {
+        //     List<Transform> foundSpots = new List<Transform>();
 
-            foreach (Transform child in transform)                       // QueueManager의 자식 순회
-            {
-                if (child.name.Contains("spot"))                         // 이름에 "spot"이 있으면
-                {
-                    foundSpots.Add(child);                               // 후보 목록에 추가
-                }
-            }
+        //     foreach (Transform child in transform)                       // QueueManager의 자식 순회
+        //     {
+        //         if (child.name.Contains("spot"))                         // 이름에 "spot"이 있으면
+        //         {
+        //             foundSpots.Add(child);                               // 후보 목록에 추가
+        //         }
+        //     }
 
-            // 이름 순으로 정렬해 줄 순서를 유지
-            foundSpots.Sort((Transform a, Transform b) => string.CompareOrdinal(a.name, b.name));
+        //     // 이름 순으로 정렬해 줄 순서를 유지
+        //     foundSpots.Sort((Transform a, Transform b) => string.CompareOrdinal(a.name, b.name));
 
-            spots = foundSpots.ToArray();                                // 배열로 변환
-        }
+        //     spots = foundSpots.ToArray();                                // 배열로 변환
+        // }
     }
 
     /* ---------- 내부 유틸 ---------- */
@@ -70,11 +71,11 @@ public class QueueManager : MonoBehaviour
     private void RefreshLookTargets()
     {
         // 첫 번째 NPC는 계산대를, 그 뒤는 앞사람을 바라보도록 설정
-        for (int i = 0; i < waitingLine.Count; i++)
-        {
-            Transform lookTarget = (i == 0) ? counter : waitingLine[i - 1].transform;
-            waitingLine[i].SetLookTarget(lookTarget);
-        }
+        // for (int i = 0; i < waitingLine.Count; i++)
+        // {
+        //     Transform lookTarget = (i == 0) ? counter : waitingLine[i - 1].transform;
+        //     waitingLine[i].SetLookTarget(lookTarget);
+        // }
     }
 
     /* ---------- 외부 호출 메서드 ---------- */
@@ -94,11 +95,13 @@ public class QueueManager : MonoBehaviour
     // NPC가 줄 서기를 시도
     public bool TryEnqueue(NpcController npcController, out Transform node)
     {
+        Debug.Log("줄서기 시도");
         // 줄이 가득 찼는지 확인
         int capacity = spots.Length + 1;         //  +1 = CounterNode
-
+        Debug.Log("capacity = " + capacity);
         if (waitingLine.Count >= capacity)
         {
+            Debug.Log("자리없");
             node = null;                                 // 자리 없음
             return false;
         }
@@ -108,7 +111,10 @@ public class QueueManager : MonoBehaviour
 
         // 방금 추가된 NPC가 서야 할 노드
         if (waitingLine.Count == 1)
-            node = counterNode;                  // ① 첫 손님은 CounterNode
+        {
+            node = counterNode;
+            Debug.Log("줄 서야 하는 곳" + counterNode);
+        }           // ① 첫 손님은 CounterNode
         else
             node = spots[waitingLine.Count - 2]; // ② 두 번째부터 spots[0]…
 

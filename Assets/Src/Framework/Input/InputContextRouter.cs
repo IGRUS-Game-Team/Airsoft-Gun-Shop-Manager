@@ -34,21 +34,49 @@ public class InputContextRouter : MonoBehaviour
         InteractionController.Instance.OnClick += () => clickRequested = true;
     }
 
+    // private void Update()
+    // {
+    //     if (!clickRequested) return;
+    //     clickRequested = false;
+
+    //     if (UIUtility.IsPointerOverUI()) return;
+
+    //     GameObject hit = RaycastDetector.Instance.HitObject;
+    //     if (hit == null) return;
+
+    //     var interactable = hit.GetComponentInParent<IInteractable>();
+    //     if (interactable != null)
+    //     {
+    //         interactable.Interact();
+    //     }
+
+    // }
     private void Update()
+{
+    if (!clickRequested) return;
+    clickRequested = false;
+
+    if (UIUtility.IsPointerOverUI()) return;
+
+    GameObject hit = RaycastDetector.Instance.HitObject;
+    if (hit == null) return;
+
+    // 🔽 이 부분 추가
+    Debug.Log("🎯 Raycast hit: " + hit.name);
+
+    var interactable = hit.GetComponentInParent<IInteractable>();
+    if (interactable != null)
     {
-        if (!clickRequested) return;
-        clickRequested = false;
-
-        if (UIUtility.IsPointerOverUI()) return;
-
-        GameObject hit = RaycastDetector.Instance.HitObject;
-        if (hit == null) return;
-
-        var interactable = hit.GetComponentInParent<IInteractable>();
-        if (interactable != null)
-        {
-            interactable.Interact();
-        }
+        Debug.Log("🧠 CheckoutItemBehaviour.Interact() 호출됨 - this: " + gameObject.name);
+        Debug.Log("✅ Interactable object type: " + interactable.GetType());
+        Debug.Log("✅ Interactable object name: " + ((MonoBehaviour)interactable).gameObject.name);
+        interactable.Interact();
     }
+    else
+    {
+        Debug.LogWarning("❌ Interactable not found on: " + hit.name);
+    }
+}
+
 }
 
