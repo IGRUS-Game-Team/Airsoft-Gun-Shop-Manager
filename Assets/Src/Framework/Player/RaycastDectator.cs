@@ -1,10 +1,12 @@
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
 /// <summary>
 /// RaycastDetector.cs 박정민
 /// Player에 붙는 스크립트입니다.
 /// Player가 바라보는 방향으로 ray를 쏴서 맞는 오브젝트를 HitObject 변수에 저장하는 역할을 합니다.
+/// 
 /// </summary>
 
 public class RaycastDetector : MonoBehaviour
@@ -15,26 +17,36 @@ public class RaycastDetector : MonoBehaviour
 
     [SerializeField] float range = 5f; //ray의 길이를 정할 수 있음
     [SerializeField] LayerMask layer; // 지정한 레이어만 hit 됨. ex) box 레이어 <- 작명 바꿔야할듯
-    private void Awake() => Instance = this;
+
+    private Camera mainCamera; // 카메라 
+
+
+    private void Awake()
+    {
+        Instance = this;
+        mainCamera = Camera.main; // 시작할 때 한 번만 찾아오기 : 장지원
+        
+    }
 
     void Update()
     {
         HitObject = null;
 
-        // UI 클릭 시 3D 레이캐스트 무시
-        if (EventSystem.current != null && EventSystem.current.IsPointerOverGameObject())
+        // 카메라가 없으면 아무것도 하지 않음 (맨 위로 올려서 먼저 체크하는 것이 효율적)
+        if (mainCamera == null) return;
+
+        // UI위에 마우스가 존재한다면
+        if (EventSystem.current.IsPointerOverGameObject())
         {
             return;
         }
 
-        if (Camera.main == null) return; //카메라 없으면 update 탈출하도록 탈출조건 설정했습니다.
-
-        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+        //UI 위가 아닐 때만 3D 물리 레이캐스트를 실행합니다.
+        Ray ray = mainCamera.ScreenPointToRay(Input.mousePosition);
         if (Physics.Raycast(ray, out RaycastHit hit, range, layer))
         {
-            HitObject = hit.collider.gameObject; // ray 맞은 오브젝트를 HitObject 변수에 저장합니다.
-            // 저장된 오브젝트는 RaycastDetector Instance.HitObject로 전 클래스에서 확인 가능합니다.
-            Debug.DrawRay(ray.origin, ray.direction * range, Color.blue); //광선이 어떻게 나가는지 보여주는 디버그코드
+            HitObject = hit.collider.gameObject;
+            Debug.DrawRay(ray.origin, ray.direction * range, Color.blue);
         }
     }
 }

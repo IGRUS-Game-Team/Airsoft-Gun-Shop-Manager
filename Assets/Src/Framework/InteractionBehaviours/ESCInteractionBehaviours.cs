@@ -31,7 +31,7 @@ public class ESCInteractionBehaviours : MonoBehaviour
         {
             Debug.Log("일반 모드 → 설정창 열기 (미구현)");
             // TODO: SettingsManager.Instance.OpenSettings(); 같은 식으로 나중에 연결
-            InGameSettingManager.Instance.SetSetting();
+            InGameSettingManager.Instance.SetSetting(); 
         }
     }
 }
