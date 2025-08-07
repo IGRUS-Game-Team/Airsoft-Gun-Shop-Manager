@@ -117,7 +117,7 @@ public class NpcController : MonoBehaviour
         targetShelfGroup = null;
         stateMachine.SetState(new NpcState_Leave(this));
     }
-    
+
     // 손에 현금 또는 카드를 생성하고 소지 상태로 전환
     public void ShowMoneyOrCard()
     {
@@ -139,6 +139,8 @@ public class NpcController : MonoBehaviour
         // 손 소켓에 인스턴스화
         spawnedObject = Instantiate(prefab, handSocket);
         spawnedObject.transform.localPosition = Vector3.zero;
+        
+        hasItemInHand = true;
     }
 
     // 손에 든 오브젝트 제거 및 소지 상태 해제

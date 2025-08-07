@@ -22,12 +22,20 @@ public class CounterManager : MonoBehaviour
     readonly Dictionary<NpcController, GameObject> npcToPay = new();
     readonly Dictionary<NpcController, int> npcBaggedCount = new();
     readonly HashSet<NpcController> pendingPay = new();   // ★추가: 결제 대기 목록
+    public static CounterManager Instance { get; private set; }
 
     void Awake()
     {
         if (I != null && I != this) { Destroy(gameObject); return; }
         I = this;
         foreach (var s in counterSlots) pool.Enqueue(s);
+
+        if (Instance != null && Instance != this)
+        {
+            Destroy(this.gameObject);
+            return;
+        }
+        Instance = this;
     }
 
     /* ─ NPC가 들고 온 상품 내려놓기 + 슬롯 배정 ─ */

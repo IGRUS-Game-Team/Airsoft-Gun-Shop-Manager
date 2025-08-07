@@ -1,31 +1,29 @@
 using UnityEngine;
-#if ENABLE_INPUT_SYSTEM
+#if ENABLE_INPUT_SYSTEM && STARTER_ASSETS_PACKAGES_CHECKED
 using UnityEngine.InputSystem;
 #endif
 
-//박정민 8/4 추가
-//ui 상호작용 시 커서 잠금 해제 기능 추가
-//TODO : 커서 잠금 기능 하나의 클래스로 만들어서 그 클래스에서 모든 UI 설정 담당하도록 해야함.
 namespace StarterAssets
 {
 	public class StarterAssetsInputs : MonoBehaviour
 	{
-
 		[Header("Character Input Values")]
 		public Vector2 move;
 		public Vector2 look;
 		public bool jump;
 		public bool sprint;
-		public bool dayEnd; // enter 액션
+		public bool dayEnd;
 
 		[Header("Movement Settings")]
 		public bool analogMovement;
 
+#if !UNITY_IOS || !UNITY_ANDROID
 		[Header("Mouse Cursor Settings")]
 		public bool cursorLocked = true;
 		public bool cursorInputForLook = true;
+#endif
 
-#if ENABLE_INPUT_SYSTEM
+#if ENABLE_INPUT_SYSTEM && STARTER_ASSETS_PACKAGES_CHECKED
 		public void OnMove(InputValue value)
 		{
 			MoveInput(value.Get<Vector2>());
@@ -33,14 +31,10 @@ namespace StarterAssets
 
 		public void OnLook(InputValue value)
 		{
-			if (cursorInputForLook && (!MonitorUIModeManager.Instance.getInUIMode() || InGameSettingManager.Instance.GetIsSettingOpen()))
+			if(cursorInputForLook)
 			{
 				LookInput(value.Get<Vector2>());
 			}
-			// if(cursorInputForLook)
-			// {
-			// 	LookInput(value.Get<Vector2>());
-			// }
 		}
 
 		public void OnJump(InputValue value)
@@ -57,26 +51,15 @@ namespace StarterAssets
 		{
 			DayEndInput(value.isPressed);
 		}
-
-		// public void OnHold(InputValue value)
-		// {
-		// 	HoldInput(value.isPressed);
-		// }
-		// public void OnDrop(InputValue value)
-		// {
-		// 	DropInput(value.isPressed);
-		// }
-		// public void OnSet(InputValue value)
-		// {
-		// 	SetInput(value.isPressed);
-		// }
+#else
+	// old input sys if we do decide to have it (most likely wont)...
 #endif
 
 
 		public void MoveInput(Vector2 newMoveDirection)
 		{
 			move = newMoveDirection;
-		}
+		} 
 
 		public void LookInput(Vector2 newLookDirection)
 		{
@@ -92,28 +75,16 @@ namespace StarterAssets
 		{
 			sprint = newSprintState;
 		}
-		// public void HoldInput(bool newHoldState)
-		// {
-		// 	hold = newHoldState;
-		// }
 
-		// public void SetInput(bool newSetState)
-		// {
-		// 	set = newSetState;
-		// }
-		// public void DropInput(bool newDropState)
-		// {
-		// 	drop = newDropState;
-		// }
 		public void DayEndInput(bool newDayEndState)
 		{
 			dayEnd = newDayEndState;
 		}
 
+#if !UNITY_IOS || !UNITY_ANDROID
 
 		private void OnApplicationFocus(bool hasFocus)
 		{
-			if (MonitorUIModeManager.Instance.getInUIMode() || InGameSettingManager.Instance.GetIsSettingOpen()) return;
 			SetCursorState(cursorLocked);
 		}
 
@@ -121,6 +92,9 @@ namespace StarterAssets
 		{
 			Cursor.lockState = newState ? CursorLockMode.Locked : CursorLockMode.None;
 		}
-	}
 
+#endif
+
+	}
+	
 }

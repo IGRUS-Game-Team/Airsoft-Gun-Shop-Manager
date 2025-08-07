@@ -44,7 +44,7 @@
                 {
                     "name": "DayEnd",
                     "type": "Button",
-                    "id": "aa2f0f94-f5be-4405-8331-0ebe9a0a5cf8",
+                    "id": "616a37cf-3aa6-4f54-b4d5-5e6df3ad44ac",
                     "expectedControlType": "",
                     "processors": "",
                     "interactions": "",
@@ -167,7 +167,7 @@
                     "id": "ed66cbff-2900-4a62-8896-696503cfcd31",
                     "path": "<Pointer>/delta",
                     "interactions": "",
-                    "processors": "InvertVector2(invertX=false),ScaleVector2(x=0.05,y=0.05)",
+                    "processors": "InvertVector2(invertX=false),ScaleVector2(x=15,y=15)",
                     "groups": "KeyboardMouse",
                     "action": "Look",
                     "isComposite": false,
@@ -230,11 +230,11 @@
                 },
                 {
                     "name": "",
-                    "id": "14d38906-01ec-4d80-ad49-fc0359ba6fa4",
+                    "id": "c8a2bfed-2b99-4f6d-80c8-17e407fe218f",
                     "path": "<Keyboard>/enter",
                     "interactions": "",
                     "processors": "",
-                    "groups": "",
+                    "groups": ";KeyboardMouse",
                     "action": "DayEnd",
                     "isComposite": false,
                     "isPartOfComposite": false
