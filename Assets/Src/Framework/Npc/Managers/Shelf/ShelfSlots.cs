@@ -1,161 +1,59 @@
-// using System.Collections.Generic;
-// using UnityEngine;
-
-// /// 한 칸 슬롯 – 최대 2개의 상품을 안쪽→바깥쪽 순으로 보관
-// [DisallowMultipleComponent]
-// [RequireComponent(typeof(Collider))]
-// public class ShelfSlot : MonoBehaviour
-// {
-//     public ShelfGroup ParentGroup { get; internal set; }
-
-//     /* ---------- 설정 ---------- */
-//     public const int Capacity = 2;
-
-//     [Header("진열 포인트 (0 = 안쪽, 1 = 바깥쪽)")]
-//     [SerializeField] Transform[] points = new Transform[Capacity];
-
-//     [Header("NPC 서기 포인트 (선택)")]
-//     [Tooltip("NPC가 정확히 설 바닥 점. 없으면 슬롯 피벗/보정점 사용")]
-//     [SerializeField] private Transform standPoint;
-//     public Transform StandPoint => standPoint;
-
-//     /* ---------- 내부 ---------- */
-//     readonly List<GameObject> items = new();
-
-//     /* ---------- 프로퍼티 ---------- */
-//     public int  ItemCount => items.Count;      // ← SlotFillBehaviour가 사용
-//     public bool IsFull    => items.Count >= Capacity;
-//     public bool HasItem   => items.Count > 0;
-
-//     /* ---------- 외부에서 위치 얻기 ---------- */
-//     public Transform GetSnapPoint(int idx) => points[idx];
-
-//     /* ---------- 외부에서 아이템 추가 ---------- */
-//     public void RegisterNewItem(GameObject go) => items.Add(go);
-
-//     /* ---------- NPC 가 꺼낼 때 ---------- */
-//     public GameObject PopItem()
-//     {
-//         if (!HasItem) return null;
-//         int last = items.Count - 1;          // 바깥쪽
-//         GameObject go = items[last];
-//         items.RemoveAt(last);
-//         go.transform.SetParent(null);
-//         return go;
-//     }
-
-//     /* ---------- (기존) 예약 해제용 ---------- */
-//     public void Release() => ParentGroup?.Release();
-
-//     void Awake()
-//     {
-//         if (ParentGroup == null)
-//             ParentGroup = GetComponentInParent<ShelfGroup>(true);
-
-//         if (points.Length != Capacity)
-//             Debug.LogWarning($"{name} : Points 배열에 2개(안쪽·바깥쪽) 넣어 주세요");
-//     }
-
-// #if UNITY_EDITOR
-//     [ContextMenu("Create StandPoint child")]
-//     private void CreateStandPoint()
-//     {
-//         if (standPoint != null) return;
-//         var go = new GameObject("StandPoint");
-//         go.transform.SetParent(transform);
-//         go.transform.localPosition = Vector3.zero;        // 일단 슬롯 피벗에 배치
-//         go.transform.localRotation = Quaternion.identity; // forward는 나중에 선반을 향하도록 돌려줘
-//         standPoint = go.transform;
-//         UnityEditor.Selection.activeTransform = standPoint;
-//     }
-// #endif
-
-//     void OnDrawGizmos()
-//     {
-//         if (standPoint == null) return;
-//         Gizmos.color = Color.green;
-//         Gizmos.DrawSphere(standPoint.position, 0.08f);
-//         // forward 확인(선반을 바라보게 맞춰 두는 걸 권장)
-//         Gizmos.DrawRay(standPoint.position, standPoint.forward * 0.35f);
-//     }
-// }
-
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.AI;
 
-/// 선반의 한 슬롯
+/// 한 칸 슬롯 – 최대 2개의 상품을 안쪽→바깥쪽 순으로 보관
 [DisallowMultipleComponent]
 [RequireComponent(typeof(Collider))]
 public class ShelfSlot : MonoBehaviour
 {
     public ShelfGroup ParentGroup { get; internal set; }
 
-    /* ---------- 진열 포인트(기존용) ---------- */
+    /* ---------- 설정 ---------- */
     public const int Capacity = 2;
 
-    [Header("진열 포인트 (0=안쪽, 1=바깥쪽)")]
-    [SerializeField] private Transform[] points = new Transform[Capacity];
+    [Header("진열 포인트 (0 = 안쪽, 1 = 바깥쪽)")]
+    [SerializeField] Transform[] points = new Transform[Capacity];
 
-    /* ---------- NPC 서기 포인트 ---------- */
     [Header("NPC 서기 포인트 (선택)")]
-    [Tooltip("NPC가 서고 바라볼 기준점입니다. 비우면 슬롯 forward 기준으로 보정합니다.")]
+    [Tooltip("NPC가 정확히 설 바닥 점. 없으면 슬롯 피벗/보정점 사용")]
     [SerializeField] private Transform standPoint;
     public Transform StandPoint => standPoint;
 
     /* ---------- 내부 ---------- */
-    private readonly List<GameObject> items = new();
+    readonly List<GameObject> items = new();
 
-    /* ---------- 외부 API(기존 호환) ---------- */
-    public Transform GetSnapPoint(int idx) => points[idx];
-    public void RegisterNewItem(GameObject go) => items.Add(go);
-    public int  ItemCount => items.Count;
+    /* ---------- 프로퍼티 ---------- */
+    public int  ItemCount => items.Count;      // ← SlotFillBehaviour가 사용
     public bool IsFull    => items.Count >= Capacity;
     public bool HasItem   => items.Count > 0;
 
+    /* ---------- 외부에서 위치 얻기 ---------- */
+    public Transform GetSnapPoint(int idx) => points[idx];
+
+    /* ---------- 외부에서 아이템 추가 ---------- */
+    public void RegisterNewItem(GameObject go) => items.Add(go);
+
+    /* ---------- NPC 가 꺼낼 때 ---------- */
     public GameObject PopItem()
     {
         if (!HasItem) return null;
-        int last = items.Count - 1;
+        int last = items.Count - 1;          // 바깥쪽
         GameObject go = items[last];
         items.RemoveAt(last);
         go.transform.SetParent(null);
         return go;
     }
 
+    /* ---------- (기존) 예약 해제용 ---------- */
     public void Release() => ParentGroup?.Release();
 
-    private void Awake()
+    void Awake()
     {
         if (ParentGroup == null)
             ParentGroup = GetComponentInParent<ShelfGroup>(true);
 
         if (points.Length != Capacity)
-            Debug.LogWarning($"{name}: points 배열에 {Capacity}개를 넣어주세요.");
-    }
-
-    /// ✅ StandPoint가 있으면 그 점의 '위치+방향'을, 없으면 슬롯 forward 기준 보정점을 반환
-    public void GetStandPose(out Vector3 pos, out Vector3 forward, float offset = 0.6f)
-    {
-        if (standPoint != null)
-        {
-            pos = standPoint.position;
-            forward = standPoint.forward; forward.y = 0f; forward.Normalize();
-            return;
-        }
-
-        // StandPoint가 없으면 슬롯 forward 기준으로 앞쪽 바닥 점
-        Vector3 f = transform.forward; f.y = 0f;
-        if (f.sqrMagnitude < 1e-4f) f = Vector3.forward;
-        f.Normalize();
-
-        Vector3 cand = transform.position - f * offset;
-        if (NavMesh.SamplePosition(cand, out var hit, 0.25f, NavMesh.AllAreas))
-            pos = hit.position;
-        else
-            pos = cand;
-
-        forward = f;
+            Debug.LogWarning($"{name} : Points 배열에 2개(안쪽·바깥쪽) 넣어 주세요");
     }
 
 #if UNITY_EDITOR
@@ -165,18 +63,19 @@ public class ShelfSlot : MonoBehaviour
         if (standPoint != null) return;
         var go = new GameObject("StandPoint");
         go.transform.SetParent(transform);
-        go.transform.localPosition = Vector3.zero;
-        go.transform.localRotation = Quaternion.identity;
+        go.transform.localPosition = Vector3.zero;        // 일단 슬롯 피벗에 배치
+        go.transform.localRotation = Quaternion.identity; // forward는 나중에 선반을 향하도록 돌려줘
         standPoint = go.transform;
         UnityEditor.Selection.activeTransform = standPoint;
     }
 #endif
 
-    private void OnDrawGizmos()
+    void OnDrawGizmos()
     {
         if (standPoint == null) return;
         Gizmos.color = Color.green;
         Gizmos.DrawSphere(standPoint.position, 0.08f);
-        Gizmos.DrawRay(standPoint.position, standPoint.forward * 0.35f); // forward 확인
+        // forward 확인(선반을 바라보게 맞춰 두는 걸 권장)
+        Gizmos.DrawRay(standPoint.position, standPoint.forward * 0.35f);
     }
 }

@@ -20,9 +20,7 @@ public class NpcState_ToQueue : IState
     {
         Debug.Log("[ToQueue] 상태 진입");
 
-        // ✅ 선반에서 떠나는 시점에 예약 즉시 해제 (대기/방황/퇴장으로 가더라도 안전)
         npcController.ReleaseShelfReservation("leaving shelf to queue");
-
 
         // 1) 빈 자리 확보 시도
         Transform assignedSpot;
