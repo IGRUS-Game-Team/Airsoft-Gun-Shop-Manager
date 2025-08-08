@@ -60,7 +60,7 @@ public class CounterManager : MonoBehaviour
             worldSize.z / s.z
         );
 
-        item.gameObject.AddComponent<CheckoutItemBehaviour>().Init(this, npc, scannerPoint, bagPoint, beepClip);
+        item.gameObject.GetComponent<CheckoutItemBehaviour>().Init(this, npc, scannerPoint, bagPoint, beepClip);
 
         return slot;
     }

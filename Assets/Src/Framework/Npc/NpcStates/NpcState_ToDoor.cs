@@ -18,6 +18,7 @@ public class NpcState_ToDoor : IState
     // 상태 진입 시 호출: 이동 재개, 목적지 설정, 애니메이션 실행
     public void Enter()
     {
+        npcController.Agent.updateRotation = true; // 이동 중엔 에이전트가 회전 맡음
         npcController.Agent.isStopped = false;                          // 이동 정지 해제
         npcController.Agent.SetDestination(doorTransform.position);     // 목적지: 출입문
         npcController.Animator.Play(WalkingAnim);                       // 걷기 애니메이션 재생
