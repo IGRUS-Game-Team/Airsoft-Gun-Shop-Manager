@@ -9,7 +9,7 @@ public class NpcState_QueueWait : IState
 
     private const string StandingAnim   = "Standing";  // 대기 애니메이션 이름
     private const string WalkingAnim    = "Walking";   // 걷기 애니메이션 이름
-    private const float  ArrivalDistance = 0.1f;       // 도착 허용 오차 거리
+    private const float  ArrivalDistance = 0.01f;       // 도착 허용 오차 거리
 
     public NpcState_QueueWait(
         NpcController npcController,

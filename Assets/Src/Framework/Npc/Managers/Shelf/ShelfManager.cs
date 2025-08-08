@@ -34,8 +34,8 @@ public class ShelfManager : MonoBehaviour
         /* 1) 예약 안 된 그룹 + 아이템 있는 그룹만 모아 둔다 */
         List<ShelfGroup> candidates = new ();
         foreach (var g in groups)
-        if (!g.IsReserved && g.GetFreeSlotWithItem() != null)
-            candidates.Add(g);
+            if (!g.IsReserved && g.GetFreeSlotWithItem() != null)
+                candidates.Add(g);
 
         /* 2) 후보가 없으면 실패 */
         if (candidates.Count == 0)
@@ -51,16 +51,16 @@ public class ShelfManager : MonoBehaviour
             var g   = candidates[idx];
             candidates.RemoveAt(idx);          // 중복 방지
 
-      if (!g.TryReserve()) continue;     // 경합으로 실패 시 다른 후보
+            if (!g.TryReserve()) continue;     // 경합으로 실패 시 다른 후보
 
-        /* 4) 그룹 안에서 ‘아이템 있는 슬롯’ 목록 중 랜덤 */
-        var itemSlots = g.GetItemSlots();  // 새 메서드(아래 참고)
-        slot = itemSlots[Random.Range(0, itemSlots.Count)];
-        return true;
-    }
+            /* 4) 그룹 안에서 ‘아이템 있는 슬롯’ 목록 중 랜덤 */
+            var itemSlots = g.GetItemSlots();
+            slot = itemSlots[Random.Range(0, itemSlots.Count)];
+            return true;
+        }
 
-    slot = null;
-    return false;
+        slot = null;
+        return false;
     }
 
     /// “지금 선반에 팔 물건이 하나라도 달려 있나?”
