@@ -1,6 +1,10 @@
 using Unity.VisualScripting;
 using UnityEngine;
 
+/// <summary>
+/// 08.06 이지연 게임 내 효과음들을 관리하는 스크립트
+/// </summary>
+
 public class AudioManager : MonoBehaviour
 {
     [Header("박스 상호작용 사운드")]
@@ -8,7 +12,7 @@ public class AudioManager : MonoBehaviour
     [SerializeField] AudioClip BoxDropSound;
     [SerializeField] AudioClip BoxThrowSound;
 
-    public static AudioManager Instance; // AudioManager = 싱글톤 선언
+    public static AudioManager Instance; // 싱글톤 선언
     public AudioSource audioSource;
 
     void Awake()
@@ -21,6 +25,7 @@ public class AudioManager : MonoBehaviour
         else Destroy(gameObject); // 두 개 이상이면 제거 
     }
 
+    // 박스 상호작용 사운드 함수
     public void PlayBoxPickUpSound()
     {
         if (BoxPickUpSound != null)
