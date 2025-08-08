@@ -33,6 +33,7 @@ public class BoxContainer : MonoBehaviour
         item = contentItem;
         remaining = Mathf.Max(0, count);
         OnChanged?.Invoke();
+        Debug.Log($"[BoxContainer] SetContent {contentItem?.name} x{count} (open={IsOpen})");
     }
 
     /// <summary>박스에서 1개 꺼내기(진열 등)</summary>

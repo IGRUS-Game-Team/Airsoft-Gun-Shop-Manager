@@ -4,6 +4,7 @@ public class BoxContentVisualManager : MonoBehaviour
 {
     [SerializeField] private BoxContainer box;
     [SerializeField] private Transform contentRoot;   // 박스 내부 바닥에 빈 오브젝트
+    //private Transform contentRoot;
     [SerializeField] private int columns = 4;
     [SerializeField] private float cellSize = 0.12f;
     [SerializeField] private float padding = 0.02f;
@@ -18,6 +19,7 @@ public class BoxContentVisualManager : MonoBehaviour
     private void Awake()
     {
         if (!box) box = GetComponent<BoxContainer>();
+        // contentRoot = contentRootGameobject.GetComponent<Transform>();
     }
 
     private void OnEnable()
@@ -41,6 +43,7 @@ public class BoxContentVisualManager : MonoBehaviour
     {
         if (open) Refresh();
         else SetActiveAll(false); // 닫힐 땐 비표시(필요하면 Destroy로 바꿔도 됨)
+        Debug.Log($"[Visual] Lid toggled open={open}");
     }
 
     private void OnBoxChanged()
@@ -50,6 +53,7 @@ public class BoxContentVisualManager : MonoBehaviour
 
     private void Refresh()
     {
+        Debug.Log($"[Visual] build want={box.Remaining}, item={(box.Item? box.Item.name : "NULL")}");
         if (!box || !box.IsOpen) return;
 
         int want = Mathf.Min(box.Remaining, cap);

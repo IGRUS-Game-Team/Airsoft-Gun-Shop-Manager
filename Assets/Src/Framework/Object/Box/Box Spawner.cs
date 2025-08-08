@@ -19,6 +19,7 @@ public class BoxSpawner : MonoBehaviour
     // 장바구니 amount = "박스 개수"
     public void BoxDrop(int itemId, int amount, ItemCategory category, string itemName)
     {
+        Debug.Log($"[BoxSpawner] drop id={itemId}, boxes={amount}, name={itemName}");
         var itemData = ResolveItem(itemId, category, itemName);
         if (itemData == null)
         {
