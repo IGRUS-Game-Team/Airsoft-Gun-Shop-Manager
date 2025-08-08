@@ -10,10 +10,10 @@ using UnityEngine;
 public class CheckoutItemBehaviour : MonoBehaviour, IInteractable
 {
     CounterManager manager;
-    NpcController   owner;
-    Transform       scanner, bag;
-    AudioClip       beep;
-    float           price;         // ★추가
+    NpcController owner;
+    Transform scanner, bag;
+    AudioClip beep;
+    float price;         // ★추가
 
     const float speed = 12f;   // 이동 속도
     bool moving, beeped;
@@ -30,6 +30,7 @@ public class CheckoutItemBehaviour : MonoBehaviour, IInteractable
         beep = clip;
         isInitialized = true;
         price = GetComponent<ProductPrice>()?.Price ?? 0f;
+        EnsureRaycastable();
         return this;
     }
 
@@ -80,4 +81,32 @@ public class CheckoutItemBehaviour : MonoBehaviour, IInteractable
             yield return null;
         }
     }
+    
+    void EnsureRaycastable()
+{
+    // 1) 레이어를 클릭용으로 고정 (없으면 Default로)
+    int interactableLayer = LayerMask.NameToLayer("Interactable");
+    gameObject.layer = (interactableLayer == -1) ? gameObject.layer : interactableLayer;
+
+    // 2) 콜라이더가 없으면 붙이고, 있으면 전부 켜기
+    var cols = GetComponentsInChildren<Collider>(true);
+    if (cols == null || cols.Length == 0)
+    {
+        // 렌더 바운드 기반 BoxCollider 생성(대충이라도 클릭 가능하게)
+        var rend = GetComponentInChildren<Renderer>();
+        var bc = gameObject.AddComponent<BoxCollider>();
+        if (rend != null)
+        {
+            var b = rend.bounds; // 월드 기준
+            bc.center = transform.InverseTransformPoint(b.center);
+            // 월드 사이즈를 로컬로 변환
+            var sizeLocal = transform.InverseTransformVector(b.size);
+            bc.size = new Vector3(Mathf.Abs(sizeLocal.x), Mathf.Abs(sizeLocal.y), Mathf.Abs(sizeLocal.z));
+        }
+    }
+    else
+    {
+        foreach (var c in cols) c.enabled = true;
+    }
+}
 }
