@@ -43,10 +43,14 @@ public class NpcController : MonoBehaviour
     public Transform HandTransform => handSocket;    // 손 소켓 Transform
     // public void OnPaymentCompleted() => PaymentDone = true;
 
-    public void OnPaymentCompleted() // 추가 : 구매 완료 -> 떠나기 : 상태 전환 
+    public void OnPaymentCompleted()
     {
         Debug.Log("결제 완료 -> 떠나기 전환");
         PaymentDone = true;
+
+        // ✅ 결제 끝나면 반드시 예약 해제하고 떠나기
+        ReleaseShelfReservation("payment done");
+
         stateMachine.SetState(new NpcState_Leave(this));
     }
 
@@ -146,7 +150,7 @@ public class NpcController : MonoBehaviour
         // 손 소켓에 인스턴스화
         spawnedObject = Instantiate(prefab, handSocket);
         spawnedObject.transform.localPosition = Vector3.zero;
-        
+
         hasItemInHand = true;
     }
 
@@ -184,6 +188,16 @@ public class NpcController : MonoBehaviour
             transform.rotation,
             target,
             speedDegPerSec * Time.deltaTime);
+    }
+    
+    public void ReleaseShelfReservation(string reason = "")
+    {
+        if (targetShelfGroup != null)
+        {
+            targetShelfGroup.Release();
+            targetShelfGroup = null;
+            Debug.Log($"[NPC] ShelfGroup released: {reason}");
+        }
     }
 
 }
