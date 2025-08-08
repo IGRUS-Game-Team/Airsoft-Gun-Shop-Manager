@@ -13,25 +13,35 @@ public class CheckoutItemBehaviour : MonoBehaviour, IInteractable
     NpcController   owner;
     Transform       scanner, bag;
     AudioClip       beep;
+    float           price;         // ★추가
 
     const float speed = 12f;   // 이동 속도
     bool moving, beeped;
+    bool isInitialized = false;
 
     public CheckoutItemBehaviour Init(
         CounterManager mgr, NpcController npc,
         Transform scan, Transform bagPos, AudioClip clip)
     {
         manager = mgr;
-        owner   = npc;
+        owner = npc;
         scanner = scan;
-        bag     = bagPos;
-        beep    = clip;
+        bag = bagPos;
+        beep = clip;
+        isInitialized = true;
+        price = GetComponent<ProductPrice>()?.Price ?? 0f;
         return this;
     }
 
     /* 플레이어가 클릭했을 때 자동 호출 (InputContextRouter 경유) */
     public void Interact()
     {
+        if (!isInitialized)
+        {
+            Debug.LogWarning("CheckoutItemBehaviour: 아직 Init되지 않음");
+            return;
+        }
+        Debug.Log("ㅎㅇ 시발롬아");
         if (moving) return;
         moving = true;
         GetComponent<Collider>().enabled = false;   // 재클릭 방지
@@ -55,6 +65,8 @@ public class CheckoutItemBehaviour : MonoBehaviour, IInteractable
             {
                 src.PlayOneShot(beep);
                 beeped = true;
+
+                // CashRegister.Instance.AddPrice(price);   // ← 계산기 담당이 만든 메서드명으로 교체
             }
 
             // ② 봉투에 닿으면 파괴 + “상품 담김” 알림
