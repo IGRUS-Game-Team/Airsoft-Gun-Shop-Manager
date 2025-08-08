@@ -36,7 +36,7 @@ public class MonitorShopCartManager : MonoBehaviour
         else
             cart[item] = amount;
 
-        Debug.Log($"장바구니에 추가됨: {item.displayName} x{amount} (총 수량: {cart[item]})");
+        Debug.Log($"장바구니에 추가됨: {item.itemName} x{amount} (총 수량: {cart[item]})");
 
         UpdateCartUI();
     }
@@ -87,10 +87,10 @@ public class MonitorShopCartManager : MonoBehaviour
         {
             var data = new CartSaveData
             {
-                itemId = kvp.Key.ItemId,
+                itemId = kvp.Key.itemId,
                 amount = kvp.Value,
                 unitPrice = kvp.Key.baseCost,
-                itemName = kvp.Key.displayName,
+                itemName = kvp.Key.itemName,
                 category = kvp.Key.category
             };
 
@@ -105,7 +105,7 @@ public class MonitorShopCartManager : MonoBehaviour
 
         foreach (var saveData in cartSaveDatas)
         {
-            var item = itemDatabase.items.Find(i => i.ItemId == saveData.itemId);
+            var item = itemDatabase.items.Find(i => i.itemId == saveData.itemId);
             if (item != null)
                 cart[item] = saveData.amount;
             else

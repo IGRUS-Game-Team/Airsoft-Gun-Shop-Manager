@@ -10,18 +10,25 @@ using UnityEngine;
 [RequireComponent(typeof(BlockIsHolding))]
 public class BoxInteractionBehaviour : MonoBehaviour, IPickable
 {
+    [SerializeField] PlayerObjectHoldController holdController; // 인스펙터에 드래그
+    [SerializeField] BoxContainer box;                          // 같은 프리팹에 붙은 컴포넌트
     private BlockIsHolding holdData;
 
-    private void Awake()
+    void Awake()
     {
         holdData = GetComponent<BlockIsHolding>();
+        if (box == null) box = GetComponent<BoxContainer>();
+        if (holdController == null) holdController = FindFirstObjectByType<PlayerObjectHoldController>();
     }
 
+    // 라우터가 호출
     public void Interact()
     {
         if (holdData.isHeld)
         {
-            // 아무 동작 안 함, 별도 키(G/R)로 제어
+            Debug.Log("박스 언박싱");
+            // 들고 있는 상태에서 다시 클릭 → 뚜껑 토글
+            box?.ToggleLid();
         }
         else
         {
@@ -31,43 +38,43 @@ public class BoxInteractionBehaviour : MonoBehaviour, IPickable
 
     public void PickUp()
     {
-        PlayerObjectHoldController.Instance.SetHeldObject(holdData);
+        if (holdController == null) return;
+        holdController.SetHeldObject(holdData); // 기존 컨트롤러 API 그대로 사용
     }
 
     public void SetDown()
     {
         if (!holdData.isHeld) return;
+        var rb = GetComponent<Rigidbody>();
+        var col = GetComponentInChildren<Collider>();
 
-        Vector3 placePos = FindAnyObjectByType<PlacePreview>().PreviewPosition + Vector3.up * 0.5f;
-        holdData.transform.position = placePos;
-        holdData.transform.rotation = Quaternion.identity;
+        transform.SetParent(holdData.originalParent, true);
+        if (col) col.enabled = true;
 
-        holdData.transform.SetParent(holdData.originalParent);
+        // 물리 ON
+        if (rb) { rb.isKinematic = false; rb.detectCollisions = true; rb.useGravity = true; }
 
-        var col = holdData.GetComponentInChildren<Collider>();
-        if (col != null) col.enabled = true;
-
-        holdData.EnablePhysics();
         holdData.isHeld = false;
-        PlayerObjectHoldController.Instance.heldObject = null;
+        holdController.heldObject = null;
     }
 
     public void ThrowObject()
     {
         if (!holdData.isHeld) return;
 
-        holdData.transform.SetParent(holdData.originalParent);
+        var rb = GetComponent<Rigidbody>();
+        var col = GetComponentInChildren<Collider>();
 
-        var col = holdData.GetComponentInChildren<Collider>();
-        if (col != null) col.enabled = true;
+        transform.SetParent(holdData.originalParent, true);
+        if (col) col.enabled = true;
 
-        holdData.EnablePhysics();
-
-        Rigidbody rb = holdData.GetComponent<Rigidbody>();
-        rb.AddForce(Camera.main.transform.forward * 10f, ForceMode.Impulse);
+        if (rb)
+        {
+            rb.isKinematic = false; rb.detectCollisions = true; rb.useGravity = true;
+            rb.AddForce(Camera.main.transform.forward * 10f, ForceMode.Impulse);
+        }
 
         holdData.isHeld = false;
-        PlayerObjectHoldController.Instance.heldObject = null;
+        holdController.heldObject = null;
     }
 }
-

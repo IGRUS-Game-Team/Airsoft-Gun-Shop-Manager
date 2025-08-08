@@ -112,6 +112,7 @@ namespace StarterAssets
 
 		private void Update()
 		{
+
 			// 8/2 추가
 			// ui모드 진입시 플레이어 움직임 막기
 			if (MonitorUIModeManager.Instance.getInUIMode()) return;
