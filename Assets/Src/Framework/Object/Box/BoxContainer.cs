@@ -1,70 +1,77 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 
 public class BoxContainer : MonoBehaviour
 {
     [Header("Lid (Left / Right)")]
-    [SerializeField] Transform lid1;              // 왼쪽 뚜껑
-    [SerializeField] Transform lid2;              // 오른쪽 뚜껑
-    [SerializeField] Vector3 lidClosedEuler = Vector3.zero;
-    [SerializeField] float lidLeftOpenZ  = 228f;  // 왼쪽 열림 Z 각도
-    [SerializeField] float lidRightOpenZ = -228f; // 오른쪽 열림 Z 각도
-    [SerializeField] float lidAnimTime = 0.2f;
+    [SerializeField] private Transform lidLeft;
+    [SerializeField] private Transform lidRight;
+    [SerializeField] private Vector3 lidClosedEuler = Vector3.zero;
+    [SerializeField] private float lidLeftOpenZ  = 228f;    // 왼쪽 뚜껑 Z
+    [SerializeField] private float lidRightOpenZ = -228f;   // 오른쪽 뚜껑 Z
+    [SerializeField] private float lidAnimTime   = 0.2f;
 
-    private readonly Dictionary<ItemData,int> remaining = new();
+    [Header("Content (Single Item)")]
+    [SerializeField] private ItemData item;  // 이 박스에 담긴 단일 품목
+    [SerializeField] private int remaining;  // 남은 개수
+
     public bool IsOpen { get; private set; }
+    public ItemData Item => item;
+    public int Remaining => remaining;
+
+    /// <summary>박스 내용물/상태가 바뀔 때(UI/비주얼 갱신용)</summary>
     public event Action OnChanged;
 
-    public void SetContents(Dictionary<ItemData,int> contents)
+    /// <summary>뚜껑이 열리거나 닫힐 때. 인자: true=열림, false=닫힘</summary>
+    public event Action<bool> OnLidChanged;
+
+    // ====== 런타임 API ======
+
+    /// <summary>장바구니 생성 직후 박스에 담길 품목/수량 주입</summary>
+    public void SetContent(ItemData contentItem, int count)
     {
-        remaining.Clear();
-        foreach (var kv in contents)
-            if (kv.Key != null && kv.Value > 0) remaining[kv.Key] = kv.Value;
+        item = contentItem;
+        remaining = Mathf.Max(0, count);
         OnChanged?.Invoke();
     }
 
-    public IReadOnlyDictionary<ItemData,int> GetRemaining() => remaining;
-
-    public bool TakeOne(ItemData item)
+    /// <summary>박스에서 1개 꺼내기(진열 등)</summary>
+    public bool TakeOne()
     {
-        if (item == null || !remaining.TryGetValue(item, out var cnt) || cnt <= 0) return false;
-        remaining[item] = cnt - 1;
+        if (item == null || remaining <= 0) return false;
+        remaining--;
         OnChanged?.Invoke();
         return true;
     }
 
+    /// <summary>뚜껑 열기/닫기 토글 (양쪽 회전 동기화)</summary>
     public void ToggleLid()
     {
-        if (lid1 == null && lid2 == null) return;
+        if (!lidLeft && !lidRight) return;
+
         StopAllCoroutines();
         StartCoroutine(RotateLids(!IsOpen));
         IsOpen = !IsOpen;
+
+        // 외부(비주얼 매니저 등)에서 열림/닫힘 트리거로 쓰도록 이벤트 발행
+        OnLidChanged?.Invoke(IsOpen);
     }
 
     private System.Collections.IEnumerator RotateLids(bool open)
     {
-        // 시작 회전값
-        var start1 = lid1 ? lid1.localRotation : Quaternion.identity;
-        var start2 = lid2 ? lid2.localRotation : Quaternion.identity;
+        var startL = lidLeft  ? lidLeft.localRotation  : Quaternion.identity;
+        var startR = lidRight ? lidRight.localRotation : Quaternion.identity;
 
-        // 목표 회전값
-        Quaternion target1, target2;
+        Quaternion targetL, targetR;
         if (open)
         {
-            // 열 때: 왼쪽은 Z=+228°, 오른쪽은 Z=-228°
-            var leftEuler  = new Vector3(lidClosedEuler.x, lidClosedEuler.y, lidLeftOpenZ);
-            var rightEuler = new Vector3(lidClosedEuler.x, lidClosedEuler.y, lidRightOpenZ);
-            target1 = Quaternion.Euler(leftEuler);
-            target2 = Quaternion.Euler(rightEuler);
+            targetL = Quaternion.Euler(lidClosedEuler.x, lidClosedEuler.y,  lidLeftOpenZ);
+            targetR = Quaternion.Euler(lidClosedEuler.x, lidClosedEuler.y, lidRightOpenZ);
         }
         else
         {
-            // 닫을 때: 둘 다 닫힘 각도
             var closed = Quaternion.Euler(lidClosedEuler);
-            target1 = closed;
-            target2 = closed;
+            targetL = closed; targetR = closed;
         }
 
         float t = 0f;
@@ -72,68 +79,130 @@ public class BoxContainer : MonoBehaviour
         {
             t += Time.deltaTime;
             float k = Mathf.Clamp01(t / lidAnimTime);
-            if (lid1) lid1.localRotation = Quaternion.Slerp(start1, target1, k);
-            if (lid2) lid2.localRotation = Quaternion.Slerp(start2, target2, k);
+            if (lidLeft)  lidLeft.localRotation  = Quaternion.Slerp(startL, targetL, k);
+            if (lidRight) lidRight.localRotation = Quaternion.Slerp(startR, targetR, k);
             yield return null;
         }
-        if (lid1) lid1.localRotation = target1;
-        if (lid2) lid2.localRotation = target2;
+        if (lidLeft)  lidLeft.localRotation  = targetL;
+        if (lidRight) lidRight.localRotation = targetR;
     }
 
-    // ==== 저장/로드 ====
+    /// <summary>복원 시 즉시 각도 반영이 필요할 때 호출</summary>
+    private void ApplyLidImmediate(bool open)
+    {
+        if (!lidLeft && !lidRight) return;
+
+        if (open)
+        {
+            if (lidLeft)  lidLeft.localRotation  = Quaternion.Euler(lidClosedEuler.x, lidClosedEuler.y,  lidLeftOpenZ);
+            if (lidRight) lidRight.localRotation = Quaternion.Euler(lidClosedEuler.x, lidClosedEuler.y, lidRightOpenZ);
+        }
+        else
+        {
+            var closed = Quaternion.Euler(lidClosedEuler);
+            if (lidLeft)  lidLeft.localRotation  = closed;
+            if (lidRight) lidRight.localRotation = closed;
+        }
+    }
+
+    // ====== 저장/로드 (GUID 기반 내부 SaveData) ======
+
     [Serializable]
     public struct SaveData
     {
-        public string prefabName;
-        public Vector3 pos;
+        public string   prefabName;
+        public Vector3  pos;
         public Quaternion rot;
-        public bool isOpen;
-        public List<string> itemKeys;
-        public List<int> counts;
+        public bool     isOpen;
+        public string   itemGuid;  // ItemData 식별자 (GUID/키)
+        public int      amount;    // 남은 개수
     }
 
-    public SaveData Capture()
+    /// <summary>
+    /// 박스 상태 캡처. getGuid: ItemData → GUID/키 변환 함수 주입
+    /// </summary>
+    public SaveData Capture(Func<ItemData, string> getGuid)
     {
-        return new SaveData {
+        return new SaveData
+        {
             prefabName = name.Replace("(Clone)", ""),
-            pos = transform.position,
-            rot = transform.rotation,
-            isOpen = IsOpen,
-            itemKeys = remaining.Keys.Select(k => k.name).ToList(),
-            counts = remaining.Values.ToList()
+            pos        = transform.position,
+            rot        = transform.rotation,
+            isOpen     = IsOpen,
+            itemGuid   = (item != null && getGuid != null) ? getGuid(item) : string.Empty,
+            amount     = remaining
         };
     }
 
+    /// <summary>
+    /// 박스 상태 복원. resolve: GUID/키 → ItemData 변환 함수 주입
+    /// </summary>
     public void Restore(SaveData data, Func<string, ItemData> resolve)
     {
         transform.SetPositionAndRotation(data.pos, data.rot);
         IsOpen = data.isOpen;
+        ApplyLidImmediate(IsOpen);
 
-        // 복원 시 즉시 각도 적용
-        if (lid1 || lid2)
-        {
-            if (IsOpen)
-            {
-                var leftEuler  = new Vector3(lidClosedEuler.x, lidClosedEuler.y, lidLeftOpenZ);
-                var rightEuler = new Vector3(lidClosedEuler.x, lidClosedEuler.y, lidRightOpenZ);
-                if (lid1) lid1.localRotation = Quaternion.Euler(leftEuler);
-                if (lid2) lid2.localRotation = Quaternion.Euler(rightEuler);
-            }
-            else
-            {
-                var closed = Quaternion.Euler(lidClosedEuler);
-                if (lid1) lid1.localRotation = closed;
-                if (lid2) lid2.localRotation = closed;
-            }
-        }
+        item = (resolve != null && !string.IsNullOrEmpty(data.itemGuid)) ? resolve(data.itemGuid) : null;
+        remaining = Mathf.Max(0, data.amount);
 
-        remaining.Clear();
-        for (int i = 0; i < data.itemKeys.Count; i++)
-        {
-            var item = resolve?.Invoke(data.itemKeys[i]);
-            var cnt  = data.counts[i];
-            if (item != null && cnt > 0) remaining[item] = cnt;
-        }
+        // 상태 변경 알림
         OnChanged?.Invoke();
+        OnLidChanged?.Invoke(IsOpen);
     }
+
+    // ====== (선택) 기존 BoxSaveData 스키마도 써야 할 때용 어댑터 ======
+    // 프로젝트에 기존 BoxSaveData 클래스가 있고, 그 스키마를 유지해야 한다면
+    // 아래 두 메서드 이름을 여러분의 기존 Capture/Restore로 "바꿔치기" 해서 쓰세요.
+    // 필요 없으면 이 영역은 지워도 됩니다.
+
+    /*
+    public BoxSaveData CaptureLegacy(
+        Func<ItemData,int>            getId,
+        Func<ItemData,string>         getName,
+        Func<ItemData,ItemCategory>   getCategory
+    )
+    {
+        var data = new BoxSaveData();
+        data.prefabName = name.Replace("(Clone)", "");
+        data.position   = transform.position;
+        data.rotation   = transform.rotation;
+
+        // 기존 스키마에 isOpen 필드가 있다면 채우고, 없다면 무시됨(컴파일 에러 시 이 줄 삭제)
+        data.isOpen     = IsOpen;
+
+        data.itemId     = (item != null && getId       != null) ? getId(item)       : 0;
+        data.itemName   = (item != null && getName     != null) ? getName(item)     : string.Empty;
+        data.category   = (item != null && getCategory != null) ? getCategory(item) : default;
+
+        data.amount     = Mathf.Max(0, remaining);
+        data.isHeld     = false; // 로드시 꼬임 방지
+
+        return data;
+    }
+
+    public void RestoreLegacy(
+        BoxSaveData data,
+        Func<int,ItemData>      resolveById,
+        Func<string,ItemData>   resolveByName
+    )
+    {
+        transform.SetPositionAndRotation(data.position, data.rotation);
+
+        // 기존 스키마에 isOpen이 있으면 사용(없으면 이 줄 주석처리)
+        IsOpen = data.isOpen;
+        ApplyLidImmediate(IsOpen);
+
+        ItemData resolved = null;
+        if (resolveById   != null && data.itemId   != 0)                resolved = resolveById(data.itemId);
+        if (resolved == null && resolveByName != null && !string.IsNullOrEmpty(data.itemName))
+            resolved = resolveByName(data.itemName);
+
+        item = resolved;
+        remaining = Mathf.Max(0, data.amount);
+
+        OnChanged?.Invoke();
+        OnLidChanged?.Invoke(IsOpen);
+    }
+    */
 }
