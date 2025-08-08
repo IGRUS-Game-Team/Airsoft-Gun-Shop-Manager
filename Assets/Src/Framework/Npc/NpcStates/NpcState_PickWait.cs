@@ -68,6 +68,8 @@ public class NpcState_PickWait : IState
         }
 
         // 5) 현재 회전을 선반 방향으로 부드럽게 변경
-        npcController.transform.rotation = Quaternion.LookRotation(forward);
+        Quaternion to = Quaternion.LookRotation(forward);
+        npcController.transform.rotation =
+    Quaternion.RotateTowards(npcController.transform.rotation, to, 360f * Time.deltaTime);
     }
 }

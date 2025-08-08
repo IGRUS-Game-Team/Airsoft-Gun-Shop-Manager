@@ -14,6 +14,11 @@ public class ShelfSlot : MonoBehaviour
     [Header("진열 포인트 (0 = 안쪽, 1 = 바깥쪽)")]
     [SerializeField] Transform[] points = new Transform[Capacity];
 
+    [Header("NPC 서기 포인트 (선택)")]
+    [Tooltip("NPC가 정확히 설 바닥 점. 없으면 슬롯 피벗/보정점 사용")]
+    [SerializeField] private Transform standPoint;
+    public Transform StandPoint => standPoint;
+
     /* ---------- 내부 ---------- */
     readonly List<GameObject> items = new();
 
@@ -49,5 +54,28 @@ public class ShelfSlot : MonoBehaviour
 
         if (points.Length != Capacity)
             Debug.LogWarning($"{name} : Points 배열에 2개(안쪽·바깥쪽) 넣어 주세요");
+    }
+
+#if UNITY_EDITOR
+    [ContextMenu("Create StandPoint child")]
+    private void CreateStandPoint()
+    {
+        if (standPoint != null) return;
+        var go = new GameObject("StandPoint");
+        go.transform.SetParent(transform);
+        go.transform.localPosition = Vector3.zero;        // 일단 슬롯 피벗에 배치
+        go.transform.localRotation = Quaternion.identity; // forward는 나중에 선반을 향하도록 돌려줘
+        standPoint = go.transform;
+        UnityEditor.Selection.activeTransform = standPoint;
+    }
+#endif
+
+    void OnDrawGizmos()
+    {
+        if (standPoint == null) return;
+        Gizmos.color = Color.green;
+        Gizmos.DrawSphere(standPoint.position, 0.08f);
+        // forward 확인(선반을 바라보게 맞춰 두는 걸 권장)
+        Gizmos.DrawRay(standPoint.position, standPoint.forward * 0.35f);
     }
 }

@@ -42,7 +42,7 @@ public class ShelfGroup : MonoBehaviour
     {
         List<ShelfSlot> list = new ();
         foreach (var s in slots)
-        if (s.HasItem) list.Add(s);
+            if (s.HasItem) list.Add(s);
         return list;
     }
 }
