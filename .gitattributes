@@ -1,0 +1,27 @@
+# --- Unity YAML(Text) assets: not LFS, use UnityYAMLMerge, enforce LF ---
+*.meta        text eol=lf
+*.unity       text eol=lf merge=unityyamlmerge
+*.prefab      text eol=lf merge=unityyamlmerge
+*.mat         text eol=lf merge=unityyamlmerge
+*.anim        text eol=lf merge=unityyamlmerge
+*.controller  text eol=lf merge=unityyamlmerge
+*.asset       text eol=lf merge=unityyamlmerge
+
+# --- Binary assets: track with LFS ---
+# Images / textures (binary)
+*.png  filter=lfs diff=lfs merge=lfs -text
+*.tga  filter=lfs diff=lfs merge=lfs -text
+*.psd  filter=lfs diff=lfs merge=lfs -text
+*.tif  filter=lfs diff=lfs merge=lfs -text
+*.tiff filter=lfs diff=lfs merge=lfs -text
+
+# 3D (usually binary)
+*.fbx  filter=lfs diff=lfs merge=lfs -text
+
+# Audio / Video / DB dumps (binary)
+*.wav  filter=lfs diff=lfs merge=lfs -text
+*.mp4  filter=lfs diff=lfs merge=lfs -text
+*.db   filter=lfs diff=lfs merge=lfs -text
+
+# Do NOT commit *.unitypackage ideally; if you must, it's binary:
+# *.unitypackage filter=lfs diff=lfs merge=lfs -text

@@ -1,0 +1,13 @@
+using System.Collections.Generic;
+using UnityEngine;
+
+[System.Serializable]
+public class GameSaveData
+{
+    public float playerMoney;
+    public PlayerSaveData playerData;
+    public List<CartSaveData> cartData = new();
+    //public List<string> unlockedRooms = new(); //해금되는 방
+
+    public List<BoxSaveData> boxDataList = new();
+}
