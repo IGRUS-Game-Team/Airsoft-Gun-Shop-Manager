@@ -24,6 +24,8 @@ public class CounterManager : MonoBehaviour
     readonly HashSet<NpcController> pendingPay = new();   // ★추가: 결제 대기 목록
     public static CounterManager Instance { get; private set; }
 
+    
+
     void Awake()
     {
         if (I != null && I != this) { Destroy(gameObject); return; }
