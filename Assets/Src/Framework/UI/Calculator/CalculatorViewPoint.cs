@@ -2,6 +2,7 @@ using System.Collections;
 using Cinemachine;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.UI;
 
 /// <summary>
 /// 장지원 8.5 계산기 화면
@@ -20,88 +21,115 @@ using UnityEngine.InputSystem;
 public class CalculatorViewPoint : MonoBehaviour, IInteractable
 {
     [Header("Cameras")]
-    [SerializeField] CinemachineVirtualCamera calculatorCamera; // 계산기 고정
-    [SerializeField] CinemachineVirtualCamera defaultCamera;    // 플레이어 추적
+    [SerializeField] CinemachineVirtualCamera calculatorCamera; 
+    [SerializeField] CinemachineVirtualCamera defaultCamera;    
     [SerializeField] float blendTime = 0.5f;
+
+    [SerializeField] GraphicRaycaster FuckingGraphicRaycaster;
 
     private CinemachineBrain brain;
     private bool isInCalculatorView;
+
+    // 커서/컨트롤 상태 저장
+    private bool wasCursorVisible;
+    private CursorLockMode prevLockMode;
+
+    // 플레이어 컨트롤러 참조
+    private MonoBehaviour playerController;
+    private CharacterController characterController;
 
     void Awake()
     {
         brain = Camera.main ? Camera.main.GetComponent<CinemachineBrain>() : null;
         if (brain == null)
-            Debug.LogWarning("[Calculator] CinemachineBrain을 찾지 못했습니다. 메인 카메라를 확인하세요.");
+            Debug.LogWarning("[Calculator] CinemachineBrain을 찾지 못했습니다. 메인 카메라 확인 필요.");
+
+        var player = GameObject.FindWithTag("Player");
+        if (player != null)
+        {
+            playerController = player.GetComponent<MonoBehaviour>(); // 프로젝트의 실제 컨트롤러 타입으로 교체
+            characterController = player.GetComponent<CharacterController>();
+        }
     }
 
     void OnEnable()
     {
-        // 프로젝트 표준 입력 파이프라인 구독
         if (InteractionController.Instance != null)
-            InteractionController.Instance.OnExitUI += HandleExitUI;
+            InteractionController.Instance.OnExitUI += ExitInspection;
     }
 
     void OnDisable()
     {
         if (InteractionController.Instance != null)
-            InteractionController.Instance.OnExitUI -= HandleExitUI;
+            InteractionController.Instance.OnExitUI -= ExitInspection;
     }
 
-    // 라우터가 호출하는 진입 지점
     public void Interact()
     {
-        // 자기 자신이 레이캐스트 타깃인지 별도 확인이 필요 없다.
-        // InputContextRouter가 이미 적절한 대상만 Interact()를 호출함.
-        SwitchToCalculatorView();
+        EnterInspection();
     }
 
-    private void HandleExitUI()
+    public void EnterInspection()
     {
-        if (isInCalculatorView)
-            SwitchToDefaultView();
-    }
+        if (isInCalculatorView) return;
 
-    private void SwitchToCalculatorView()
-    {
-        Debug.Log("[Calculator] 계산기 카메라로 전환");
-        Cursor.visible = true;
-        Cursor.lockState = CursorLockMode.None;
+        Debug.Log("[Calculator] UI 모드 진입");
+        FuckingGraphicRaycaster.enabled = false;
 
-        if (brain) brain.m_DefaultBlend.m_Time = blendTime;
-        isInCalculatorView = true;
+        // 커서 상태 저장
+        wasCursorVisible = Cursor.visible;
+        prevLockMode = Cursor.lockState;
 
-        // ESC에서 세팅창이 뜨지 않도록 플래그 활성화
+        // ESC에서 세팅창 안뜨도록 플래그++
         GlobalInteractionFlagS.ModalDepth++;
-        Debug.Log(GlobalInteractionFlagS.ModalDepth);
 
+        // 카메라 전환
+        if (brain) brain.m_DefaultBlend.m_Time = blendTime;
         if (defaultCamera) defaultCamera.Priority = 0;
         if (calculatorCamera) calculatorCamera.Priority = 10;
+
+        // 플레이어 조작 비활성화
+        if (playerController) playerController.enabled = false;
+        if (characterController) characterController.enabled = false;
+
+        // 커서 상태
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
+
+        isInCalculatorView = true;
     }
-    private void SwitchToDefaultView()
+
+    public void ExitInspection()
     {
-        Debug.Log("[Calculator] 기본 카메라로 전환");
+        if (!isInCalculatorView) return;
 
-        if (!InGameSettingManager.Instance.GetIsSettingOpen())
-        {
-            Cursor.visible = false;
-            Cursor.lockState = CursorLockMode.Locked;
-        }
+        Debug.Log("[Calculator] UI 모드 종료");
+        FuckingGraphicRaycaster.enabled = true;
 
+        // 카메라 복귀
         if (brain) brain.m_DefaultBlend.m_Time = blendTime;
-        isInCalculatorView = false;
-
-        // 한 프레임 뒤에 모달 플래그 해제
-        StartCoroutine(ReleaseModalFlagNextFrame());
-        Debug.Log(GlobalInteractionFlagS.ModalDepth);
-
         if (defaultCamera) defaultCamera.Priority = 10;
         if (calculatorCamera) calculatorCamera.Priority = 0;
+
+        // 플레이어 조작 재활성화
+        if (playerController) playerController.enabled = true;
+        if (characterController) characterController.enabled = true;
+
+        // 커서 복구
+        Cursor.lockState = prevLockMode;
+        Cursor.visible = wasCursorVisible;
+
+        // 모달 플래그 해제 (한 프레임 뒤에)
+        StartCoroutine(ReleaseModalFlagNextFrame());
+
+        isInCalculatorView = false;
     }
+
     private IEnumerator ReleaseModalFlagNextFrame()
     {
-        yield return null; // 다음 프레임까지 대기
+        yield return null;
         GlobalInteractionFlagS.ModalDepth--;
-        Debug.Log(GlobalInteractionFlagS.ModalDepth);
+        Debug.Log($"[Calculator] ModalDepth={GlobalInteractionFlagS.ModalDepth}");
     }
     //     [SerializeField] CinemachineVirtualCamera calculatorCamera; // 계산기 화면 고정 카메라
     //     [SerializeField] CinemachineVirtualCamera defaultCamera; //player follow 카메라
