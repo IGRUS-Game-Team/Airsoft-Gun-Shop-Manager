@@ -1,120 +1,74 @@
 using UnityEngine;
-using UnityEngine.AI;
 
+// NPC가 줄에 서서 대기 중, 자리 이동 시 걷기 애니메이션, 도착 후 대기 애니메이션 재생
 public class NpcState_QueueWait : IState
 {
-    private readonly NpcController npcController;
-    private readonly QueueManager  queueManager;
-    private Transform myNode;
-    private bool itemPlacedOnCounter = false;
+    private readonly NpcController npcController;  // 이 상태를 수행할 NPC
+    private readonly QueueManager queueManager;    // 줄 관리 매니저
+    private Transform myNode;                      // NPC가 현재 서 있는 자리
 
-    private const string StandingAnim = "Standing";
-    private const string WalkingAnim    = "Walking";
+    private const string StandingAnim   = "Standing";  // 대기 애니메이션 이름
+    private const string WalkingAnim    = "Walking";   // 걷기 애니메이션 이름
+    private const float  ArrivalDistance = 0.01f;       // 도착 허용 오차 거리
 
-    public NpcState_QueueWait(NpcController npcController, QueueManager queueManager, Transform node)
+    public NpcState_QueueWait(
+        NpcController npcController,
+        QueueManager  queueManager,
+        Transform     node)
     {
-        this.npcController = npcController;
-        this.queueManager  = queueManager;
-        myNode = node;
+        this.npcController = npcController;  // NPC 참조 저장
+        this.queueManager  = queueManager;   // 매니저 참조 저장
+        this.myNode        = node;           // 초기 자리 저장
     }
 
     public void Enter()
     {
-        npcController.Agent.ResetPath();
-        npcController.Agent.isStopped      = true;
-        npcController.Agent.updateRotation = false; // 수동 회전
-
-        // ★ 맨 앞이면 카운터, 아니면 "맨 앞자리(counterNode)" 방향으로 바라보기
-        FaceToPoint(npcController.transform, queueManager.IsFront(npcController) ? queueManager.CounterTransform.position : queueManager.CounterNode.position);
-
-        npcController.Animator.Play(StandingAnim);
+        npcController.Agent.ResetPath();                             // 이전 이동 경로 완전 초기화
+        npcController.Agent.isStopped      = true;                   // 이동 정지
+        npcController.Agent.updateRotation = false;                  // 자동 회전 중단
+        npcController.transform.LookAt(queueManager.CounterTransform); // 카운터 방향으로 회전
+        npcController.Animator.Play(StandingAnim);                   // 대기 애니메이션 실행
     }
 
     public void Tick()
     {
-        if (npcController.QueueTarget == null)
-            return;
-
-        // 자리 바뀌면 이동 시작
-        if (npcController.QueueTarget != myNode)
+        // 1) 자리가 변경된 경우 → 걷기 애니메이션, 새 자리로 이동
+        if (npcController.QueueTarget != this.myNode)
         {
-            npcController.Agent.ResetPath();
-            npcController.Agent.isStopped      = false;
-            npcController.Agent.updateRotation = true;
-            npcController.Agent.SetDestination(npcController.QueueTarget.position);
-            npcController.Animator.Play(WalkingAnim);
-            myNode = npcController.QueueTarget;
-            return;
+            npcController.Agent.ResetPath();                             // 경로 재설정
+            npcController.Agent.isStopped      = false;                  // 이동 재개
+            npcController.Agent.SetDestination(npcController.QueueTarget.position); // 새 자리 목적지 설정
+            npcController.Animator.Play(WalkingAnim);                    // 걷기 애니메이션 실행
+            this.myNode = npcController.QueueTarget;                     // 현재 자리 업데이트
+            return;                                                      // 이동만 처리하고 종료
         }
 
-        // 도착 판정(간단)
-        NavMeshAgent agent = npcController.Agent;
-        
-        if (agent.pathPending) return;
-        if (agent.pathStatus == NavMeshPathStatus.PathInvalid) return;
+        // 2) 도착 여부 판단: 경로 계산 완료 + 거리 허용 범위 이내
+        bool arrived = npcController.Agent.pathPending == false &&
+                       npcController.Agent.remainingDistance <= ArrivalDistance;
 
-        // ── 속도→버킷→동적 여유 거리 계산 ─────────────────────────
-        float speed = agent.velocity.magnitude;                      // m/s
-        int bucket  = Mathf.Clamp(Mathf.CeilToInt(speed), 0, 12);    // 1~2 => 2
-        float dynTol = 0.06f + (0.02f * bucket);                     // 기본 0.06 + 버킷당 0.02
-        if (dynTol > 0.32f) dynTol = 0.32f;                          // 상한
-        // ──────────────────────────────────────────────────────────
-
-        // 2) 남은 거리 ≤ (stoppingDistance + 속도기반 여유)
-        if (agent.remainingDistance <= agent.stoppingDistance + dynTol)
+        // 3) 도착했으면 대기 애니메이션으로 전환
+        if (arrived)
         {
-            // 3) 거의 멈췄는지(완전 0 대신 작은 값)
-            if (!agent.hasPath || agent.velocity.sqrMagnitude <= 0.002f)
-            {
-                npcController.Agent.isStopped = true;
-                npcController.Agent.updateRotation = false;
-
-                // ★ 서 있는 동안에도 같은 원칙으로 바라보기 유지
-                FaceToPoint(npcController.transform, queueManager.IsFront(npcController) ? queueManager.CounterTransform.position : queueManager.CounterNode.position
-            );
-
-                npcController.Animator.Play(StandingAnim);
-            // ★ 맨 앞이면: 상품을 카운터에 '한 번만' 올려두고(스캔 대기)
-            if (queueManager.IsFront(npcController) && !itemPlacedOnCounter)
-            {
-                npcController.GetComponent<CarriedItemHandler>()?.PlaceToCounter();
-                itemPlacedOnCounter = true;
-            }
-
-            // ★ 스캔/봉투 끝났는지 확인 → 끝났으면 이제 Offer 상태로 전환
-            if (queueManager.IsFront(npcController)
-                && CounterManager.Instance.IsReadyToPay(npcController))
-                {
-                    npcController.stateMachine.SetState(new NpcState_OfferPayment(npcController, queueManager.CounterTransform));
-                    return;
-                }
-            }
-
+            npcController.Agent.isStopped = true;        // 완전 정지
+            npcController.Animator.Play(StandingAnim);   // 대기 애니메이션 재생
         }
-        
-        // ★ 스캔/봉투 끝났는지 확인 → 끝났으면 이제 Offer 상태로 전환
-        if (queueManager.IsFront(npcController)
-        && CounterManager.Instance.IsReadyToPay(npcController))
+
+        // 4) 맨 앞이고 물건을 들고 있으면 결제 상태로 전환
+        if (arrived && queueManager.IsFront(npcController) && npcController.hasItemInHand)
         {
             npcController.stateMachine.SetState(
-            new NpcState_OfferPayment(npcController, queueManager.CounterTransform));
-            return;
+                new NpcState_OfferPayment(
+                    npcController,
+                    queueManager,
+                    npcController.CashPrefab,
+                    npcController.CardPrefab,
+                    queueManager.CounterTransform));           // 결제 상태로 이동
         }
     }
 
     public void Exit()
     {
-        npcController.Agent.updateRotation = true;
-    }
-
-    // ── 로컬 유틸: 특정 지점(월드 좌표)을 향해 부드럽게 회전 ──
-    private static void FaceToPoint(Transform me, Vector3 worldPoint, float degPerSec = 540f)
-    {
-        Vector3 dir = worldPoint - me.position;
-        dir.y = 0f;
-        if (dir.sqrMagnitude < 0.0001f) return;
-
-        Quaternion target = Quaternion.LookRotation(dir);
-        me.rotation = Quaternion.RotateTowards(me.rotation, target, degPerSec * Time.deltaTime);
+        npcController.Agent.updateRotation = true;         // 자동 회전 복원
     }
 }

@@ -3,7 +3,7 @@ using UnityEngine;
 
 public class BlockOutLiner : MonoBehaviour
 {
-    [SerializeField] private bool selected = false;
+    private bool selected = false;
     [SerializeField] Material sharedOutlineMaterial;
     Renderer[] renderers;
 

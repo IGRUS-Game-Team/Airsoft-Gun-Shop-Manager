@@ -14,21 +14,11 @@ public class CheckoutItemBehaviour : MonoBehaviour, IInteractable
     Transform scanner, bag;
     AudioClip beep;
     float price;         // ★추가
-    private CountorMonitorController countorMonitorController;
-    private CashRegisterUI cashRegisterUI;
-
-    private CounterSlotData counterSlotData;
 
     const float speed = 12f;   // 이동 속도
     bool moving, beeped;
     bool isInitialized = false;
 
-    void Awake()
-    {
-        countorMonitorController = FindFirstObjectByType<CountorMonitorController>();
-        cashRegisterUI = FindFirstObjectByType<CashRegisterUI>();
-        if (!countorMonitorController) Debug.Log("없음 ㅅㅂ");
-    }
     public CheckoutItemBehaviour Init(
         CounterManager mgr, NpcController npc,
         Transform scan, Transform bagPos, AudioClip clip)
@@ -39,9 +29,7 @@ public class CheckoutItemBehaviour : MonoBehaviour, IInteractable
         bag = bagPos;
         beep = clip;
         isInitialized = true;
-        counterSlotData = GetComponent<CounterSlotData>();
-        counterSlotData.itemObject = this.gameObject;
-        //price = GetComponent<CounterSlotData>()?.itemData.baseCost ?? 0f;
+        price = GetComponent<ProductPrice>()?.Price ?? 0f;
         EnsureRaycastable();
         return this;
     }
@@ -78,10 +66,8 @@ public class CheckoutItemBehaviour : MonoBehaviour, IInteractable
             {
                 src.PlayOneShot(beep);
                 beeped = true;
-                Debug.Log(price + " " + "계산 시퀸스");
-                countorMonitorController.Show(counterSlotData);  // ← 계산기 담당이 만든 메서드명으로 교체
-                cashRegisterUI.SetValues(counterSlotData.itemData.baseCost - Random.Range(0, 100), counterSlotData.itemData.baseCost);
 
+                // CashRegister.Instance.AddPrice(price);   // ← 계산기 담당이 만든 메서드명으로 교체
             }
 
             // ② 봉투에 닿으면 파괴 + “상품 담김” 알림

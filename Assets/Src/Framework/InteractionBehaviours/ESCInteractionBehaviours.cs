@@ -27,15 +27,11 @@ public class ESCInteractionBehaviours : MonoBehaviour
             Debug.Log("UI 모드 → 나가기");
             MonitorUIModeManager.Instance.ExitUIMode();
         }
-        else if (GlobalInteractionFlagS.ModalDepth >= 1)
-        {
-            Debug.Log("모달이 1 이상입니다");
-            return;
-        }
         else
         {
-            Debug.Log("인게임세팅ui on");
-            InGameSettingManager.Instance.SetSetting();
+            Debug.Log("일반 모드 → 설정창 열기 (미구현)");
+            // TODO: SettingsManager.Instance.OpenSettings(); 같은 식으로 나중에 연결
+            InGameSettingManager.Instance.SetSetting(); 
         }
     }
 }

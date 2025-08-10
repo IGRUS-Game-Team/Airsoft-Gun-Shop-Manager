@@ -10,11 +10,10 @@ public class CashRegisterUI : MonoBehaviour
 
     private float currentGiven = 0f;
     [SerializeField] private float targetChange = 0f;
-     
-    
+
     public void SetValues(float received, float total)
     {
-        float change =  total- received ;
+        float change = received - total;
         receivedText.text = $"${received:0.00}";
         totalText.text = $"${total:0.00}";
         changeText.text = $"${change:0.00}";

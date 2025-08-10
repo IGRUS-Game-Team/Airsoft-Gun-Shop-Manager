@@ -14,7 +14,7 @@ public class PaymentItem : MonoBehaviour
     /* UI·마우스 클릭에서 호출 */
     public void PayByPlayer()
     {
-        CounterManager.Instance.CompletePayment(context.payer);   // ★변경
+        CounterManager.I.CompletePayment(context.payer);   // ★변경
         onPaid?.Invoke();
         Destroy(gameObject);
     }
