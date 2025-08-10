@@ -3,7 +3,7 @@ using UnityEngine;
 
 public class CounterManager : MonoBehaviour
 {
-    public static CounterManager I { get; private set; }
+    public static CounterManager Instance { get; private set; }
 
     [Header("카운터 슬롯들 (Inspector 순서대로 사용)")]
     [SerializeField] Transform[] counterSlots;
@@ -21,21 +21,25 @@ public class CounterManager : MonoBehaviour
     readonly Dictionary<NpcController, Transform> npcToSlot = new();
     readonly Dictionary<NpcController, GameObject> npcToPay = new();
     readonly Dictionary<NpcController, int> npcBaggedCount = new();
-    readonly HashSet<NpcController> pendingPay = new();   // ★추가: 결제 대기 목록
-    public static CounterManager Instance { get; private set; }
+    private readonly HashSet<NpcController> readyToPay = new();
+
+    public bool IsReadyToPay(NpcController npc) => readyToPay.Contains(npc);
+    public void MarkReadyToPay(NpcController npc) => readyToPay.Add(npc);
+    public void ClearReadyToPay(NpcController npc) => readyToPay.Remove(npc);
+
+    
 
     void Awake()
     {
-        if (I != null && I != this) { Destroy(gameObject); return; }
-        I = this;
-        foreach (var s in counterSlots) pool.Enqueue(s);
-
+         // 싱글턴 보장
         if (Instance != null && Instance != this)
         {
-            Destroy(this.gameObject);
+            Destroy(gameObject);
             return;
         }
         Instance = this;
+
+        foreach (Transform counterSlot in counterSlots) pool.Enqueue(counterSlot);
     }
 
     /* ─ NPC가 들고 온 상품 내려놓기 + 슬롯 배정 ─ */
@@ -72,32 +76,7 @@ public class CounterManager : MonoBehaviour
             npcBaggedCount[npc] = 0;
         npcBaggedCount[npc]++;
 
-        // 필요하다면: 모든 상품이 담긴 후 카드/현금에 반짝 효과 주기 등
-    }
-
-    public void MarkPendingPayment(NpcController npc) => pendingPay.Add(npc);    // ★추가
-
-    /* ─ 플레이어가 카드/현금을 클릭해 결제 대기 ─ */
-    public void Pay(NpcController npc)                                  // ★추가
-    {
-        CompletePayment(npc);   // 슬롯 · 돈/카드 정리 및 줄 전진
-    }
-
-    /* ─ 현금/카드 생성 ─ */
-    public void ShowPaymentObject(NpcController npc, Transform handSocket)
-    {
-        if (npcToPay.ContainsKey(npc)) return;  // 중복 생성 방지
-
-        GameObject prefab = Random.value < 0.5f ? cashPrefab : cardPrefab;
-
-        // handSocket의 위치와 회전 그대로 복사
-        GameObject payObj = Instantiate(prefab, handSocket.position, handSocket.rotation, handSocket);
-
-        // 로컬 위치 및 회전 초기화
-        payObj.transform.localPosition = Vector3.zero;
-        payObj.transform.localRotation = Quaternion.identity;
-
-        npcToPay[npc] = payObj;
+        readyToPay.Add(npc);
     }
     
     /* ─ 슬롯 반납 전용 ─ */
@@ -126,6 +105,19 @@ public class CounterManager : MonoBehaviour
         // 4) NPC 내부 플래그·슬롯 정리
         npc.GetComponent<CarriedItemHandler>()?.ReleaseSlot();
         npc.OnPaymentCompleted();
+    }
+
+    public void ShowPaymentObject(NpcController npc, Transform handSocket, PaymentType method)
+    {
+        if (npcToPay.ContainsKey(npc)) return;  // 중복 생성 방지
+
+        GameObject prefab = (method == PaymentType.Cash) ? cashPrefab : cardPrefab;
+
+        GameObject payObj = Instantiate(prefab, handSocket.position, handSocket.rotation, handSocket);
+        payObj.transform.localPosition = Vector3.zero;
+        payObj.transform.localRotation = Quaternion.identity;
+
+        npcToPay[npc] = payObj;
     }
 
 
@@ -163,7 +155,7 @@ public class CounterManager : MonoBehaviour
         //계산 실패시 UI는 CalculatorErrorUI에 구현완료
     }
 
-    
+
     private void SubscribeCalculatorEvents()
     {
         CalculatorOk.SuccessCompare += HandlePaymentSuccess;

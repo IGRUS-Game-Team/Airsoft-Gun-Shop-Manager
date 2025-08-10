@@ -57,6 +57,10 @@ public class InputContextRouter : MonoBehaviour
 
         if (UIUtility.IsPointerOverUI()) return;
 
+        if (RaycastDetector.Instance == null)
+        { 
+            Debug.LogWarning("[Router] RaycastDetector missing");
+        }       
         var hit = (RaycastDetector.Instance != null) ? RaycastDetector.Instance.HitObject : null;
 
         // 1) 들고 있는 오브젝트를 조준 중이거나, 아무 것도 안 맞았을 때 → held 우선

@@ -18,7 +18,6 @@ public class MonitorInteractionBehaviour : MonoBehaviour, IInspectable
             return;
         }
         MonitorUIModeManager.Instance.EnterUIMode(monitorUICam);
-        uiClicker.SetEnterTime(); 
         
     }
 

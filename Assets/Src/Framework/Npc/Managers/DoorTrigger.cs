@@ -26,11 +26,11 @@ public class DoorTrigger : MonoBehaviour
 
         /* ── 인원 제한 ── */
         if (insideCount >= maxInStore)
-        {   npc.StartLeaving(exitPoint, "MAX_STORE");  return; }
+        {   npc.StartLeaving(exitPoint);  return; }
 
         /* ── 선반 빈 칸 예약 ── */
         if (!ShelfManager.Instance.TryGetAvailableSlot(out ShelfSlot slot))
-        {   npc.StartLeaving(exitPoint, "NO_SLOT");   return; }
+        {   npc.StartLeaving(exitPoint);   return; }
 
         /* ── 입장 확정 ── */
         insideCount++;
