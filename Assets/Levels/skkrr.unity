@@ -321,7 +321,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6808801588572630794, guid: a358c3ca975eaab469bc325ac820f985, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -0.0000467879
+      value: 0.00048419303
       objectReference: {fileID: 0}
     - target: {fileID: 6935892787233463129, guid: a358c3ca975eaab469bc325ac820f985, type: 3}
       propertyPath: m_AnchorMax.x
@@ -929,6 +929,10 @@ PrefabInstance:
       propertyPath: m_ConstrainProportionsScale
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 3033007368179337394, guid: 0b83ab344c87865408dfdc0541d2c723, type: 3}
+      propertyPath: m_Camera
+      value: 
+      objectReference: {fileID: 1097866308}
     - target: {fileID: 3939384831136156883, guid: 0b83ab344c87865408dfdc0541d2c723, type: 3}
       propertyPath: m_Name
       value: Calculator
@@ -1922,6 +1926,11 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 1d49bccacbcc805428f48da94e2a7621, type: 3}
+--- !u!20 &1097866308 stripped
+Camera:
+  m_CorrespondingSourceObject: {fileID: 3135545771024354502, guid: f1a038ae4230fc64f810ae94c8cf626d, type: 3}
+  m_PrefabInstance: {fileID: 878711964}
+  m_PrefabAsset: {fileID: 0}
 --- !u!224 &1120434204 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 3625317703237926640, guid: d9cb8a44418667c408137ba759133414, type: 3}
@@ -2396,6 +2405,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 605638721}
     - target: {fileID: 5389618506397281778, guid: 4f3e1293042b09148b255bd36fcef3d1, type: 3}
+      propertyPath: 'npcPrefabs.Array.data[10]'
+      value: 
+      objectReference: {fileID: 1157323347645730359, guid: bcfa60c33f63c12408f634d99d96fab0, type: 3}
+    - target: {fileID: 5389618506397281778, guid: 4f3e1293042b09148b255bd36fcef3d1, type: 3}
       propertyPath: 'spawnPoints.Array.data[0]'
       value: 
       objectReference: {fileID: 1776089071}
@@ -2705,7 +2718,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6875954652739384557, guid: 77b8ee79b2fedcb4c8676dfce79ab3c7, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
