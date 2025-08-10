@@ -6,9 +6,6 @@ public class NpcState_OfferPayment : IState
     /* ---------- 의존성 필드 ---------- */
 
     private readonly NpcController npcController;        // 상태를 실행할 NPC
-    private readonly QueueManager queueManager;          // 줄 관리 매니저
-    private readonly GameObject cashPrefab;              // 현금 프리팹
-    private readonly GameObject cardPrefab;              // 카드 프리팹
     private readonly Transform counterTransform;         // 계산대 위치
 
     /* ---------- 상수 ---------- */
@@ -27,16 +24,10 @@ public class NpcState_OfferPayment : IState
     // 외부에서 필요한 요소를 모두 주입받아 상태를 만든다.
     public NpcState_OfferPayment(
         NpcController npcController,
-        QueueManager   queueManager,
-        GameObject     cashPrefab,
-        GameObject     cardPrefab,
         Transform      counter)
     {
         this.npcController   = npcController;            // 필드와 매개변수 이름 충돌 → this. 사용
-        this.queueManager    = queueManager;
-        this.cashPrefab      = cashPrefab;
-        this.cardPrefab      = cardPrefab;
-        this.counterTransform = counter;
+        counterTransform = counter;
     }
 
     /* ---------- IState 구현 ---------- */
@@ -55,7 +46,6 @@ public class NpcState_OfferPayment : IState
         // (2) NavMeshAgent 이동·회전 중단
         npcController.Agent.isStopped = true;       // 이동 정지
         npcController.Agent.updateRotation = false;      // 자동 회전 끔
-        npcController.Animator.SetTrigger("OfferPayment");
     }
 
     // 매 프레임: 몸을 계산대 쪽으로 돌리고, 다 돌면 결제 물건을 생성
@@ -64,6 +54,12 @@ public class NpcState_OfferPayment : IState
         // 이미 정확히 돌았으면 이동·회전 로직 건너뜀
         if (rotationComplete)
         {
+            if (!itemSpawned)
+            {
+                npcController.Animator.SetTrigger("OfferPayment");
+                SpawnPaymentItem();  // ← 회전 끝난 순간 딱 1번만
+                itemSpawned = true;
+            }
             return;
         }
 
@@ -104,31 +100,27 @@ public class NpcState_OfferPayment : IState
     // 손 소켓에 현금 또는 카드를 생성하고 클릭 이벤트를 연결
     private void SpawnPaymentItem()
     {
-        Transform hand = npcController.HandTransform;    // 손 위치
-        GameObject prefab = paymentContext.method == PaymentType.Cash ? cashPrefab : cardPrefab;
-
-        // 손·프리팹이 없으면 바로 퇴장 상태로 전환
-        if (hand == null || prefab == null)
+        Transform hand = npcController.HandTransform;
+        if (hand == null)
         {
             npcController.stateMachine.SetState(new NpcState_Leave(npcController));
             return;
         }
 
-        // (1) 손에 프리팹 인스턴스 생성
-        GameObject item = Object.Instantiate(prefab, hand);
+        // ★ 랜덤으로 정한 타입을 넘겨서 생성만 위임
+        CounterManager.Instance.ShowPaymentObject(npcController, hand, paymentContext.method);
 
-        // (2) 약간 앞으로 이동해 손 모델과 겹침 방지
-        item.transform.localPosition = Vector3.forward * 0.05f;
-        item.transform.localRotation = Quaternion.identity;
-
-        // (3) 클릭 시 호출될 콜백 등록
-        item.GetComponent<PaymentItem>().Init(paymentContext, OnPaid);
+        // 필요하면 방금 생성된 오브젝트에서 초기화 호출
+        // 손 자식에서 PaymentItem 찾기 (CounterManager가 반환값을 주지 않으니 이렇게 안전하게)
+        PaymentItem payItem = hand.GetComponentInChildren<PaymentItem>(includeInactive: true);
+        if (payItem != null)
+            payItem.Init(paymentContext, OnPaid);
     }
 
     // 플레이어가 아이템을 클릭해서 결제를 완료했을 때 호출
     private void OnPaid()
     {
-        CounterManager.I.CompletePayment(npcController);   // ★변경: 매니저에게 위임
+        CounterManager.Instance.CompletePayment(npcController);   // ★변경: 매니저에게 위임
         npcController.stateMachine.SetState(new NpcState_Leave(npcController));
     }
 }
