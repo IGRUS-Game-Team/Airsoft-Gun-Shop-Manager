@@ -4,12 +4,10 @@ using UnityEngine;
 [RequireComponent(typeof(CarriedItemHandler))]
 public class PaymentAnimEvents : MonoBehaviour
 {
-    NpcController      npc;
     CarriedItemHandler carrier;
 
     void Awake()
     {
-        npc     = GetComponent<NpcController>();
         carrier = GetComponent<CarriedItemHandler>();
     }
 
@@ -17,6 +15,5 @@ public class PaymentAnimEvents : MonoBehaviour
     public void OnOfferReached()
     {
         carrier.PlaceToCounter();                           // 상품 내려놓기
-        CounterManager.I.ShowPaymentObject(npc, npc.HandTransform); // 돈/카드 생성
     }
 }

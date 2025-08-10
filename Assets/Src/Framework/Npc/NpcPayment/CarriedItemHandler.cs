@@ -35,7 +35,7 @@ public class CarriedItemHandler : MonoBehaviour
 
         // 슬롯이 없으면 빌림
         if (counterSlot == null)
-            counterSlot = CounterManager.I.PlaceItem(npc, heldItem, worldSize);
+            counterSlot = CounterManager.Instance.PlaceItem(npc, heldItem, worldSize);
 
         // PlaceItem 이 null 반환 시(슬롯 부족) 대비
         if (counterSlot != null) heldItem = null;
@@ -45,7 +45,7 @@ public class CarriedItemHandler : MonoBehaviour
     public void ReleaseSlot()
     {
         if (counterSlot != null)
-            CounterManager.I.ReturnSlot(counterSlot);   // ★변경: 매니저에 돌려주기
+            CounterManager.Instance.ReturnSlot(counterSlot);   // ★변경: 매니저에 돌려주기
         counterSlot = null;
     }
 }
