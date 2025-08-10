@@ -27,12 +27,7 @@ public class NpcState_Leave : IState
     // 상태 진입: 슬롯 해제 → NavMeshAgent 설정 → 출구로 이동
     public void Enter()
     {
-        if (npcController.targetShelfGroup != null)
-        {
-            npcController.targetShelfGroup.Release();
-            npcController.targetShelfGroup = null;
-        }
-
+        npcController.ReleaseShelfReservation("enter leave");
         if (reservedSlot != null)                           // 1) 슬롯이 있으면
         {
             reservedSlot.ParentGroup?.Release();            //    예약 해제

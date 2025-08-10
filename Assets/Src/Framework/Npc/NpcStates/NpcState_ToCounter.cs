@@ -19,48 +19,54 @@ public class NpcState_ToCounter : IState
     {
         // 이동 재개 및 목적지 설정 (기존 로직 유지)
         npcController.Agent.updateRotation = true;
-        npcController.Agent.isStopped = false;
-        npcController.Agent.SetDestination(counterNode.position);
-        npcController.Animator.Play(WalkAnim);
+        this.npcController.Agent.isStopped = false;
+        this.npcController.Agent.SetDestination(this.counterNode.position);
+        this.npcController.Animator.Play(WalkAnim);
     }
 
     public void Tick()
     {
         // 경로 계산 중이면 대기 (기존 유지)
-        if (npcController.Agent.pathPending)
+        if (this.npcController.Agent.pathPending)
             return;
 
         // ===== 도착 체크(허용 반경) + 스냅만 변경 =====
         const float ARRIVE_EPS = 0.35f; // 씬 보며 0.25~0.4 사이 조정
 
-        Vector3 targetPos = counterNode.position;
-        float sqrDist = (npcController.transform.position - targetPos).sqrMagnitude;
+        Vector3 targetPos = this.counterNode.position;
+        float sqrDist = (this.npcController.transform.position - targetPos).sqrMagnitude;
 
         // 위치 거리 OR remainingDistance 둘 중 하나로 도착 인정
         bool inRange =
             sqrDist <= ARRIVE_EPS * ARRIVE_EPS ||
-            npcController.Agent.remainingDistance <=
-                Mathf.Max(npcController.Agent.stoppingDistance, ARRIVE_EPS);
+            this.npcController.Agent.remainingDistance <=
+                Mathf.Max(this.npcController.Agent.stoppingDistance, ARRIVE_EPS);
 
         if (!inRange)
             return;
 
         // NavMesh 위 안전 스냅(Warp) + 경로 정지
-        NavMeshAgent agent = npcController.Agent;
-        agent.isStopped = true;
-        agent.ResetPath();
+        var ag = this.npcController.Agent;
+        ag.isStopped = true;
+        ag.ResetPath();
 
         Vector3 snapPos = targetPos;
-        if (NavMesh.SamplePosition(targetPos, out NavMeshHit hit, 0.5f, NavMesh.AllAreas))
+        if (NavMesh.SamplePosition(targetPos, out var hit, 0.5f, NavMesh.AllAreas))
             snapPos = hit.position;
-            agent.Warp(snapPos);
+        ag.Warp(snapPos);
 
         // ===== 아래는 기존 로직 그대로 =====
-        npcController.Agent.updateRotation = false;
-        npcController.transform.LookAt(counterNode);
+        this.npcController.Agent.updateRotation = false;
+        this.npcController.transform.LookAt(this.counterNode);
 
         // 결제 제안 상태로 전환 (기존 그대로)
-        npcController.stateMachine.SetState(new NpcState_OfferPayment(npcController, counterNode));
+        this.npcController.stateMachine.SetState(
+            new NpcState_OfferPayment(
+                this.npcController,
+                Object.FindFirstObjectByType<QueueManager>(),
+                this.npcController.CashPrefab,
+                this.npcController.CardPrefab,
+                this.counterNode));
     }
 
     public void Exit() { }

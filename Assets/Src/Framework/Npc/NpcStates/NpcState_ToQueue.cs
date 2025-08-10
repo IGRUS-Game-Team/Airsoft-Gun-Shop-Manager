@@ -1,99 +1,97 @@
 using UnityEngine;
-using UnityEngine.AI;
 
 // NPC가 물건을 집은 후 줄에 합류하거나 배회 상태로 전환하는 상태
 public class NpcState_ToQueue : IState
 {
     private readonly NpcController npcController;  // 대상 NPC
     private readonly QueueManager queueManager;    // 줄 관리 매니저
-    private Vector3 queueSpot;                   // NPC가 서야 할 자리
-    private Transform destination; // 최종 목적지
+    private Transform queueSpot;                   // NPC가 서야 할 자리
+    
+
     private const string WalkingAnim = "Walking";  // 걷기 애니메이션 이름
 
     public NpcState_ToQueue(NpcController npcController, QueueManager queueManager)
     {
         this.npcController = npcController;
-        this.queueManager = queueManager;
+        this.queueManager  = queueManager;
     }
 
     public void Enter()
     {
-        NavMeshAgent agent = npcController.Agent;
         Debug.Log("[ToQueue] 상태 진입");
 
-        if (npcController.targetShelfGroup != null)
-        {
-            npcController.targetShelfGroup.Release();
-            npcController.targetShelfGroup = null;
-        }
+        npcController.ReleaseShelfReservation("leaving shelf to queue");
 
-        if (!queueManager.TryEnqueue(npcController, out Transform assignedSpot) || assignedSpot == null)
+        // 1) 빈 자리 확보 시도
+        Transform assignedSpot;
+        bool joined = queueManager.TryEnqueue(npcController, out assignedSpot);
+
+        // 2) 줄이 가득 찼으면 배회 또는 퇴장 상태로 전환
+        if (!joined)
         {
-            Debug.Log("[ToQueue] 줄이 가득 → 배회 또는 퇴장");
-            npcController.Agent.updateRotation = true;
-            npcController.Agent.isStopped = false;
+            Debug.Log("[ToQueue] 줄이 가득 참 → 배회 또는 퇴장");
+            npcController.Agent.updateRotation = true;  // 이동은 자동 회전 모드
+            npcController.Agent.isStopped      = false; // 혹시 멈춰있던 거 풀기
 
             Transform[] wanderPoints = queueManager.WanderPoints;
             if (wanderPoints == null || wanderPoints.Length == 0)
             {
-                npcController.stateMachine.SetState(new NpcState_Leave(npcController));
+                npcController.stateMachine.SetState(
+                    new NpcState_Leave(npcController));
             }
             else
             {
-                npcController.stateMachine.SetState(new NpcState_Wander(npcController, wanderPoints, 20f));
+                npcController.stateMachine.SetState(
+                    new NpcState_Wander(npcController, wanderPoints, 20f));
             }
             return;
         }
 
-        destination = assignedSpot;
-        queueSpot = assignedSpot.position;
-        agent.SetDestination(queueSpot);
+        // 3) 자리 확보 성공: 목표 노드 설정 및 애니메이션 실행
+        this.queueSpot = assignedSpot;
+        npcController.SetQueueTarget(assignedSpot);   
         npcController.Animator.Play(WalkingAnim);
-
     }
 
     public void Tick()
     {
-        NavMeshAgent agent = npcController.Agent;
+        // 2) 아직 경로 계산 중이면 대기
+        if (npcController.Agent.pathPending)
+            return;
 
-        if (agent.pathPending) return;
-        if (agent.pathStatus == NavMeshPathStatus.PathInvalid) return;
+        // ===== 도착 체크(허용 반경) + 스냅 =====
+        const float ARRIVE_EPS = 0.35f; // 허용 반경(씬 보고 0.25~0.4로 조절)
 
-        // ── 속도→버킷→동적 여유 거리 계산 ─────────────────────────
-        float speed = agent.velocity.magnitude;                      // m/s
-        int bucket = Mathf.Clamp(Mathf.CeilToInt(speed), 0, 12);    // 1~2 => 2
-        float dynTol = 0.06f + (0.02f * bucket);                     // 기본 0.06 + 버킷당 0.02
-        if (dynTol > 0.32f) dynTol = 0.32f;                          // 상한
-        // 추가 start
-        Vector3 me = npcController.transform.position;
-        float planarDist = Vector2.Distance(
-        new Vector2(me.x, me.z),
-        new Vector2(queueSpot.x, queueSpot.z)
-        );
+        Vector3 targetPos = queueSpot.position;
+        float sqrDist = (npcController.transform.position - targetPos).sqrMagnitude;
 
-        bool nearByPath = agent.remainingDistance <= agent.stoppingDistance + dynTol;
-        bool partialOK = agent.pathStatus == NavMeshPathStatus.PathPartial && planarDist <= dynTol + 0.05f;
-        // 추가 end
-        // ──────────────────────────────────────────────────────────
+        // 위치 거리 or remainingDistance 둘 중 하나만 만족해도 도착 인정
+        bool inRange =
+            sqrDist <= ARRIVE_EPS * ARRIVE_EPS ||
+            npcController.Agent.remainingDistance <= Mathf.Max(npcController.Agent.stoppingDistance, ARRIVE_EPS);
 
-        // // 2) 남은 거리 ≤ (stoppingDistance + 속도기반 여유)
-        // if (agent.remainingDistance <= agent.stoppingDistance + dynTol)
-        // {
-        //     // 3) 거의 멈췄는지(완전 0 대신 작은 값)
-        //     if (!agent.hasPath || agent.velocity.sqrMagnitude <= 0.002f)
-        //     {
-        //         npcController.stateMachine.SetState(
-        //         new NpcState_QueueWait(npcController, queueManager, destination));
-        //     }
-        // }
-        if (nearByPath || partialOK)
+        if (!inRange)
         {
-            if (!agent.hasPath || agent.velocity.sqrMagnitude <= 0.002f)
-            {
-                npcController.stateMachine.SetState(
-                new NpcState_QueueWait(npcController, queueManager, destination));
-            }
+            // 필요하면 로그 유지
+            // Debug.Log($"[ToQueue] 이동 중: 남은거리={npcController.Agent.remainingDistance:F3}");
+            return;
         }
+
+        // NavMesh 위로 안전 스냅(Warp) + 이동/경로 정지
+        var ag = npcController.Agent;
+        ag.isStopped = true;
+        ag.ResetPath();
+
+        Vector3 snapPos = targetPos;
+        if (UnityEngine.AI.NavMesh.SamplePosition(targetPos, out var hit, 0.5f, UnityEngine.AI.NavMesh.AllAreas))
+            snapPos = hit.position;
+        ag.Warp(snapPos);
+
+        Debug.Log("[ToQueue] 도착 완료 → QueueWait 상태로 전환");
+
+        // 다음 상태로 전환(회전은 QueueWait에서 처리)
+        npcController.stateMachine.SetState(
+            new NpcState_QueueWait(npcController, queueManager, queueSpot));
     }
 
     public void Exit()
