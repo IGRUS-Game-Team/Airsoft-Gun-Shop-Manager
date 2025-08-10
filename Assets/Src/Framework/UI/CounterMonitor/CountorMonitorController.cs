@@ -9,19 +9,16 @@ public class CountorMonitorController : MonoBehaviour
 
     [SerializeField] TextMeshProUGUI totalPriceText;
 
-    public void Show(List<CounterSlotData> items)
+    public void Show(CounterSlotData items)
     {
         Clear();
 
         float total = 0f;
 
-        foreach (var slot in items)
-        {
-            var card = Instantiate(cardPrefab, contentRoot);
-            card.Setup(slot.itemData, slot.amount);
-            total += slot.itemData.baseCost * slot.amount;
-        }
-
+        var card = Instantiate(cardPrefab, contentRoot);
+        card.Setup(items.itemData, items.amount);
+        total += items.itemData.baseCost * items.amount;
+        
         totalPriceText.text = $"${total:F2}";
     }
 

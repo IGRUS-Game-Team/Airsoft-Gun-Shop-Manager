@@ -9,6 +9,10 @@ using UnityEngine.UI;
 /// 클릭하면 ray를 모니터 render texture가 씌어진 cube로 쏨, cube에 맞은 좌표를 ui 상의 좌표로 변환 후
 /// 그 좌표에 있는 버튼의 이벤트를 실행시킴
 /// </summary>
+/// 
+/// 8/10 박정민 로직 변경
+/// 클릭했을 때 딜레이를 걸어 클릭을 무시하는게 아닌
+/// 걍 첫클릭 무시로 대체
 public class RenderTextureUIClicker : MonoBehaviour
 {
     [SerializeField] Camera MonitorCam;
@@ -18,9 +22,7 @@ public class RenderTextureUIClicker : MonoBehaviour
     [SerializeField] GraphicRaycaster uiRaycaster;
     [SerializeField] EventSystem eventSystem;
 
-    [SerializeField] float clickDelay = 0.15f;
-
-    private float enterTime = -999f;
+    bool firstClickIgnored = false;
 
 
     void Update()
@@ -30,10 +32,10 @@ public class RenderTextureUIClicker : MonoBehaviour
             return;
         }
 
-        // 진입 후 딜레이 이전이면 클릭 무시
-        if (Time.time - enterTime < clickDelay)
+        if (!firstClickIgnored)
         {
-            Debug.Log("UI 진입 직후 클릭 무시됨");
+            Debug.Log("UI 진입 후 첫 클릭 무시");
+            firstClickIgnored = true;
             return;
         }
 
@@ -83,8 +85,4 @@ public class RenderTextureUIClicker : MonoBehaviour
     }
 
 
-public void SetEnterTime()
-{
-    enterTime = Time.time;
-}
 }
