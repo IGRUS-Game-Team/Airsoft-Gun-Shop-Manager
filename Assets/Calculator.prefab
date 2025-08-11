@@ -145,10 +145,10 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3987180936723120746}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0.60726357, z: -0, w: -0.7945004}
+  m_LocalRotation: {x: -0, y: -0.6072651, z: 0, w: -0.79449934}
   m_LocalPosition: {x: -0.05, y: 1.369, z: 1.848}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
+  m_LocalScale: {x: 0.3, y: 0.3, z: 0.3}
+  m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 8211147155280920793}
   - {fileID: 1431623764628080098}
@@ -205,6 +205,7 @@ MonoBehaviour:
   calculatorCamera: {fileID: 5969362449047375144}
   defaultCamera: {fileID: 0}
   blendTime: 1
+  FuckingGraphicRaycaster: {fileID: 0}
 --- !u!1001 &5475329893933130814
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -253,6 +254,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 1813587265561061654, guid: 77b8ee79b2fedcb4c8676dfce79ab3c7, type: 3}
+      propertyPath: m_Priority
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 3628085822027166130, guid: 77b8ee79b2fedcb4c8676dfce79ab3c7, type: 3}
       propertyPath: m_Name
       value: CalculatorCameraPoint
@@ -290,6 +295,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: CalculatorCanvas
       objectReference: {fileID: 0}
+    - target: {fileID: 1262343976320590633, guid: cc60bff5cfcee524d9e466e3f1610a27, type: 3}
+      propertyPath: m_Layer
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 7557881440226449012, guid: cc60bff5cfcee524d9e466e3f1610a27, type: 3}
       propertyPath: m_Pivot.x
       value: 0.5
@@ -316,11 +325,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7557881440226449012, guid: cc60bff5cfcee524d9e466e3f1610a27, type: 3}
       propertyPath: m_SizeDelta.x
-      value: 1
+      value: 100
       objectReference: {fileID: 0}
     - target: {fileID: 7557881440226449012, guid: cc60bff5cfcee524d9e466e3f1610a27, type: 3}
       propertyPath: m_SizeDelta.y
-      value: 1
+      value: 100
       objectReference: {fileID: 0}
     - target: {fileID: 7557881440226449012, guid: cc60bff5cfcee524d9e466e3f1610a27, type: 3}
       propertyPath: m_LocalPosition.x

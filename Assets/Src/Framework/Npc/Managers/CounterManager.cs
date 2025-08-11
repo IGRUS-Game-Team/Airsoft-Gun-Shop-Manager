@@ -7,7 +7,7 @@ public class CounterManager : MonoBehaviour
 
     [Header("카운터 슬롯들 (Inspector 순서대로 사용)")]
     [SerializeField] Transform[] counterSlots;
-    readonly Queue<Transform> pool = new();
+    readonly List<Transform> freeSlots = new();     
 
     [Header("결제용 프리팹")]
     [SerializeField] GameObject cashPrefab;
@@ -39,19 +39,21 @@ public class CounterManager : MonoBehaviour
         }
         Instance = this;
 
-        foreach (Transform counterSlot in counterSlots) pool.Enqueue(counterSlot);
+        freeSlots.AddRange(counterSlots);     
     }
 
     /* ─ NPC가 들고 온 상품 내려놓기 + 슬롯 배정 ─ */
     public Transform PlaceItem(NpcController npc, GameObject item, Vector3 worldSize)
     {
-        if (npcToSlot.ContainsKey(npc) == false)
+        // ── npcToSlot 사용 안 함 ──
+        var rnd = TakeRandomFreeSlot();
+        if (rnd == null)
         {
-            if (pool.Count == 0) { Debug.LogWarning("카운터 슬롯 부족"); return null; }
-            npcToSlot[npc] = pool.Dequeue();
+            Debug.LogWarning("카운터 슬롯 부족");
+            return null;
         }
 
-        Transform slot = npcToSlot[npc];
+        Transform slot = rnd;
 
         item.transform.SetParent(slot, false);
         item.transform.localPosition = Vector3.zero;
@@ -64,7 +66,9 @@ public class CounterManager : MonoBehaviour
             worldSize.z / s.z
         );
 
-        item.gameObject.GetComponent<CheckoutItemBehaviour>().Init(this, npc, scannerPoint, bagPoint, beepClip);
+        item.gameObject
+            .GetComponent<CheckoutItemBehaviour>()
+            .Init(this, npc, scannerPoint, bagPoint, beepClip);
 
         return slot;
     }
@@ -80,7 +84,11 @@ public class CounterManager : MonoBehaviour
     }
     
     /* ─ 슬롯 반납 전용 ─ */
-    public void ReturnSlot(Transform slot) => pool.Enqueue(slot);
+    public void ReturnSlot(Transform slot)                            // ★변경
+    {
+        if (slot == null) return;
+        if (!freeSlots.Contains(slot)) freeSlots.Add(slot);
+    }
 
     /* ─ 결제 완료 처리 ─ */
     public void CompletePayment(NpcController npc)
@@ -118,6 +126,15 @@ public class CounterManager : MonoBehaviour
         payObj.transform.localRotation = Quaternion.identity;
 
         npcToPay[npc] = payObj;
+    }
+
+    Transform TakeRandomFreeSlot()
+    {
+        if (freeSlots.Count == 0) return null;
+        int idx = Random.Range(0, freeSlots.Count);
+        Transform t = freeSlots[idx];
+        freeSlots.RemoveAt(idx);
+        return t;
     }
 
 
