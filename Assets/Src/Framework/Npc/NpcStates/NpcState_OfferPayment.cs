@@ -19,14 +19,19 @@ public class NpcState_OfferPayment : IState
     private bool rotationComplete;                       // 목표 방향으로 정확히 선 뒤 true
     private PaymentContext paymentContext;               // 결제 정보
 
+    private CountorMonitorController countorMonitorController;
+
     /* ---------- 생성자 ---------- */
 
     // 외부에서 필요한 요소를 모두 주입받아 상태를 만든다.
+    // private void Awake() {
+    //     countorMonitorController = 
+    // }
     public NpcState_OfferPayment(
         NpcController npcController,
-        Transform      counter)
+        Transform counter)
     {
-        this.npcController   = npcController;            // 필드와 매개변수 이름 충돌 → this. 사용
+        this.npcController = npcController;            // 필드와 매개변수 이름 충돌 → this. 사용
         counterTransform = counter;
     }
 
@@ -135,5 +140,6 @@ public class NpcState_OfferPayment : IState
     {
         CounterManager.Instance.CompletePayment(npcController);   // 매니저에게 위임
         npcController.stateMachine.SetState(new NpcState_Leave(npcController));
+        Debug.Log("계산 완료 ㅅㅂ");
     }
 }
