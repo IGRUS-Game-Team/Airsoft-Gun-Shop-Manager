@@ -100,10 +100,8 @@ public class CheckoutItemBehaviour : MonoBehaviour, IInteractable
                     {
                         if (beep) src.PlayOneShot(beep);
                         beeped = true;
-
-
                         countorMonitorController.Show(counterSlotData);
-                        cashRegisterUI.SetValues(counterSlotData.itemData.baseCost - Random.Range(0, 100), counterSlotData.itemData.baseCost);
+                        //cashRegisterUI.SetValues(counterSlotData.itemData.baseCost - Random.Range(0, 100), counterSlotData.itemData.baseCost);
                         Debug.Log($"{price} 계산 시퀀스");
                     }
                 }
