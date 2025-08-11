@@ -14,14 +14,15 @@ public class CounterManager : MonoBehaviour
     [SerializeField] GameObject cardPrefab;
 
     [Header("스캐너, 봉투 위치, 스캔 효과음")]
-    [SerializeField] Transform scannerPoint;    // ★바코드 위치
-    [SerializeField] Transform bagPoint;        // ★봉투 위치
-    [SerializeField] AudioClip beepClip;       // ★삑 효과음
+    [SerializeField] Transform scannerPoint;    // 바코드 위치
+    [SerializeField] Transform bagPoint;        // 봉투 위치
+    [SerializeField] AudioClip beepClip;       // 삑 효과음
 
     readonly Dictionary<NpcController, Transform> npcToSlot = new();
     readonly Dictionary<NpcController, GameObject> npcToPay = new();
     readonly Dictionary<NpcController, int> npcBaggedCount = new();
     private readonly HashSet<NpcController> readyToPay = new();
+    readonly Dictionary<NpcController, int> npcCheckoutTargetCount = new(); // ★추가
 
     public bool IsReadyToPay(NpcController npc) => readyToPay.Contains(npc);
     public void MarkReadyToPay(NpcController npc) => readyToPay.Add(npc);
@@ -67,6 +68,14 @@ public class CounterManager : MonoBehaviour
         item.gameObject.GetComponent<CheckoutItemBehaviour>().Init(this, npc, scannerPoint, bagPoint, beepClip);
 
         return slot;
+    }
+
+    // ★추가: 이번 손님 총 개수 세팅 (계산대에 다 올리기 “직전”에 호출)
+    public void BeginCheckout(NpcController npc, int totalItems)
+    {
+        npcCheckoutTargetCount[npc] = Mathf.Max(0, totalItems);
+        npcBaggedCount[npc] = 0;
+        readyToPay.Remove(npc);
     }
 
     /* ─ 상품 한 개가 봉투에 완전히 들어갔을 때 호출 ─ */
