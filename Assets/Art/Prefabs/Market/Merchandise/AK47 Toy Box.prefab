@@ -15,6 +15,7 @@ GameObject:
   - component: {fileID: 2864769764699910070}
   - component: {fileID: 587506048247636224}
   - component: {fileID: -144209739508554414}
+  - component: {fileID: -2805823992432471520}
   m_Layer: 3
   m_Name: AK47 Toy Box
   m_TagString: Untagged
@@ -102,6 +103,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dc82b085a38e6e440bb6741fd4c5c4cd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  scanRadius: 0.6
+  bagRadius: 0.8
+  drawGizmos: 1
 --- !u!114 &2864769764699910070
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -114,6 +118,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0ccb6c0d3408f134b929a7b03ee477cd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  selected: 0
   sharedOutlineMaterial: {fileID: 2100000, guid: b42560bf0c4ffd0458a491ad48a0a66c, type: 2}
 --- !u!65 &587506048247636224
 BoxCollider:
@@ -151,3 +156,16 @@ MonoBehaviour:
   itemObject: {fileID: 7052068986711583175}
   itemData: {fileID: 11400000, guid: e8ab074aeaf9a8843b222007e54dbdd7, type: 2}
   amount: 1
+--- !u!114 &-2805823992432471520
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7052068986711583175}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9345664f47681ba41ad9508fc726bb0d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  itemData: {fileID: 11400000, guid: e8ab074aeaf9a8843b222007e54dbdd7, type: 2}

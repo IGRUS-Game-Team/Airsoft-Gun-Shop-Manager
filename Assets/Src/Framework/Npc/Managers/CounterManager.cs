@@ -7,7 +7,7 @@ public class CounterManager : MonoBehaviour
 
     [Header("카운터 슬롯들 (Inspector 순서대로 사용)")]
     [SerializeField] Transform[] counterSlots;
-    readonly Queue<Transform> pool = new();
+    readonly List<Transform> freeSlots = new();     
 
     [Header("결제용 프리팹")]
     [SerializeField] GameObject cashPrefab;
@@ -17,21 +17,23 @@ public class CounterManager : MonoBehaviour
     [SerializeField] Transform scannerPoint;    // ★바코드 위치
     [SerializeField] Transform bagPoint;        // ★봉투 위치
     [SerializeField] AudioClip beepClip;       // ★삑 효과음
+    private CountorMonitorController countorMonitorController;
 
     readonly Dictionary<NpcController, Transform> npcToSlot = new();
     readonly Dictionary<NpcController, GameObject> npcToPay = new();
     readonly Dictionary<NpcController, int> npcBaggedCount = new();
     private readonly HashSet<NpcController> readyToPay = new();
+    readonly Dictionary<NpcController, int> npcCheckoutTargetCount = new(); // ★추가
 
     public bool IsReadyToPay(NpcController npc) => readyToPay.Contains(npc);
     public void MarkReadyToPay(NpcController npc) => readyToPay.Add(npc);
     public void ClearReadyToPay(NpcController npc) => readyToPay.Remove(npc);
 
-    
+
 
     void Awake()
     {
-         // 싱글턴 보장
+        // 싱글턴 보장
         if (Instance != null && Instance != this)
         {
             Destroy(gameObject);
@@ -39,19 +41,23 @@ public class CounterManager : MonoBehaviour
         }
         Instance = this;
 
-        foreach (Transform counterSlot in counterSlots) pool.Enqueue(counterSlot);
+        freeSlots.AddRange(counterSlots);     
+        countorMonitorController = FindFirstObjectByType<CountorMonitorController>();
     }
 
     /* ─ NPC가 들고 온 상품 내려놓기 + 슬롯 배정 ─ */
     public Transform PlaceItem(NpcController npc, GameObject item, Vector3 worldSize)
     {
-        if (npcToSlot.ContainsKey(npc) == false)
+        // ── npcToSlot 사용 안 함 ──
+        Debug.Log($"[SLOT][REQ] npc={npc.name} item={item.name} free={freeSlots.Count}");
+        var rnd = TakeRandomFreeSlot();
+        if (rnd == null)
         {
-            if (pool.Count == 0) { Debug.LogWarning("카운터 슬롯 부족"); return null; }
-            npcToSlot[npc] = pool.Dequeue();
+            Debug.LogWarning("카운터 슬롯 부족");
+            return null;
         }
 
-        Transform slot = npcToSlot[npc];
+        Transform slot = rnd;
 
         item.transform.SetParent(slot, false);
         item.transform.localPosition = Vector3.zero;
@@ -64,10 +70,25 @@ public class CounterManager : MonoBehaviour
             worldSize.z / s.z
         );
 
-        item.gameObject.GetComponent<CheckoutItemBehaviour>().Init(this, npc, scannerPoint, bagPoint, beepClip);
+        item.gameObject
+            .GetComponent<CheckoutItemBehaviour>()
+            .Init(this, npc, scannerPoint, bagPoint, beepClip);
 
+        Debug.Log($"[SLOT][TAKE] item={item.name} -> {slot.name}  freeNow={freeSlots.Count}");
         return slot;
     }
+
+
+    // ★추가: 이번 손님 총 개수 세팅 (계산대에 다 올리기 “직전”에 호출)
+    public void BeginCheckout(NpcController npc, int totalItems)
+    {
+        npcCheckoutTargetCount[npc] = Mathf.Max(0, totalItems);
+        npcBaggedCount[npc] = 0;
+        readyToPay.Remove(npc);
+
+        Debug.Log($" 계산 시작 전 총 개수 = {totalItems}");
+    }
+
 
     /* ─ 상품 한 개가 봉투에 완전히 들어갔을 때 호출 ─ */
     public void OnItemBagged(NpcController npc)                         // ★추가
@@ -76,11 +97,23 @@ public class CounterManager : MonoBehaviour
             npcBaggedCount[npc] = 0;
         npcBaggedCount[npc]++;
 
-        readyToPay.Add(npc);
+        int cur    = npcBaggedCount[npc];
+        int target = npcCheckoutTargetCount.TryGetValue(npc, out var t) ? t : -1;
+        bool ready = target >= 0 && cur >= target;
+
+        if (ready) readyToPay.Add(npc);
+
+        Debug.Log($"현재 상황 {cur}/{target} 결제 준비 상태 = {ready}"); // ★추가
+        
     }
-    
+
     /* ─ 슬롯 반납 전용 ─ */
-    public void ReturnSlot(Transform slot) => pool.Enqueue(slot);
+    public void ReturnSlot(Transform slot)                            // ★변경
+    {
+        if (slot == null) return;
+        if (!freeSlots.Contains(slot)) freeSlots.Add(slot);
+        Debug.Log($"[SLOT][RETURN] {slot.name}  freeNow={freeSlots.Count}");
+    }
 
     /* ─ 결제 완료 처리 ─ */
     public void CompletePayment(NpcController npc)
@@ -120,6 +153,41 @@ public class CounterManager : MonoBehaviour
         npcToPay[npc] = payObj;
     }
 
+    Transform TakeRandomFreeSlot()
+    {
+        if (freeSlots.Count == 0) return null;
+        int idx = Random.Range(0, freeSlots.Count);
+        Transform t = freeSlots[idx];
+        freeSlots.RemoveAt(idx);
+        return t;
+    }
+
+    #if UNITY_EDITOR
+    [SerializeField] bool debugDrawSlots = true;
+
+    void OnDrawGizmos()
+    {
+        if (!debugDrawSlots || counterSlots == null)
+        {
+            Debug.Log(debugDrawSlots + " " + counterSlots);
+            return;
+        }
+
+        var free = new HashSet<Transform>(freeSlots);
+        foreach (var s in counterSlots)
+        {
+            if (s == null)
+            {
+                Debug.Log("s" + s + " 가 null");
+                continue;
+            }
+
+            Gizmos.color = free.Contains(s) ? new Color(0,1,0,0.35f) : new Color(1,0,0,0.35f); // free=초록, 점유=빨강
+            Gizmos.DrawSphere(s.position + Vector3.up*0.05f, 0.05f);
+        }
+    }
+    #endif
+
 
 
     //추가 === 장지원
@@ -131,7 +199,6 @@ public class CounterManager : MonoBehaviour
     //계산 시작
     public void StartCalculatorPayment(NpcController npc)
     {
-        Debug.Log("응가" + npc);
         currentNpcForPayment = npc; //계산을 처리할 npc
 
         SubscribeCalculatorEvents(); //계산 이벤트 시작
@@ -141,14 +208,14 @@ public class CounterManager : MonoBehaviour
     //success 이벤트가 진행할 메서드
     private void HandlePaymentSuccess() //계산 성공
     {
-        Debug.Log(currentNpcForPayment);
-
         if (currentNpcForPayment != null)
         {
             //결제 완료 처리
             CompletePayment(currentNpcForPayment);
             Debug.Log(npcPaymentAmount);
             GameState.Instance.AddMoney(npcPaymentAmount); //손님이 결제한 금액 매출액에 추가
+            countorMonitorController.Clear();
+            
         }
 
         //이벤트 구독 해제

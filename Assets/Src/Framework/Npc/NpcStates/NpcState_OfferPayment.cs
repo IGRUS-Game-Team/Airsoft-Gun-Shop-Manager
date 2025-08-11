@@ -17,16 +17,22 @@ public class NpcState_OfferPayment : IState
 
     private bool itemSpawned;                            // 소지품을 손에 생성했는가?
     private bool rotationComplete;                       // 목표 방향으로 정확히 선 뒤 true
+    private bool loggedReady;
     private PaymentContext paymentContext;               // 결제 정보
+
+    private CountorMonitorController countorMonitorController;
 
     /* ---------- 생성자 ---------- */
 
     // 외부에서 필요한 요소를 모두 주입받아 상태를 만든다.
+    // private void Awake() {
+    //     countorMonitorController = 
+    // }
     public NpcState_OfferPayment(
         NpcController npcController,
-        Transform      counter)
+        Transform counter)
     {
-        this.npcController   = npcController;            // 필드와 매개변수 이름 충돌 → this. 사용
+        this.npcController = npcController;            // 필드와 매개변수 이름 충돌 → this. 사용
         counterTransform = counter;
     }
 
@@ -46,6 +52,17 @@ public class NpcState_OfferPayment : IState
         // (2) NavMeshAgent 이동·회전 중단
         npcController.Agent.isStopped = true;       // 이동 정지
         npcController.Agent.updateRotation = false;      // 자동 회전 끔
+
+        // ★추가: 들고 온 거 전부 계산대에 내려놓고, 총 개수 등록
+        var carrier = npcController.GetComponent<CarriedItemHandler>();
+        Debug.Log(carrier);
+        if (carrier != null)
+        {
+            Debug.Log($"[OfferPayment.Enter] CarriedCount = {carrier.CarriedCount}");
+            Debug.Log("들고 온 거 모두 놓기");
+            CounterManager.Instance.BeginCheckout(npcController, carrier.CarriedCount); // ★추가
+            carrier.PlaceAllToCounter();                                                // ★추가
+        }
     }
 
     // 매 프레임: 몸을 계산대 쪽으로 돌리고, 다 돌면 결제 물건을 생성
@@ -54,6 +71,10 @@ public class NpcState_OfferPayment : IState
         // 이미 정확히 돌았으면 이동·회전 로직 건너뜀
         if (rotationComplete)
         {
+            bool ready = CounterManager.Instance.IsReadyToPay(npcController);
+            if (ready && !loggedReady) { Debug.Log($"[PAY][READY] {npcController.name}"); loggedReady = true; } // ★추가
+            if (!ready) return;
+
             if (!itemSpawned)
             {
                 npcController.Animator.SetTrigger("OfferPayment");
@@ -122,5 +143,6 @@ public class NpcState_OfferPayment : IState
     {
         CounterManager.Instance.CompletePayment(npcController);   // ★변경: 매니저에게 위임
         npcController.stateMachine.SetState(new NpcState_Leave(npcController));
+        Debug.Log("계산 완료 ㅅㅂ");
     }
 }
