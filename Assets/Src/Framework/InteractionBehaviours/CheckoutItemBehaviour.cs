@@ -71,55 +71,125 @@ public class CheckoutItemBehaviour : MonoBehaviour, IInteractable
         StartCoroutine(MoveRoutine());
     }
 
-    IEnumerator MoveRoutine()
+IEnumerator MoveRoutine()
+{
+    Debug.Log($"[MoveRoutine] START for {gameObject.name}");
+    Debug.Log($"bag={bag}, scanner={scanner}, owner={owner}, manager={manager}, counterSlotData={counterSlotData}");
+
+    if (bag != null)
+        Debug.Log($"Start distance to bag: {Vector3.Distance(transform.position, bag.position)}");
+
+    // 시작 시 봉투 안에 이미 있는 경우
+    if (bag != null && InsideRadius2D(transform.position, bag.position, bagRadius))
     {
-        if (bag == null)
+        var usedSlot = transform.parent;
+        Debug.Log($"[BAG-IMMEDIATE] owner={owner?.name}, item={gameObject.name}, parentSlot={usedSlot?.name}");
+
+        if (usedSlot == null)
+            Debug.LogWarning("[BAG-IMMEDIATE] usedSlot is NULL!");
+        else
+            CounterManager.Instance?.ReturnSlot(usedSlot);
+
+        // 다음 아이템 시도
+        if (owner == null)
+            Debug.LogWarning("[BAG-IMMEDIATE] owner is NULL!");
+        else
+            owner.GetComponent<CarriedItemHandler>()?.PlaceToCounter();
+
+        manager?.OnItemBagged(owner);
+        Destroy(gameObject);
+        yield break;
+    }
+
+    Vector3 dir = (bag != null) ? (bag.position - transform.position).normalized : Vector3.zero;
+    Debug.Log($"[MOVE] dir={dir}");
+
+    AudioSource src = gameObject.AddComponent<AudioSource>();
+    src.playOnAwake = false;
+
+    while (true)
+    {
+        transform.position += dir * speed * Time.deltaTime;
+
+        // 스캐너 판정
+        if (!beeped)
         {
-            Debug.LogWarning("CheckoutItemBehaviour: bag Transform이 비어있음");
-            yield break;
-        }
-
-        Vector3 dir = (bag.position - transform.position).normalized;
-
-        AudioSource src = gameObject.AddComponent<AudioSource>();
-        src.playOnAwake = false;
-
-        while (true)
-        {
-            // 이동
-            transform.position += dir * speed * Time.deltaTime;
-
-            // ① 스캐너 통과하면 삑 (넉넉한 반경 + 진행방향 확인)
-            if (!beeped && scanner != null)
+            if (scanner == null)
             {
-                // 수평 거리로 반경 판정(높이 차이는 무시)
+                Debug.LogWarning("[SCANNER] scanner is NULL!");
+            }
+            else
+            {
                 if (InsideRadius2D(transform.position, scanner.position, scanRadius))
                 {
-                    // 스캐너를 ‘지나쳤다’ 판정(스캐너 기준 앞으로 진행 중)
+                    Debug.Log("[SCANNER] Inside scan radius");
                     if (Vector3.Dot(transform.position - scanner.position, dir) > 0f)
                     {
-                        if (beep) src.PlayOneShot(beep);
+                        Debug.Log("[SCANNER] Passed scanner, triggering beep");
+                        if (beep != null) src.PlayOneShot(beep);
+                        else Debug.LogWarning("[SCANNER] beep clip is NULL");
+
                         beeped = true;
 
+                        if (countorMonitorController == null)
+                            Debug.LogWarning("[SCANNER] countorMonitorController is NULL!");
+                        else
+                            countorMonitorController.Show(counterSlotData);
 
-                        countorMonitorController.Show(counterSlotData);
-                        cashRegisterUI.SetValues(counterSlotData.itemData.baseCost - Random.Range(0, 100), counterSlotData.itemData.baseCost);
+                        if (cashRegisterUI == null)
+                            Debug.LogWarning("[SCANNER] cashRegisterUI is NULL!");
+                        else if (counterSlotData?.itemData == null)
+                            Debug.LogWarning("[SCANNER] counterSlotData.itemData is NULL!");
+                        else
+                            cashRegisterUI.SetValues(
+                                counterSlotData.itemData.baseCost - Random.Range(0, 100),
+                                counterSlotData.itemData.baseCost
+                            );
+
                         Debug.Log($"{price} 계산 시퀀스");
                     }
                 }
             }
-
-            // ② 봉투 반경에 들어오면 포장 완료
-            if (bag != null && InsideRadius2D(transform.position, bag.position, bagRadius))
-            {
-                manager.OnItemBagged(owner); // “상품 담김” 알림
-                Destroy(gameObject);
-                yield break;
-            }
-
-            yield return null;
         }
+
+        // 봉투 판정
+        // if (bag == null)
+        // {
+        //     Debug.LogWarning("[BAG] bag is NULL!");
+        // }
+        // else if (InsideRadius2D(transform.position, bag.position, bagRadius))
+        // {
+        //     Debug.Log($"[BAG] Packed item={gameObject.name}, owner={owner?.name}");
+
+        //     manager?.OnItemBagged(owner);
+        //     Destroy(gameObject);
+        //     yield break;
+        // }
+        // else
+        // {
+        //     Debug.Log($"[BAG] Not in radius yet. Dist={Vector3.Distance(transform.position, bag.position)}");
+        // }
+                // ② 봉투 반경 도착 → 슬롯 반납 + 다음 아이템 시도
+        if (bag != null && InsideRadius2D(transform.position, bag.position, bagRadius))
+        {
+            var usedSlot = transform.parent;
+            Debug.Log($"[BAG] Packed item={gameObject.name}, owner={owner?.name}, parentSlot={usedSlot?.name}");
+
+            if (usedSlot != null)
+                CounterManager.Instance.ReturnSlot(usedSlot);
+
+            manager.OnItemBagged(owner);
+
+            owner?.GetComponent<CarriedItemHandler>()?.PlaceToCounter();
+
+            Destroy(gameObject);
+            yield break;
+        }
+
+        yield return null;
     }
+}
+
 
     // 2D(수평) 반경 체크: y는 무시해서 판정 넉넉하게
     bool InsideRadius2D(Vector3 a, Vector3 b, float radius)
@@ -153,29 +223,4 @@ public class CheckoutItemBehaviour : MonoBehaviour, IInteractable
             foreach (var c in cols) c.enabled = true;
         }
     }
-
-#if UNITY_EDITOR
-    void OnDrawGizmosSelected()
-    {
-        if (!drawGizmos) return;
-
-        Gizmos.matrix = Matrix4x4.identity;
-        Color scanC = new Color(0f, 1f, 0.5f, 0.25f);
-        Color bagC  = new Color(0.2f, 0.6f, 1f, 0.25f);
-
-        if (scanner != null)
-        {
-            Gizmos.color = scanC;
-            var p = scanner.position; p.y = 0f;
-            Gizmos.DrawSphere(p, scanRadius);
-        }
-
-        if (bag != null)
-        {
-            Gizmos.color = bagC;
-            var p = bag.position; p.y = 0f;
-            Gizmos.DrawSphere(p, bagRadius);
-        }
-    }
-#endif
 }

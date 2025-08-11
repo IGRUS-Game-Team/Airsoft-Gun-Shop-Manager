@@ -17,6 +17,7 @@ public class NpcState_OfferPayment : IState
 
     private bool itemSpawned;                            // 소지품을 손에 생성했는가?
     private bool rotationComplete;                       // 목표 방향으로 정확히 선 뒤 true
+    private bool loggedReady;
     private PaymentContext paymentContext;               // 결제 정보
 
     private CountorMonitorController countorMonitorController;
@@ -72,6 +73,10 @@ public class NpcState_OfferPayment : IState
         // 이미 정확히 돌았으면 이동·회전 로직 건너뜀
         if (rotationComplete)
         {
+            bool ready = CounterManager.Instance.IsReadyToPay(npcController);
+            if (ready && !loggedReady) { Debug.Log($"[PAY][READY] {npcController.name}"); loggedReady = true; } // ★추가
+            if (!ready) return;
+
             if (!itemSpawned)
             {
                 npcController.Animator.SetTrigger("OfferPayment");

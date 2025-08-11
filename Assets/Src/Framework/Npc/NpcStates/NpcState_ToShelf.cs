@@ -46,7 +46,6 @@ public class NpcState_ToShelf : IState
         // 거의 멈췄으면 도착으로 인정
         if (!agent.hasPath || agent.velocity.sqrMagnitude <= 0.002f)
         {
-            Debug.Log("선반 도착 했음");
 
             // 자동 회전 끄고, 선반 쪽을 바라보게
             agent.updateRotation = false;

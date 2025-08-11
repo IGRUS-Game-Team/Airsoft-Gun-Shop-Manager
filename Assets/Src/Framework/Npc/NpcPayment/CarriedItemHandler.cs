@@ -60,23 +60,27 @@ public class CarriedItemHandler : MonoBehaviour
     /* ───────────────── 카운터로 이동 ───────────────── */
     public void PlaceToCounter()
     {
-
-        // ✅ 큐가 비었으면 종료
         if (carried.Count == 0) return;
 
-        // ✅ 큐에서 "실제" 아이템 꺼내기 (이게 핵심!)
         var pick = carried.Dequeue();
 
-        // 계산대에서는 튀지 않게: 콜라이더 ON, RB는 kinematic 유지
         foreach (var col in pick.go.GetComponentsInChildren<Collider>(true)) col.enabled = true;
-        var rb = pick.go.GetComponent<Rigidbody>();
-        if (rb) rb.isKinematic = true;
+        var rb = pick.go.GetComponent<Rigidbody>(); if (rb) rb.isKinematic = true;
 
-        // ★ worldScale을 넘겨서 CounterManager가 로컬스케일 계산하게
-        if (counterSlot == null)
-            counterSlot = CounterManager.Instance.PlaceItem(npc, pick.go, pick.worldScale);
-        else
-            CounterManager.Instance.PlaceItem(npc, pick.go, pick.worldScale);
+        // ★ 여기서 로그 + null 처리
+        Debug.Log($"[PLACE] try npc={npc.name} item={pick.go.name} carriedBefore={carried.Count}");
+        var assigned = CounterManager.Instance.PlaceItem(npc, pick.go, pick.worldScale);
+
+        if (assigned == null)
+        {
+            // 슬롯이 없으면 다시 숨기고 큐로 되돌림 → 다음에 다시 시도
+            pick.go.SetActive(false);
+            carried.Enqueue(pick);                              // ★ 되돌려두기
+            Debug.Log($"[PLACE] NO SLOT. requeue npc={npc.name} pending={carried.Count}");
+            return;
+        }
+
+        if (counterSlot == null) counterSlot = assigned;
     }
 
     /* ───────────────── 계산대에 전부 올리기 ───────────────── */
