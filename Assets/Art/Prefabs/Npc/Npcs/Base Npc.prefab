@@ -8959,7 +8959,7 @@ NavMeshAgent:
   m_AgentTypeID: 0
   m_Radius: 0.25
   m_Speed: 1.5
-  m_Acceleration: 8
+  m_Acceleration: 100
   avoidancePriority: 50
   m_AngularSpeed: 120
   m_StoppingDistance: 0
@@ -9004,9 +9004,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b390cf5fbe87c6f40b8814eb702699b4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  cashPrefab: {fileID: 4025612861382877536, guid: 0e5d5abdb36fabd44a122df52a718042, type: 3}
-  cardPrefab: {fileID: 8827973011339687832, guid: e33efc887e5d8fb4d97b3d5b4a748d35, type: 3}
   handSocket: {fileID: 0}
+  tickInterval: 1
 --- !u!114 &1217747583365190962
 MonoBehaviour:
   m_ObjectHideFlags: 0
