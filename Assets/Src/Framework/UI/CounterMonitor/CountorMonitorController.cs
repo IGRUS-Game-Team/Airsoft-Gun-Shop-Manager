@@ -9,23 +9,57 @@ public class CountorMonitorController : MonoBehaviour
     [SerializeField] TextMeshProUGUI totalPriceText;
     [SerializeField] CalculatorOk calculatorOk;
 
-    public void Show(CounterSlotData items)
+public void Show(CounterSlotData items)
+{
+    // 0) null 검사
+    if (items == null)
     {
-        Clear();
-
-        float total = 0f;
-
-        var card = Instantiate(cardPrefab, contentRoot);
-        card.Setup(items.itemData, items.amount);
-        total += items.itemData.baseCost * items.amount;
-
-        totalPriceText.text = $"${total:F2}";
-
-        calculatorOk.SetTotalPrice(total);
-        //일단 하나 받아옴
-        //준서님이 여러개 받는걸로 로직 고치면
-        //FIXME : 로직 여러개 받은 후에 그 값들(total) 다 더해서 한번에 settotalprice하는걸로 로직 변경해야함.
+        Debug.LogError("[Show] items == null");
+        return;
     }
+    if (items.itemData == null)
+    {
+        Debug.LogError("[Show] items.itemData == null");
+        return;
+    }
+    if (cardPrefab == null)
+    {
+        Debug.LogError("[Show] cardPrefab not assigned");
+        return;
+    }
+    if (contentRoot == null)
+    {
+        Debug.LogError("[Show] contentRoot not assigned");
+        return;
+    }
+    if (totalPriceText == null)
+    {
+        Debug.LogError("[Show] totalPriceText not assigned");
+        return;
+    }
+    if (calculatorOk == null)
+    {
+        Debug.LogError("[Show] calculatorOk not assigned");
+        return;
+    }
+
+    // 1) 안전하게 값 복사 (코루틴 중 원본 파괴 방지)
+    var data   = items.itemData;
+    var amount = items.amount;
+    var unit   = data.baseCost;
+
+    // 2) UI 갱신
+    Clear();
+
+    float total = unit * amount;
+
+    var card = Instantiate(cardPrefab, contentRoot);
+    card.Setup(data, amount);
+
+    totalPriceText.text = $"${total:F2}";
+    calculatorOk.SetTotalPrice(total);
+}
+
 
     public void Clear()
     {
