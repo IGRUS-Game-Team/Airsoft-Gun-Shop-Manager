@@ -42,7 +42,7 @@ public class ShelfSlot : MonoBehaviour
         var itemDataManager = go.GetComponent<ItemDataManager>();
         ItemData itemDatas = itemDataManager.GetItemData();
 
-        Vector3 priceCardPosition = transform.position + new Vector3(-0.12f,-0.2f,-0.12f);
+        Vector3 priceCardPosition = transform.position + new Vector3(-0.14f,0.3f,-0.14f);
 
         // 3. 이벤트 호출 수정: 부모 Transform(priceCardParent)을 함께 전달
         if (priceCardParent != null)
