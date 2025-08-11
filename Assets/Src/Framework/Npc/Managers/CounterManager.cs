@@ -4,8 +4,6 @@ using UnityEngine;
 public class CounterManager : MonoBehaviour
 {
     public static CounterManager Instance { get; private set; }
-    private CountorMonitorController countorMonitorController;
-
 
     [Header("카운터 슬롯들 (Inspector 순서대로 사용)")]
     [SerializeField] Transform[] counterSlots;
@@ -19,6 +17,7 @@ public class CounterManager : MonoBehaviour
     [SerializeField] Transform scannerPoint;    // ★바코드 위치
     [SerializeField] Transform bagPoint;        // ★봉투 위치
     [SerializeField] AudioClip beepClip;       // ★삑 효과음
+    private CountorMonitorController countorMonitorController;
 
     readonly Dictionary<NpcController, Transform> npcToSlot = new();
     readonly Dictionary<NpcController, GameObject> npcToPay = new();
@@ -41,10 +40,8 @@ public class CounterManager : MonoBehaviour
         }
         Instance = this;
 
-        countorMonitorController = FindFirstObjectByType<CountorMonitorController>();
-
         freeSlots.AddRange(counterSlots);     
-
+        countorMonitorController = FindFirstObjectByType<CountorMonitorController>();
     }
 
     /* ─ NPC가 들고 온 상품 내려놓기 + 슬롯 배정 ─ */
@@ -172,7 +169,7 @@ public class CounterManager : MonoBehaviour
             Debug.Log(npcPaymentAmount);
             GameState.Instance.AddMoney(npcPaymentAmount); //손님이 결제한 금액 매출액에 추가
             countorMonitorController.Clear();
-
+            
         }
 
         //이벤트 구독 해제
