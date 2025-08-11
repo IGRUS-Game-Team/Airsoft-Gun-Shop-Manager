@@ -9,6 +9,9 @@ public class PriceCardFactory : MonoBehaviour
     public static PriceCardFactory Instance { get; private set; }
     [Header("가격표 프리팹 & 위치 슬롯")]
     [SerializeField] GameObject priceCardWithSetting;
+
+    [Header("회전률")]
+    [SerializeField] int ex=-140;
     
 
     [Header("PriceObserver")]
@@ -66,7 +69,7 @@ public class PriceCardFactory : MonoBehaviour
 
 
         // 새 가격표 생성
-        Quaternion rotation = Quaternion.Euler(0, 110, 0);
+        Quaternion rotation = Quaternion.Euler(0, ex, 0);
         GameObject newPriceCard = Instantiate(priceCardWithSetting, position, rotation, parent);
         priceCardDictionary.Add(position, newPriceCard);
 

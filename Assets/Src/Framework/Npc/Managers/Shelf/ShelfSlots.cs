@@ -12,8 +12,7 @@ public class ShelfSlot : MonoBehaviour
     //Transform은 부모가 된 카드슬롯의 위치
     [Header("shelf slot 오브젝트")]
     [SerializeField] private Transform priceCardParent; 
-    [SerializeField] private Vector3 cardPosition;
-
+    
     /* ---------- 설정 ---------- */
     public const int Capacity = 2;
 
@@ -43,7 +42,7 @@ public class ShelfSlot : MonoBehaviour
         var itemDataManager = go.GetComponent<ItemDataManager>();
         ItemData itemDatas = itemDataManager.GetItemData();
 
-        Vector3 priceCardPosition = transform.position + cardPosition;
+        Vector3 priceCardPosition = transform.position + new Vector3(-0.12f,-0.2f,-0.12f);
 
         // 3. 이벤트 호출 수정: 부모 Transform(priceCardParent)을 함께 전달
         if (priceCardParent != null)
