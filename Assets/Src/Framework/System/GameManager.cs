@@ -7,6 +7,7 @@ public class GameManager : MonoBehaviour
     {
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
+        Application.targetFrameRate = 40;
     }
 
     // Update is called once per frame
