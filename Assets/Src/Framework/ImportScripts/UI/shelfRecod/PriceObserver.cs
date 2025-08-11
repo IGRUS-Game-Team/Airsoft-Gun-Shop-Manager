@@ -7,10 +7,17 @@ using UnityEngine;
 public class PriceObserver : MonoBehaviour
 {
     // 전역 가격 관리자
-
+    private Dictionary<int, ItemData> currentItemData = new();
     private Dictionary<int, float> currentPrices = new();//각 상품의 현재 가격을 저장하는 딕셔너리<상품id,현재 가격>
     private Dictionary<int, List<IPriceChangeable>> observers = new();//상품 구독중인 관찰자 목록<상품id,>
 
+
+    // // 상품 데이터 등록/업데이트
+    // public void RegisterProduct(ItemData itemData)
+    // {
+    //     //currentItemData[itemData.ItemId] = itemData;
+    // }
+    
     //관찰자 등록
     public void Subscribe(int itemId, IPriceChangeable observer)
     {
@@ -26,7 +33,7 @@ public class PriceObserver : MonoBehaviour
     public float GetPrice(int itemId)
     {
         return currentPrices.TryGetValue(itemId, out float price) ? price : 0f;
-    }
+    } 
 
 
     //가격 업데이트
@@ -35,6 +42,7 @@ public class PriceObserver : MonoBehaviour
     {
         float oldPrice = GetPrice(itemId);
         currentPrices[itemId] = newPrice;//상품 가격 변경
+        Debug.Log($"{oldPrice} / {newPrice}");
 
         // 모든 구독자에게 알림
         if (observers.ContainsKey(itemId))
@@ -42,5 +50,7 @@ public class PriceObserver : MonoBehaviour
                 observer.OnPriceChanged(itemId, newPrice, oldPrice);//옵저버들은 OnPriceChanged를 구현해서 본인의 로직에 맞게 가격을 수정해야함
     }
     
+
+
 
 }

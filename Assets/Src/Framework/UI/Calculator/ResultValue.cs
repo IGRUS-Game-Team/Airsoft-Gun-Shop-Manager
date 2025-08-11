@@ -19,7 +19,7 @@ public class ResultValue : MonoBehaviour
 
 
     //프로퍼티 currentValue get
-    public string CurrentValue => currentValue; 
+    public string CurrentValue => currentValue;
 
 
     void Start()
@@ -28,20 +28,23 @@ public class ResultValue : MonoBehaviour
         UpdateDisplay();
     }
 
-    void OnEnable() {
+    void OnEnable()
+    {
         CalculatorButton.OnCalculatorInput += OnCalculatorInput;
         CalculatorClear.ClearDisplay += ClearDisplay;
+        CalculatorOk.SuccessCompare +=ClearDisplay;
     }
     void OnDisable() {
         CalculatorButton.OnCalculatorInput -= OnCalculatorInput;
         CalculatorClear.ClearDisplay -= ClearDisplay;
-    } 
+        CalculatorOk.SuccessCompare -=ClearDisplay;
+    }
 
     // 숫자버튼, 소수점 버튼 눌렀을 때 호출되는 이벤트
     public void OnCalculatorInput(string buttonText) //호출한 버튼의 기호
     {
 
-        if (IsValidInput(buttonText)==false) return;//숫자 입력 제약사항
+        if (IsValidInput(buttonText) == false) return;//숫자 입력 제약사항
         ProcessButton(buttonText);//버튼 상호작용
         UpdateDisplay(); //화면 갱신
 
@@ -56,7 +59,7 @@ public class ResultValue : MonoBehaviour
         {
             return false;
         }
-        
+
         if (buttonText == ".")//소수점 제약
         {
             if (isInitialState)//소수점 시작 불가
@@ -68,9 +71,9 @@ public class ResultValue : MonoBehaviour
             if (hasDot) //이미 소수점 존재x
             {
                 Debug.Log("이미 소수점 존재");
-                return false; 
+                return false;
             }
-            
+
         }
         //문제없으면
         return true;
@@ -78,32 +81,32 @@ public class ResultValue : MonoBehaviour
 
     //숫자, 소수점 버튼을 눌렀을 때
     //숫자, 소수점 버튼을 눌렀을 때
-private void ProcessButton(string buttonText)
-{
-    Debug.Log("버튼 클릭 시");
-    
-    if (buttonText == "·")//소수점 표시를 .으로 변환
+    private void ProcessButton(string buttonText)
     {
-        buttonText = ".";
+        Debug.Log("버튼 클릭 시");
+
+        if (buttonText == "·")//소수점 표시를 .으로 변환
+        {
+            buttonText = ".";
+        }
+
+        if (isInitialState) //초기 상태 -> 변경 상태
+        {
+            currentValue = buttonText;
+            isInitialState = false;
+        }
+        else
+        {
+            currentValue += buttonText;
+        }
+
+        // 소수점이 추가된 경우에만 hasDot을 true로 설정
+        if (buttonText == ".")
+        {
+            hasDot = true;
+            Debug.Log(". 입력 및 hasDot true");
+        }
     }
-    
-    if (isInitialState) //초기 상태 -> 변경 상태
-    {
-        currentValue = buttonText;
-        isInitialState = false;
-    }
-    else
-    {
-        currentValue += buttonText;
-    }
-    
-    // 소수점이 추가된 경우에만 hasDot을 true로 설정
-    if (buttonText == ".")
-    {
-        hasDot = true;
-        Debug.Log(". 입력 및 hasDot true");
-    }
-}
 
 
     //result화면에 업데이트
@@ -112,7 +115,7 @@ private void ProcessButton(string buttonText)
         resultText.text = currentValue;
         Debug.Log($"화면 업데이트 및 이벤트 발생: '{currentValue}'");
         OnInputValueChanged?.Invoke(currentValue);
-    } 
+    }
 
 
     // Clear 버튼이 눌렸을 때 호출되는 이벤트
@@ -124,6 +127,8 @@ private void ProcessButton(string buttonText)
         isInitialState = true; // 숫자 입력없는 초기 상태
         UpdateDisplay();// 화면 업데이트
     }
+
+
 
     
 }

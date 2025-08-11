@@ -1,16 +1,8 @@
 using UnityEngine;
-
+/// <summary>
+/// 장지원 8.11
+/// </summary>
 public class PriceCardDisplayManager : MonoBehaviour
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
+    
 }
