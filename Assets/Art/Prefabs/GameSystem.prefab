@@ -114,9 +114,9 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 7004439273166729436}
+  - {fileID: 6393762551020762842}
   - {fileID: 5980018321493472769}
   - {fileID: 1483951779538260481}
-  - {fileID: 7088757991273933654}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &8634903231590990962
@@ -164,7 +164,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   money: 300000
---- !u!1001 &2114200227350988940
+--- !u!1001 &2849726436458091776
 PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
@@ -172,13 +172,17 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1375399491351270362}
     m_Modifications:
+    - target: {fileID: 739472522620453337, guid: 3a03e91410e589e40b9c4cc1d1b72d1f, type: 3}
+      propertyPath: m_Name
+      value: 3DObjectClickUIManager
+      objectReference: {fileID: 0}
     - target: {fileID: 1031071299619931405, guid: 3a03e91410e589e40b9c4cc1d1b72d1f, type: 3}
       propertyPath: gameState
       value: 
       objectReference: {fileID: 562936055438642883}
     - target: {fileID: 2184112852705639751, guid: 3a03e91410e589e40b9c4cc1d1b72d1f, type: 3}
       propertyPath: m_Name
-      value: Manager
+      value: GameManager
       objectReference: {fileID: 0}
     - target: {fileID: 6265684397003639949, guid: 3a03e91410e589e40b9c4cc1d1b72d1f, type: 3}
       propertyPath: eventSystem
@@ -225,14 +229,15 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
-    m_RemovedGameObjects: []
+    m_RemovedGameObjects:
+    - {fileID: 1397200331370792253, guid: 3a03e91410e589e40b9c4cc1d1b72d1f, type: 3}
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 3a03e91410e589e40b9c4cc1d1b72d1f, type: 3}
---- !u!4 &7088757991273933654 stripped
+--- !u!4 &6393762551020762842 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 9166925525532697562, guid: 3a03e91410e589e40b9c4cc1d1b72d1f, type: 3}
-  m_PrefabInstance: {fileID: 2114200227350988940}
+  m_PrefabInstance: {fileID: 2849726436458091776}
   m_PrefabAsset: {fileID: 0}
 --- !u!1001 &6412516236208287277
 PrefabInstance:
