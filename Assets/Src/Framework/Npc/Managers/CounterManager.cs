@@ -23,6 +23,7 @@ public class CounterManager : MonoBehaviour
     readonly Dictionary<NpcController, GameObject> npcToPay = new();
     readonly Dictionary<NpcController, int> npcBaggedCount = new();
     private readonly HashSet<NpcController> readyToPay = new();
+    readonly Dictionary<NpcController, int> npcCheckoutTargetCount = new(); // ★추가
 
     public bool IsReadyToPay(NpcController npc) => readyToPay.Contains(npc);
     public void MarkReadyToPay(NpcController npc) => readyToPay.Add(npc);
