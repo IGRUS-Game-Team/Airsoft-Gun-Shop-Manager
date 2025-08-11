@@ -21,12 +21,12 @@ public class PriceCardController : MonoBehaviour, IPriceChangeable
 
     void OnEnable()//이름 업데이트
     {
-        ShelfSlot.OnProductPlaced +=UpdateName;
+        ShelfSlot.OnProductPlacedToFactory +=UpdateName;
     }
 
     void OnDisable()
     {
-        ShelfSlot.OnProductPlaced -=UpdateName;
+        ShelfSlot.OnProductPlacedToFactory -=UpdateName;
     }
 
 
