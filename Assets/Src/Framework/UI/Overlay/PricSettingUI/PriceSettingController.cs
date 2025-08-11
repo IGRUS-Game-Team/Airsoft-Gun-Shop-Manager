@@ -15,21 +15,31 @@ public class PriceSettingController : MonoBehaviour
 
 
     //so에서 가져올 요소 (임시 작성)
-    string displayName = "pistol"; //상품 이름
-    float baseCost = 10f; //원가 
+    string displayName; //상품 이름
+    float baseCost; //원가
 
 
     private bool isSuccess; //float 바꾸는거 성공여부
     private float price;
 
-
-//아근데 스크립터블 오브젝트 가져오는 컨트롤러는 따로 있어야할듯?
-    private void GetScriptableObject()
+    void Start()
     {
-        //so에서 값 가져와서 이름, 원가 변수에 넣기
+        SetText();   
+    }
+    void OnEnable() //활성화 될때마다 갱신 어때?
+    {
+        SetText();        
     }
 
-    //텍스트에 받은 so넣기
+    //변수에 저장(so 받기)
+    public void GetScriptableObject(ItemData itemData)
+    {
+        displayName = itemData.name;
+        baseCost = itemData.baseCost;
+        Debug.Log($"세팅창이 받은 값 {displayName} {baseCost}");
+    }
+
+    //텍스트에 받은 so넣기 -> 이걸 언제 시작하느냐가 관건
     private void SetText()
     {
         // 이익 계산

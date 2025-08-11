@@ -18,16 +18,17 @@ public class PriceCardController : MonoBehaviour, IPriceChangeable
     private float currentPrice;
     private float currentName;
     private float currentLeft;
+    private ItemData currentItemData;
 
-    void OnEnable()//이름 업데이트
-    {
-        ShelfSlot.OnProductPlaced +=UpdateName;
-    }
+    // void OnEnable()//이름 업데이트
+    // {
+    //     ShelfSlot.OnProductPlacedToFactory +=UpdateName;
+    // }
 
-    void OnDisable()
-    {
-        ShelfSlot.OnProductPlaced -=UpdateName;
-    }
+    // void OnDisable()
+    // {
+    //     ShelfSlot.OnProductPlacedToFactory -=UpdateName;
+    // }
 
 
     private void OnMouseDown()//클릭하면 Ui 호출 -> 이거 인터페이스로 바꾸라고?
@@ -40,13 +41,20 @@ public class PriceCardController : MonoBehaviour, IPriceChangeable
         }
     }
 
-    // //사람이 input변경하면 가격이 변한다
-    // // setting창 Okay 버튼이랑 연결
-    // public void UpdatePrice()
-    // {
-    //     price.text = PriceInputHandler.Instance.SendStirngPrice();
-    // }
-    private void UpdateName(ItemData itemData) {
+    //사람이 input변경하면 가격이 변한다
+    // setting창 Okay 버튼이랑 연결
+    public void UpdatePrice()
+    {
+        string priceString = PriceInputHandler.Instance.SendStirngPrice();
+        price.text = "$  " + (priceString == "" ? "0.00" : priceString);
+    }
+    
+    public void UpdatePrice(ItemData itemData)//팩토리랑 연결
+    {
+        price.text = "$  " + itemData.baseCost.ToString();
+    }
+    public void UpdateName(ItemData itemData)
+    {
         productname.text = itemData.name;
     }
 
