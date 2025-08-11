@@ -59,6 +59,43 @@ public class NpcState_PickItem : IState
             npcController.heldItem.activeSelf)
             npcController.heldItem.SetActive(false);
 
+        // ★추가: 더 담아야 하면, 다음 슬롯으로 이동해서 계속 담기
+        var carrier = npcController.GetComponent<CarriedItemHandler>();
+        Debug.Log("carrier.HasAllDesired 상태 : " + carrier.HasAllDesired, carrier);
+        if (carrier != null && !carrier.HasAllDesired)
+        {
+            Debug.Log("Npc가 물건 다시 집으러 감");
+            // 현재 슬롯에 아직 남아있으면 그 자리 다시 가기 (애니 한 번 더)
+            ShelfSlot cur = npcController.targetShelfSlot ? npcController.targetShelfSlot.GetComponent<ShelfSlot>() : null;
+
+            ShelfSlot next = null;
+            if (cur != null && cur.HasItem)
+            {
+                next = cur; // 같은 슬롯에서 한 번 더
+                Debug.Log("같은 자리에서 한 번 더 집음");
+            }
+            else
+            {
+                // 다른 슬롯 검색: ShelfManager 활용
+                if (ShelfManager.Instance != null && ShelfManager.Instance.TryGetAvailableSlot(out var other))
+                    next = other;
+                Debug.Log("다른 자리에서 한 번 더 집음");
+            }
+
+            // 다음 목적지로 재이동
+            if (next != null)
+            {
+                Debug.Log("이건 머임");
+                npcController.hasItemInHand = false;   // ★추가: 다음 픽업을 위해 리셋
+                npcController.heldItem = null;    // ★추가
+                npcController.targetShelfSlot = next.transform;
+                npcController.targetShelfGroup = next.ParentGroup; // ★추가(Queue에서 Release용)
+                npcController.stateMachine.SetState(new NpcState_ToShelf(npcController));
+                return;
+            }
+            // 슬롯이 전혀 없다면 → 담은 만큼만 계산대로
+        }
+
         if (queueManager == null)
             queueManager = Object.FindFirstObjectByType<QueueManager>();
 
