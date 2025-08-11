@@ -4,6 +4,8 @@ using UnityEngine;
 public class CounterManager : MonoBehaviour
 {
     public static CounterManager Instance { get; private set; }
+    private CountorMonitorController countorMonitorController;
+
 
     [Header("카운터 슬롯들 (Inspector 순서대로 사용)")]
     [SerializeField] Transform[] counterSlots;
@@ -27,11 +29,11 @@ public class CounterManager : MonoBehaviour
     public void MarkReadyToPay(NpcController npc) => readyToPay.Add(npc);
     public void ClearReadyToPay(NpcController npc) => readyToPay.Remove(npc);
 
-    
+
 
     void Awake()
     {
-         // 싱글턴 보장
+        // 싱글턴 보장
         if (Instance != null && Instance != this)
         {
             Destroy(gameObject);
@@ -40,6 +42,7 @@ public class CounterManager : MonoBehaviour
         Instance = this;
 
         foreach (Transform counterSlot in counterSlots) pool.Enqueue(counterSlot);
+        countorMonitorController = FindFirstObjectByType<CountorMonitorController>();
     }
 
     /* ─ NPC가 들고 온 상품 내려놓기 + 슬롯 배정 ─ */
@@ -149,6 +152,8 @@ public class CounterManager : MonoBehaviour
             CompletePayment(currentNpcForPayment);
             Debug.Log(npcPaymentAmount);
             GameState.Instance.AddMoney(npcPaymentAmount); //손님이 결제한 금액 매출액에 추가
+            countorMonitorController.Clear();
+
         }
 
         //이벤트 구독 해제

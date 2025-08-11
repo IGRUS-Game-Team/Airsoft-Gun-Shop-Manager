@@ -9,63 +9,61 @@ public class CountorMonitorController : MonoBehaviour
     [SerializeField] TextMeshProUGUI totalPriceText;
     [SerializeField] CalculatorOk calculatorOk;
 
+    private float total = 0f;
 public void Show(CounterSlotData items)
 {
-    // 0) null 검사
-    if (items == null)
-    {
-        Debug.LogError("[Show] items == null");
-        return;
-    }
-    if (items.itemData == null)
-    {
-        Debug.LogError("[Show] items.itemData == null");
-        return;
-    }
-    if (cardPrefab == null)
-    {
-        Debug.LogError("[Show] cardPrefab not assigned");
-        return;
-    }
-    if (contentRoot == null)
-    {
-        Debug.LogError("[Show] contentRoot not assigned");
-        return;
-    }
-    if (totalPriceText == null)
-    {
-        Debug.LogError("[Show] totalPriceText not assigned");
-        return;
-    }
-    if (calculatorOk == null)
-    {
-        Debug.LogError("[Show] calculatorOk not assigned");
-        return;
-    }
+    if (items == null || items.itemData == null) return;
 
-    // 1) 안전하게 값 복사 (코루틴 중 원본 파괴 방지)
-    var data   = items.itemData;
+    var data = items.itemData;
     var amount = items.amount;
-    var unit   = data.baseCost;
+    var unit = data.baseCost;
 
-    // 2) UI 갱신
-    Clear();
+    // 기존 카드 있는지 찾기
+    CheckoutCardView existingCard = null;
+    foreach (Transform child in contentRoot)
+    {
+        var cardView = child.GetComponent<CheckoutCardView>();
+        if (cardView != null && cardView.ItemData == data)
+        {
+            existingCard = cardView;
+            break;
+        }
+    }
 
-    float total = unit * amount;
+    if (existingCard != null)
+    {
+        // 기존 수량 증가
+        existingCard.AddAmount(amount);
+    }
+    else
+    {
+        // 새 카드 생성
+        var card = Instantiate(cardPrefab, contentRoot);
+        card.Setup(data, amount);
+    }
 
-    var card = Instantiate(cardPrefab, contentRoot);
-    card.Setup(data, amount);
+    // 전체 합계 갱신
+    float total = 0f;
+    foreach (Transform child in contentRoot)
+    {
+        var cardView = child.GetComponent<CheckoutCardView>();
+        if (cardView != null)
+        {
+            total += cardView.TotalPrice;
+        }
+    }
 
     totalPriceText.text = $"${total:F2}";
     calculatorOk.SetTotalPrice(total);
 }
-
 
     public void Clear()
     {
         foreach (Transform child in contentRoot)
             Destroy(child.gameObject);
 
+        total = 0f;
         totalPriceText.text = "$0.00";
     }
+
 }
