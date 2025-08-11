@@ -126,11 +126,12 @@ public class CounterManager : MonoBehaviour
     #region 계산 결제 로직
     private NpcController currentNpcForPayment;
     private float npcPaymentAmount; // 손님 결제 금액
-    GameState moneyState; //돈관리 메서드 가져오기
+
 
     //계산 시작
     public void StartCalculatorPayment(NpcController npc)
     {
+        Debug.Log("응가" + npc);
         currentNpcForPayment = npc; //계산을 처리할 npc
 
         SubscribeCalculatorEvents(); //계산 이벤트 시작
@@ -140,11 +141,14 @@ public class CounterManager : MonoBehaviour
     //success 이벤트가 진행할 메서드
     private void HandlePaymentSuccess() //계산 성공
     {
+        Debug.Log(currentNpcForPayment);
+
         if (currentNpcForPayment != null)
         {
             //결제 완료 처리
             CompletePayment(currentNpcForPayment);
-            moneyState.AddMoney(npcPaymentAmount); //손님이 결제한 금액 매출액에 추가
+            Debug.Log(npcPaymentAmount);
+            GameState.Instance.AddMoney(npcPaymentAmount); //손님이 결제한 금액 매출액에 추가
         }
 
         //이벤트 구독 해제
