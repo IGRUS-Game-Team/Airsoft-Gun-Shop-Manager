@@ -77,7 +77,6 @@ public class NpcController : MonoBehaviour
     // TODO : 결제 시스템 스크립트로 메서드 옮기기
     public void OnPaymentCompleted()
     {
-        Debug.Log("결제 완료 -> 떠나기 전환");
         PaymentDone = true;
         if (targetShelfGroup != null)
         {
