@@ -52,6 +52,17 @@ public class NpcState_OfferPayment : IState
         // (2) NavMeshAgent 이동·회전 중단
         npcController.Agent.isStopped = true;       // 이동 정지
         npcController.Agent.updateRotation = false;      // 자동 회전 끔
+
+        // ★추가: 들고 온 거 전부 계산대에 내려놓고, 총 개수 등록
+        var carrier = npcController.GetComponent<CarriedItemHandler>();
+        Debug.Log(carrier);
+        if (carrier != null)
+        {
+            Debug.Log($"[OfferPayment.Enter] CarriedCount = {carrier.CarriedCount}");
+            Debug.Log("들고 온 거 모두 놓기");
+            CounterManager.Instance.BeginCheckout(npcController, carrier.CarriedCount); // ★추가
+            carrier.PlaceAllToCounter();                                                // ★추가
+        }
     }
 
     // 매 프레임: 몸을 계산대 쪽으로 돌리고, 다 돌면 결제 물건을 생성
