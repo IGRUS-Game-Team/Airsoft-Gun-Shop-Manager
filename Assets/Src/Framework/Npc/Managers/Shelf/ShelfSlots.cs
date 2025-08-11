@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -7,6 +8,7 @@ using UnityEngine;
 public class ShelfSlot : MonoBehaviour
 {
     public ShelfGroup ParentGroup { get; internal set; }
+    public static event Action<ItemData> OnProductPlacedToFactory; //so 가격표를 전달
 
     /* ---------- 설정 ---------- */
     public const int Capacity = 2;
@@ -30,8 +32,15 @@ public class ShelfSlot : MonoBehaviour
     /* ---------- 외부에서 위치 얻기 ---------- */
     public Transform GetSnapPoint(int idx) => points[idx];
 
-    /* ---------- 외부에서 아이템 추가 ---------- */
-    public void RegisterNewItem(GameObject go) => items.Add(go);
+    /* ---------- 외부에서 아이템 추가 ---------- */ //수정 so값 넘기기
+    public void RegisterNewItem(GameObject go)
+    {
+        items.Add(go);
+        var itemDataManager = go.GetComponent<ItemDataManager>(); //상품 정보 가져오기
+        ItemData itemDatas = itemDataManager.GetItemData();
+        OnProductPlacedToFactory?.Invoke(itemDatas); //가격표 팩토리에게 so를 전달
+        Debug.Log($"상품 등록: {itemDataManager.ItemName} (ID: {itemDataManager.ItemId})");
+    } 
 
     /* ---------- NPC 가 꺼낼 때 ---------- */
     public GameObject PopItem()

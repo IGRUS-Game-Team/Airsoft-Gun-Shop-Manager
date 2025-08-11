@@ -15,6 +15,7 @@ GameObject:
   - component: {fileID: -2797257581451470175}
   - component: {fileID: -5365950117450489940}
   - component: {fileID: -5433720113991641747}
+  - component: {fileID: 2229203065777185835}
   m_Layer: 3
   m_Name: M16 Toy Box
   m_TagString: Untagged
@@ -30,7 +31,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1848264370535289149}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: -0, z: -0, w: 1}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -102,6 +103,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0ccb6c0d3408f134b929a7b03ee477cd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  selected: 0
   sharedOutlineMaterial: {fileID: 0}
 --- !u!65 &-2797257581451470175
 BoxCollider:
@@ -148,4 +150,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a5e7c86b57b59d54c8060d57ca844ac4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  data: {fileID: 11400000, guid: e8ab074aeaf9a8843b222007e54dbdd7, type: 2}
+  data: {fileID: 0}
+--- !u!114 &2229203065777185835
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1848264370535289149}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9345664f47681ba41ad9508fc726bb0d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  itemData: {fileID: 11400000, guid: 3ab567b32b6f0514f8a315d3e30e190d, type: 2}
