@@ -14,25 +14,25 @@ public class CounterManager : MonoBehaviour
     [SerializeField] GameObject cardPrefab;
 
     [Header("스캐너, 봉투 위치, 스캔 효과음")]
-    [SerializeField] Transform scannerPoint;    // 바코드 위치
-    [SerializeField] Transform bagPoint;        // 봉투 위치
-    [SerializeField] AudioClip beepClip;       // 삑 효과음
+    [SerializeField] Transform scannerPoint;    // ★바코드 위치
+    [SerializeField] Transform bagPoint;        // ★봉투 위치
+    [SerializeField] AudioClip beepClip;       // ★삑 효과음
+    private CountorMonitorController countorMonitorController;
 
     readonly Dictionary<NpcController, Transform> npcToSlot = new();
     readonly Dictionary<NpcController, GameObject> npcToPay = new();
     readonly Dictionary<NpcController, int> npcBaggedCount = new();
     private readonly HashSet<NpcController> readyToPay = new();
-    readonly Dictionary<NpcController, int> npcCheckoutTargetCount = new(); // ★추가
 
     public bool IsReadyToPay(NpcController npc) => readyToPay.Contains(npc);
     public void MarkReadyToPay(NpcController npc) => readyToPay.Add(npc);
     public void ClearReadyToPay(NpcController npc) => readyToPay.Remove(npc);
 
-    
+
 
     void Awake()
     {
-         // 싱글턴 보장
+        // 싱글턴 보장
         if (Instance != null && Instance != this)
         {
             Destroy(gameObject);
@@ -41,6 +41,7 @@ public class CounterManager : MonoBehaviour
         Instance = this;
 
         freeSlots.AddRange(counterSlots);     
+        countorMonitorController = FindFirstObjectByType<CountorMonitorController>();
     }
 
     /* ─ NPC가 들고 온 상품 내려놓기 + 슬롯 배정 ─ */
@@ -76,6 +77,7 @@ public class CounterManager : MonoBehaviour
         return slot;
     }
 
+
     // ★추가: 이번 손님 총 개수 세팅 (계산대에 다 올리기 “직전”에 호출)
     public void BeginCheckout(NpcController npc, int totalItems)
     {
@@ -85,6 +87,7 @@ public class CounterManager : MonoBehaviour
 
         Debug.Log($" 계산 시작 전 총 개수 = {totalItems}");
     }
+
 
     /* ─ 상품 한 개가 봉투에 완전히 들어갔을 때 호출 ─ */
     public void OnItemBagged(NpcController npc)                         // ★추가
@@ -210,6 +213,8 @@ public class CounterManager : MonoBehaviour
             CompletePayment(currentNpcForPayment);
             Debug.Log(npcPaymentAmount);
             GameState.Instance.AddMoney(npcPaymentAmount); //손님이 결제한 금액 매출액에 추가
+            countorMonitorController.Clear();
+            
         }
 
         //이벤트 구독 해제

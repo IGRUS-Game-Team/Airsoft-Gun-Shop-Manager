@@ -1,54 +1,25 @@
-using System.Collections.Generic; // ★추가
 using UnityEngine;
 
 public class CarriedItemHandler : MonoBehaviour
 {
     [SerializeField] Transform handSocket;
 
-    // ★추가: 랜덤 목표 개수 범위
-    [Header("여러 개 담기")]
-    [SerializeField] int desiredMin = 1;   // 최소 픽업 개수
-    [SerializeField] int desiredMax = 3;   // 최대 픽업 개수
-
     NpcController npc;
     GameObject    heldItem;
     Vector3       worldSize;
-    Vector3 lastWorldSize;
-    Transform     counterSlot;          // 매니저에서 빌린 슬롯 저장
-    public int DesiredCount { get; private set; } // ★추가
+    Transform     counterSlot;          // ★변경: 매니저에서 빌린 슬롯 저장
 
-     // ★추가: 들고 있는 아이템 큐(계산대에 순차로 올림)
-    private struct Picked
-    {
-        public GameObject go;
-        public Vector3 worldScale;
-    }
-
-    private readonly Queue<Picked> carried = new(); // ★추가
-    public int CarriedCount => carried.Count;       // ★추가
-    public bool HasAllDesired => CarriedCount >= DesiredCount; // ★추가
-
-    void Awake()
-    {
-        npc = GetComponent<NpcController>();
-        DesiredCount = Mathf.Clamp(Random.Range(desiredMin, desiredMax + 1), 1, 9999); // ★fix: 랜덤 목표 개수 초기화
-    }
+    void Awake() => npc = GetComponent<NpcController>();
 
     /* ───────────────── 물건 집기 ───────────────── */
     public void Attach(GameObject item)
     {
-        heldItem = item;
-        
-        // ★ 1) 붙이기 전, 원래 월드 스케일 저장
-        var originalWorldScale = item.transform.lossyScale;
+        heldItem  = item;
+        worldSize = item.transform.lossyScale;
 
-        item.transform.SetParent(handSocket, true);
+        item.transform.SetParent(handSocket, false);
         item.transform.localPosition = Vector3.zero;
-        item.transform.localRotation = Quaternion.identity;
         item.SetActive(true);
-        
-        // ★추가: 리스트(큐)에 저장만 해두기
-        carried.Enqueue(new Picked { go = item, worldScale = originalWorldScale });
     }
 
     /* ───────────────── 손에서 숨기기 ───────────────── */
@@ -60,6 +31,7 @@ public class CarriedItemHandler : MonoBehaviour
     /* ───────────────── 카운터로 이동 ───────────────── */
     public void PlaceToCounter()
     {
+
         if (carried.Count == 0) return;
 
         var pick = carried.Dequeue();
@@ -91,14 +63,15 @@ public class CarriedItemHandler : MonoBehaviour
         for (int i = 0; i < count; i++)
             PlaceToCounter();
 
-        heldItem = null; // 마지막 레퍼런스 정리
+        // PlaceItem 이 null 반환 시(슬롯 부족) 대비
+        if (counterSlot != null) heldItem = null;
     }
 
     /* ───────────────── 결제 완료 후 반납 ───────────────── */
     public void ReleaseSlot()
     {
         if (counterSlot != null)
-            CounterManager.Instance.ReturnSlot(counterSlot);   // 매니저에 돌려주기
+            CounterManager.Instance.ReturnSlot(counterSlot);   // ★변경: 매니저에 돌려주기
         counterSlot = null;
     }
 }

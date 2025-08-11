@@ -131,6 +131,7 @@ IEnumerator MoveRoutine()
 
                         beeped = true;
 
+
                         if (countorMonitorController == null)
                             Debug.LogWarning("[SCANNER] countorMonitorController is NULL!");
                         else
@@ -145,6 +146,10 @@ IEnumerator MoveRoutine()
                                 counterSlotData.itemData.baseCost - Random.Range(0, 100),
                                 counterSlotData.itemData.baseCost
                             );
+
+
+                        countorMonitorController.Show(counterSlotData);
+                        //cashRegisterUI.SetValues(counterSlotData.itemData.baseCost - Random.Range(0, 100), counterSlotData.itemData.baseCost);
 
                         Debug.Log($"{price} 계산 시퀀스");
                     }

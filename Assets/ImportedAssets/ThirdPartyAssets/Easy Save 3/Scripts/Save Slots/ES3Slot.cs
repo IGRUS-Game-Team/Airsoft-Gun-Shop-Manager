@@ -85,36 +85,21 @@ public class ES3Slot : MonoBehaviour
     // Selects a slot and calls post-selection events if applicable.
     public virtual void SelectSlot()
     {
-        // // Hide the confirmation dialog if it's open.
-        // confirmationDialog?.SetActive(false);
+        // Hide the confirmation dialog if it's open.
+        confirmationDialog?.SetActive(false);
 
-        // // Set the path used by Auto Save.
-        // ES3SlotManager.selectedSlotPath = GetSlotPath();
+        // Set the path used by Auto Save.
+        ES3SlotManager.selectedSlotPath = GetSlotPath();
 
-        // // When the default path used by Easy Save's methods.
-        // ES3Settings.defaultSettings.path = ES3SlotManager.selectedSlotPath;
+        // When the default path used by Easy Save's methods.
+        ES3Settings.defaultSettings.path = ES3SlotManager.selectedSlotPath;
 
-        // // If we've specified an event to be called after the user selects a slot, invoke it.
-        // mgr.onAfterSelectSlot?.Invoke();
+        // If we've specified an event to be called after the user selects a slot, invoke it.
+        mgr.onAfterSelectSlot?.Invoke();
 
-        // // If we've specified a scene to load after the user selects a slot, load it.
-        // if (!string.IsNullOrEmpty(mgr.loadSceneAfterSelectSlot))
-        //     SceneManager.LoadScene(mgr.loadSceneAfterSelectSlot);
-
-            // 1. 슬롯 경로 설정
-    ES3SlotManager.selectedSlotPath = GetComponentInParent<ES3SlotManager>().GetSlotPath(nameLabel.text);
-
-    Debug.Log("슬롯 선택됨: " + ES3SlotManager.selectedSlotPath);
-
-    // 2. 선택 후 이벤트 실행 (선택 사항)
-    var mgr = GetComponentInParent<ES3SlotManager>();
-    mgr.onAfterSelectSlot?.Invoke();
-
-    // 3. 선택한 슬롯으로 씬 이동
-    if (!string.IsNullOrEmpty(mgr.loadSceneAfterSelectSlot))
-    {
-        UnityEngine.SceneManagement.SceneManager.LoadScene(mgr.loadSceneAfterSelectSlot);
-    }
+        // If we've specified a scene to load after the user selects a slot, load it.
+        if (!string.IsNullOrEmpty(mgr.loadSceneAfterSelectSlot))
+            SceneManager.LoadScene(mgr.loadSceneAfterSelectSlot);
     }
 
 #endregion

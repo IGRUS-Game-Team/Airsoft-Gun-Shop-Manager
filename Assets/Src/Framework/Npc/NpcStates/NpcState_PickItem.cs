@@ -59,6 +59,7 @@ public class NpcState_PickItem : IState
             npcController.heldItem.activeSelf)
             npcController.heldItem.SetActive(false);
 
+
         // ★추가: 더 담아야 하면, 다음 슬롯으로 이동해서 계속 담기
         var carrier = npcController.GetComponent<CarriedItemHandler>();
         if (carrier != null && !carrier.HasAllDesired)
@@ -90,6 +91,7 @@ public class NpcState_PickItem : IState
             }
             // 슬롯이 전혀 없다면 → 담은 만큼만 계산대로
         }
+
 
         if (queueManager == null)
             queueManager = Object.FindFirstObjectByType<QueueManager>();

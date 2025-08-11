@@ -1,7 +1,7 @@
 fileFormatVersion: 2
 guid: 98f277b0c8055e143b2fcf058d3c27dc
 ModelImporter:
-  serializedVersion: 21300
+  serializedVersion: 20200
   internalIDToNameTable:
   - first:
       74: 7478122292733868173
@@ -23,16 +23,16 @@ ModelImporter:
     bakeSimulation: 0
     resampleCurves: 1
     optimizeGameObjects: 0
-    removeConstantScaleCurves: 0
     motionNodeName: 
     rigImportErrors: 
-    rigImportWarnings: 
+    rigImportWarnings: "Copied Avatar Rig Configuration mis-match. Bone length in
+      copied configuration does not match position in animation file:\n\t'Left_UpperLeg'
+      : position error = 3.626586 mm\n\t'Left_Foot' : position error = 12.542060
+      mm\n\t'Left_Toes' : position error = 30.265436 mm\n\t'Right_UpperLeg' : position
+      error = 3.626659 mm\n\t'Right_Foot' : position error = 12.543159 mm\n\t'Right_Toes'
+      : position error = 30.260939 mm\n"
     animationImportErrors: 
-    animationImportWarnings: "\nClip 'Jump' has import animation warnings that might
-      lower retargeting quality:\nNote: Activate translation DOF on avatar to improve
-      retargeting quality.\n\t'Spine' has translation animation that will be discarded.\n\t'Chest'
-      has translation animation that will be discarded.\n\t'UpperChest' has translation
-      animation that will be discarded.\n"
+    animationImportWarnings: 
     animationRetargetingWarnings: 
     animationDoRetargetingWarnings: 0
     importAnimatedCustomProperties: 0
@@ -115,7 +115,6 @@ ModelImporter:
     importBlendShapes: 1
     importCameras: 1
     importLights: 1
-    nodeNameCollisionStrategy: 0
     fileIdsGeneration: 2
     swapUVChannels: 0
     generateSecondaryUV: 0
@@ -127,7 +126,6 @@ ModelImporter:
     skinWeightsMode: 0
     maxBonesPerVertex: 4
     minBoneWeight: 0.001
-    optimizeBones: 1
     meshOptimizationFlags: -1
     indexFormat: 0
     secondaryUVAngleDistortion: 8
@@ -955,7 +953,6 @@ ModelImporter:
   humanoidOversampling: 1
   avatarSetup: 2
   addHumanoidExtraRootOnlyWhenUsingAvatar: 0
-  remapMaterialsIfMaterialImportModeIsNone: 1
   additionalBone: 0
   userData: 
   assetBundleName: 

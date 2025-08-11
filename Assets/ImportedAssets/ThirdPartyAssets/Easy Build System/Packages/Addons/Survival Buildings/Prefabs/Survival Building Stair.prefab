@@ -1,0 +1,325 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &2031129664597072957
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2024809274300038699}
+  - component: {fileID: 4258723903555525088}
+  - component: {fileID: 8177018051603306307}
+  - component: {fileID: 8057882206792892015}
+  - component: {fileID: 2278562227426695440}
+  - component: {fileID: 3814002006516315940}
+  m_Layer: 0
+  m_Name: Survival Building Stair
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2024809274300038699
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2031129664597072957}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 4019602915418742387}
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &4258723903555525088
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2031129664597072957}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c08165ce30072044e960de88165a1464, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_ClearGrassDetails: 1
+  m_ClearGrassRadius: 2
+  m_ShowGizmos: 1
+--- !u!114 &8177018051603306307
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2031129664597072957}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8e40b4c8a1aabff41ac57b3b07b8c2fe, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_GeneralSettings:
+    m_Name: Survival Building Stair
+    m_Type: Stair
+    m_Thumbnail: {fileID: 2800000, guid: 7f0c98b53090ba34799f318be46fea63, type: 3}
+    m_Identifier: cc3158796a674e77adf911ef953d4fd1
+  m_ModelSettings:
+    m_Models:
+    - {fileID: 2588093484819794545}
+    m_ModelIndex: 0
+    m_ModelBounds:
+      m_Center: {x: -0.06488991, y: 1.0787144, z: 0.08872509}
+      m_Extent: {x: 1.2630035, y: 1.0787144, z: 1.2310286}
+  m_PreviewSettings:
+    m_PreviewElevation: 0
+    m_PreviewElevationHeight: 1
+    m_Indicator: 0
+    m_IndicatorSettings:
+      m_Object: {fileID: 0}
+      m_Color: {r: 1, g: 0.5, b: 0, a: 1}
+      m_OffsetPosition: {x: 0, y: 0, z: 0}
+      m_OffsetRotation: {x: 0, y: 0, z: 0}
+      m_OffsetScale: {x: 1, y: 1, z: 1}
+    m_RotateAxis: {x: 0, y: 90, z: 0}
+    m_RotateAccordingAngle: 0
+    m_RotateAccordingAxis: 0
+    m_CanRotateOnSocket: 1
+    m_LockRotation: 0
+    m_ResetRotation: 0
+    m_OffsetPosition: {x: 0, y: 0, z: 0}
+    m_ClampRotation: 0
+    m_ClampMinRotation: {x: 0, y: 0, z: 0}
+    m_ClampMaxRotation: {x: 0, y: 0, z: 0}
+    m_ClampPosition: 0
+    m_ClampMinPosition: {x: 0, y: 0, z: 0}
+    m_ClampMaxPosition: {x: 0, y: 0, z: 0}
+    m_CanMovingIfPlaceable: 0
+    m_DisableGameObjects: []
+    m_DisableMonoBehaviours: []
+    m_Material: {fileID: 2100000, guid: 75763a96044062145903eed7888a25f7, type: 2}
+    m_IgnoreRenderers: []
+    m_Type: 0
+    m_MovementGridSize: 1
+    m_MovementGridOffset: 0
+    m_MovementSmoothTime: 5
+    m_Transition: 0
+    m_FadingTransition:
+      m_FadeDuration: 0.1
+    m_PulseTransition:
+      m_PulseDuration: 1
+      m_PulseMinAlpha: 0
+      m_PulseMaxAlpha: 1
+    m_FlashingTransition:
+      m_FlashDuration: 0.1
+      m_FlashCount: 5
+    m_PlacingColor: {r: 0, g: 1, b: 0, a: 0.2}
+    m_EditingColor: {r: 0, g: 1, b: 1, a: 0.2}
+    m_DestroyingColor: {r: 1, g: 0, b: 0, a: 0.2}
+  m_State: 1
+  m_Properties: []
+  m_InstancedIndicatorObject: {fileID: 0}
+  OnChangedStateEvent:
+    m_PersistentCalls:
+      m_Calls: []
+--- !u!114 &8057882206792892015
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2031129664597072957}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3720bbe100e6564438ceb1433cdff3bb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_LayerMask:
+    serializedVersion: 2
+    m_Bits: 1
+  m_Tolerance: 0.8
+  m_PreventOverlapping: 0
+  m_OverlappingRaycastLength: 0.5
+  m_IgnoreOverlappingTypes: []
+  m_RequiredBuildingPartCollision: 0
+  m_RequireBuildingSurfaces: 0
+  m_BuildingSurfaceTags: []
+  m_ShowDebugs: 0
+  m_ShowGizmos: 1
+--- !u!114 &2278562227426695440
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2031129664597072957}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fb0e453fbfcfbc14fb3c91a1a9a729f0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Points:
+  - m_LayerMask:
+      serializedVersion: 2
+      m_Bits: 1
+    m_Bounds:
+      m_Center: {x: 0, y: 0, z: 0}
+      m_Extent: {x: 0.1, y: 0.1, z: 0.1}
+    m_RequireAnyCollider: 0
+    m_RequireType:
+    - Foundation
+    - Floor
+  m_IsSleeping: 0
+  m_FallingTime: 5
+  m_CheckStabilityInterval: 1
+  m_CanPlaceOnlyIfStable: 1
+  m_ShowDebugs: 0
+  m_ShowGizmos: 1
+  OnFallingBuildingPartEvent:
+    m_PersistentCalls:
+      m_Calls: []
+--- !u!114 &3814002006516315940
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2031129664597072957}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bcebc462b2cc90043ab597914acc4017, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_CanPlacing: 1
+  m_CanDestroying: 1
+  m_CanEditing: 1
+  m_RequireArea: 0
+  m_RequireSocket: 1
+  m_IgnoreSocket: 0
+  m_ShowDebugs: 0
+--- !u!1 &2588093484819794545
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4019602915418742387}
+  - component: {fileID: 5107730726359997642}
+  - component: {fileID: 4323285917634363713}
+  - component: {fileID: 8340897167470142549}
+  - component: {fileID: 1519482777560183482}
+  m_Layer: 0
+  m_Name: Wood Stair
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &4019602915418742387
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2588093484819794545}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2024809274300038699}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!33 &5107730726359997642
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2588093484819794545}
+  m_Mesh: {fileID: -5887014672839972545, guid: 742a65efb4003ae40bbb9c323ec4a458, type: 3}
+--- !u!23 &4323285917634363713
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2588093484819794545}
+  m_Enabled: 1
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 2100000, guid: 32a1d050a6172af4ca34a4e5cd699e19, type: 2}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_AdditionalVertexStreams: {fileID: 0}
+--- !u!64 &8340897167470142549
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2588093484819794545}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 5
+  m_Convex: 0
+  m_CookingOptions: 30
+  m_Mesh: {fileID: -5887014672839972545, guid: 742a65efb4003ae40bbb9c323ec4a458, type: 3}
+--- !u!114 &1519482777560183482
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2588093484819794545}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e4193392a874dc94f92ea6b7d0a0e8e3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_BuildingDebris: {fileID: 2499552741105740199, guid: 7aba49ed8523ea8448d120361772c970, type: 3}
+  m_BuildingDebrisLifetime: 5

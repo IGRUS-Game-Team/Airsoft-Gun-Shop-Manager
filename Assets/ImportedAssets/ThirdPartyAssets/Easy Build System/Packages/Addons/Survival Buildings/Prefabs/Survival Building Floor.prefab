@@ -1,0 +1,809 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &2592262726110702108
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 691388646056560919}
+  - component: {fileID: 7467432878803292836}
+  m_Layer: 8
+  m_Name: Building Socket (Stair)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &691388646056560919
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2592262726110702108}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 3097569185509180591}
+  m_RootOrder: 4
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &7467432878803292836
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2592262726110702108}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8de37d035f129bb428c26276cf0b5a10, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_SnappingPoints:
+  - m_MatchBy: 0
+    m_BuildingPart: {fileID: 8177018051603306307, guid: aff5806de64517e4ca56b753d9e4aa9e,
+      type: 3}
+    m_Type: 
+    m_Position: {x: 0, y: 0, z: 0}
+    m_Rotation: {x: 0, y: 0, z: 0}
+    m_Scale: {x: 1, y: 1.2, z: 1}
+  m_SocketRadius: 0.25
+--- !u!1 &3086463444991895225
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3097569185509180591}
+  - component: {fileID: 5161069191191391687}
+  - component: {fileID: 6428341603110077675}
+  - component: {fileID: 2988775844581565332}
+  - component: {fileID: 147309354027142560}
+  m_Layer: 0
+  m_Name: Survival Building Floor
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3097569185509180591
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3086463444991895225}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children:
+  - {fileID: 2160848165661060029}
+  - {fileID: 8062390770339307223}
+  - {fileID: 7374751188039604273}
+  - {fileID: 5489810644763278480}
+  - {fileID: 691388646056560919}
+  - {fileID: 1158152817873980721}
+  - {fileID: 3722372720852637505}
+  - {fileID: 4574630572292758892}
+  m_Father: {fileID: 0}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &5161069191191391687
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3086463444991895225}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8e40b4c8a1aabff41ac57b3b07b8c2fe, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_GeneralSettings:
+    m_Name: Survival Building Floor
+    m_Type: Floor
+    m_Thumbnail: {fileID: 2800000, guid: acbbae00ef69840488b87f08cc7b5a0c, type: 3}
+    m_Identifier: 706709919ddd455b9f26a011209728e4
+  m_ModelSettings:
+    m_Models:
+    - {fileID: 4548131717484032731}
+    - {fileID: 4099215640784981499}
+    - {fileID: 3762628743711328214}
+    m_ModelIndex: 0
+    m_ModelBounds:
+      m_Center: {x: -0.009398818, y: 0.020106507, z: 0.00573349}
+      m_Extent: {x: 1.2736073, y: 0.092098, z: 1.2735996}
+  m_PreviewSettings:
+    m_PreviewElevation: 0
+    m_PreviewElevationHeight: 1
+    m_Indicator: 0
+    m_IndicatorSettings:
+      m_Object: {fileID: 0}
+      m_Color: {r: 1, g: 0.5, b: 0, a: 1}
+      m_OffsetPosition: {x: 0, y: 0, z: 0}
+      m_OffsetRotation: {x: 0, y: 0, z: 0}
+      m_OffsetScale: {x: 1, y: 1, z: 1}
+    m_RotateAxis: {x: 0, y: 45, z: 0}
+    m_RotateAccordingAngle: 0
+    m_RotateAccordingAxis: 0
+    m_CanRotateOnSocket: 0
+    m_LockRotation: 0
+    m_ResetRotation: 0
+    m_OffsetPosition: {x: 0, y: 0, z: 0}
+    m_ClampRotation: 0
+    m_ClampMinRotation: {x: 0, y: 0, z: 0}
+    m_ClampMaxRotation: {x: 0, y: 0, z: 0}
+    m_ClampPosition: 0
+    m_ClampMinPosition: {x: 0, y: 0, z: 0}
+    m_ClampMaxPosition: {x: 0, y: 0, z: 0}
+    m_CanMovingIfPlaceable: 0
+    m_DisableGameObjects: []
+    m_DisableMonoBehaviours: []
+    m_Material: {fileID: 2100000, guid: 75763a96044062145903eed7888a25f7, type: 2}
+    m_IgnoreRenderers: []
+    m_UseGridSnapping: 0
+    m_MovementGridSize: 1
+    m_MovementGridOffset: 0
+    m_SmoothMovement: 0
+    m_MovementSmoothTime: 5
+    m_Transition: 0
+    m_FadingTransition:
+      m_FadeDuration: 0.1
+    m_PulseTransition:
+      m_PulseDuration: 1
+      m_PulseMinAlpha: 0
+      m_PulseMaxAlpha: 1
+    m_FlashingTransition:
+      m_FlashDuration: 0.1
+      m_FlashCount: 5
+    m_PlacingColor: {r: 0, g: 1, b: 0, a: 0.2}
+    m_EditingColor: {r: 0, g: 1, b: 1, a: 0.2}
+    m_DestroyingColor: {r: 1, g: 0, b: 0, a: 0.2}
+  m_State: 1
+  m_Properties: []
+  m_InstancedIndicatorObject: {fileID: 0}
+  OnChangedStateEvent:
+    m_PersistentCalls:
+      m_Calls: []
+--- !u!114 &6428341603110077675
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3086463444991895225}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3720bbe100e6564438ceb1433cdff3bb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_LayerMask:
+    serializedVersion: 2
+    m_Bits: 1
+  m_Tolerance: 0.75
+  m_PreventOverlapping: 0
+  m_OverlappingRaycastLength: 0.5
+  m_IgnoreOverlappingTypes: []
+  m_RequiredBuildingPartCollision: 0
+  m_RequireBuildingSurfaces: 0
+  m_BuildingSurfaceTags: []
+  m_ShowDebugs: 0
+  m_ShowGizmos: 1
+--- !u!114 &2988775844581565332
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3086463444991895225}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fb0e453fbfcfbc14fb3c91a1a9a729f0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Points:
+  - m_LayerMask:
+      serializedVersion: 2
+      m_Bits: 1
+    m_Bounds:
+      m_Center: {x: 0, y: -0.1, z: 0}
+      m_Extent: {x: 1.35, y: 0, z: 1.35}
+    m_RequireAnyCollider: 0
+    m_RequireType:
+    - Wall
+  m_IsSleeping: 0
+  m_FallingTime: 0
+  m_CheckStabilityInterval: 1
+  m_CanPlaceOnlyIfStable: 1
+  m_ShowDebugs: 0
+  m_ShowGizmos: 1
+  OnFallingBuildingPartEvent:
+    m_PersistentCalls:
+      m_Calls: []
+--- !u!114 &147309354027142560
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3086463444991895225}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bcebc462b2cc90043ab597914acc4017, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_CanPlacing: 1
+  m_CanDestroying: 1
+  m_CanEditing: 1
+  m_RequireArea: 0
+  m_RequireSocket: 1
+  m_IgnoreSocket: 0
+  m_ShowDebugs: 0
+--- !u!1 &3167684093674203742
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 8062390770339307223}
+  - component: {fileID: 8609111796038838523}
+  m_Layer: 8
+  m_Name: Building Socket (Floor)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &8062390770339307223
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3167684093674203742}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 1.3}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 3097569185509180591}
+  m_RootOrder: 1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &8609111796038838523
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3167684093674203742}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8de37d035f129bb428c26276cf0b5a10, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_SnappingPoints:
+  - m_MatchBy: 1
+    m_BuildingPart: {fileID: 0}
+    m_Type: Floor
+    m_Position: {x: 0, y: 0, z: 1.35}
+    m_Rotation: {x: 0, y: 0, z: 0}
+    m_Scale: {x: 1, y: 1, z: 1}
+  - m_MatchBy: 1
+    m_BuildingPart: {fileID: 5922851360953957637, guid: 6e2154020fb4afd42939f2c13ecb1282,
+      type: 3}
+    m_Type: Wall
+    m_Position: {x: 0, y: 0, z: 0}
+    m_Rotation: {x: 0, y: 0, z: 0}
+    m_Scale: {x: 1, y: 1, z: 1}
+  m_SocketRadius: 0.25
+--- !u!1 &3762628743711328214
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4574630572292758892}
+  - component: {fileID: 635994710899020489}
+  - component: {fileID: 3402318438913877507}
+  - component: {fileID: 1662451644519320719}
+  - component: {fileID: 5379958960661663965}
+  m_Layer: 0
+  m_Name: Metal Floor
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!4 &4574630572292758892
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3762628743711328214}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 3097569185509180591}
+  m_RootOrder: 7
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!33 &635994710899020489
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3762628743711328214}
+  m_Mesh: {fileID: -3058239992970097546, guid: 7aef9a88597d6bd43b46ff8b501d7af7, type: 3}
+--- !u!23 &3402318438913877507
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3762628743711328214}
+  m_Enabled: 1
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 2100000, guid: 32a1d050a6172af4ca34a4e5cd699e19, type: 2}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+--- !u!64 &1662451644519320719
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3762628743711328214}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 4
+  m_Convex: 1
+  m_CookingOptions: 30
+  m_Mesh: {fileID: -3058239992970097546, guid: 7aef9a88597d6bd43b46ff8b501d7af7, type: 3}
+--- !u!114 &5379958960661663965
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3762628743711328214}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e4193392a874dc94f92ea6b7d0a0e8e3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_BuildingDebris: {fileID: 3065314559017564003, guid: ecf656aea8c8d3c48a71ac7be804707b,
+    type: 3}
+  m_BuildingDebrisLifetime: 15
+--- !u!1 &4099215640784981499
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3722372720852637505}
+  - component: {fileID: 290303856473643236}
+  - component: {fileID: 2586098181525302318}
+  - component: {fileID: 2001545427970082466}
+  - component: {fileID: 9126687058633301485}
+  m_Layer: 0
+  m_Name: Rock Floor
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!4 &3722372720852637505
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4099215640784981499}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 3097569185509180591}
+  m_RootOrder: 6
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!33 &290303856473643236
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4099215640784981499}
+  m_Mesh: {fileID: -4942100978866087317, guid: f11ceac81c01d974895142c11155b20e, type: 3}
+--- !u!23 &2586098181525302318
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4099215640784981499}
+  m_Enabled: 1
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 2100000, guid: 32a1d050a6172af4ca34a4e5cd699e19, type: 2}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+--- !u!64 &2001545427970082466
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4099215640784981499}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 4
+  m_Convex: 1
+  m_CookingOptions: 30
+  m_Mesh: {fileID: -4942100978866087317, guid: f11ceac81c01d974895142c11155b20e, type: 3}
+--- !u!114 &9126687058633301485
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4099215640784981499}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e4193392a874dc94f92ea6b7d0a0e8e3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_BuildingDebris: {fileID: 1040678555542108415, guid: 222eb53dbd2fa6145a357d1b9b8d551e,
+    type: 3}
+  m_BuildingDebrisLifetime: 15
+--- !u!1 &4548131717484032731
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1158152817873980721}
+  - component: {fileID: 4020706921159156105}
+  - component: {fileID: 1212573541207727869}
+  - component: {fileID: 3941494036792728546}
+  - component: {fileID: 8476430316045140204}
+  m_Layer: 0
+  m_Name: Wood Floor
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1158152817873980721
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4548131717484032731}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 3097569185509180591}
+  m_RootOrder: 5
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!33 &4020706921159156105
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4548131717484032731}
+  m_Mesh: {fileID: 6878401081566913370, guid: 93b2b84f294789e4babeea7f26e28d25, type: 3}
+--- !u!23 &1212573541207727869
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4548131717484032731}
+  m_Enabled: 1
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 2100000, guid: 32a1d050a6172af4ca34a4e5cd699e19, type: 2}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+--- !u!64 &3941494036792728546
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4548131717484032731}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 4
+  m_Convex: 1
+  m_CookingOptions: 30
+  m_Mesh: {fileID: 6878401081566913370, guid: 93b2b84f294789e4babeea7f26e28d25, type: 3}
+--- !u!114 &8476430316045140204
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4548131717484032731}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e4193392a874dc94f92ea6b7d0a0e8e3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_BuildingDebris: {fileID: 5090579095121785347, guid: 402099c6230ae044eb00cd17c4497f65,
+    type: 3}
+  m_BuildingDebrisLifetime: 15
+--- !u!1 &5213642131823110437
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 5489810644763278480}
+  - component: {fileID: 7574100637945563873}
+  m_Layer: 8
+  m_Name: Building Socket (Floor)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &5489810644763278480
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5213642131823110437}
+  m_LocalRotation: {x: -0, y: 0.7071068, z: -0, w: 0.7071068}
+  m_LocalPosition: {x: 0, y: 0, z: -1.3}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 3097569185509180591}
+  m_RootOrder: 3
+  m_LocalEulerAnglesHint: {x: 0, y: 90, z: 0}
+--- !u!114 &7574100637945563873
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5213642131823110437}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8de37d035f129bb428c26276cf0b5a10, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_SnappingPoints:
+  - m_MatchBy: 1
+    m_BuildingPart: {fileID: 0}
+    m_Type: Floor
+    m_Position: {x: 1.35, y: 0, z: 0}
+    m_Rotation: {x: 0, y: 0, z: 0}
+    m_Scale: {x: 1, y: 1, z: 1}
+  - m_MatchBy: 1
+    m_BuildingPart: {fileID: 5922851360953957637, guid: 6e2154020fb4afd42939f2c13ecb1282,
+      type: 3}
+    m_Type: Wall
+    m_Position: {x: 0, y: 0, z: 0}
+    m_Rotation: {x: 0, y: 90, z: 0}
+    m_Scale: {x: 1, y: 1, z: 1}
+  m_SocketRadius: 0.25
+--- !u!1 &5607400837207316203
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 7374751188039604273}
+  - component: {fileID: 2558064900440803308}
+  m_Layer: 8
+  m_Name: Building Socket (Floor)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &7374751188039604273
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5607400837207316203}
+  m_LocalRotation: {x: -0, y: 0.7071068, z: -0, w: 0.7071068}
+  m_LocalPosition: {x: 1.3, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 3097569185509180591}
+  m_RootOrder: 2
+  m_LocalEulerAnglesHint: {x: 0, y: 90, z: 0}
+--- !u!114 &2558064900440803308
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5607400837207316203}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8de37d035f129bb428c26276cf0b5a10, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_SnappingPoints:
+  - m_MatchBy: 1
+    m_BuildingPart: {fileID: 0}
+    m_Type: Floor
+    m_Position: {x: 0, y: 0, z: 1.35}
+    m_Rotation: {x: 0, y: 0, z: 0}
+    m_Scale: {x: 1, y: 1, z: 1}
+  - m_MatchBy: 1
+    m_BuildingPart: {fileID: 5922851360953957637, guid: 6e2154020fb4afd42939f2c13ecb1282,
+      type: 3}
+    m_Type: Wall
+    m_Position: {x: 0, y: 0, z: 0}
+    m_Rotation: {x: 0, y: 0, z: 0}
+    m_Scale: {x: 1, y: 1, z: 1}
+  m_SocketRadius: 0.25
+--- !u!1 &8319777089701774819
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2160848165661060029}
+  - component: {fileID: 907277410333828280}
+  m_Layer: 8
+  m_Name: Building Socket (Floor)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2160848165661060029
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8319777089701774819}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -1.3, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 3097569185509180591}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &907277410333828280
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8319777089701774819}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8de37d035f129bb428c26276cf0b5a10, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_SnappingPoints:
+  - m_MatchBy: 1
+    m_BuildingPart: {fileID: 0}
+    m_Type: Floor
+    m_Position: {x: -1.35, y: 0, z: 0}
+    m_Rotation: {x: 0, y: 0, z: 0}
+    m_Scale: {x: 1, y: 1, z: 1}
+  - m_MatchBy: 1
+    m_BuildingPart: {fileID: 0}
+    m_Type: Wall
+    m_Position: {x: 0, y: 0, z: 0}
+    m_Rotation: {x: 0, y: -90, z: 0}
+    m_Scale: {x: 1, y: 1, z: 1}
+  m_SocketRadius: 0.25
