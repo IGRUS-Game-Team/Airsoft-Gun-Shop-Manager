@@ -21,9 +21,9 @@ public class CalculatorOk : MonoBehaviour
     public string InputPrice => inputPrice;// 입력값
 
     //set 함수 
-    public void SetTotalPrice(string newPrice)
+    public void SetTotalPrice(float newPrice)
     {
-        totalPrice = newPrice;
+        totalPrice = newPrice.ToString();
     }
 
     //set 함수 
