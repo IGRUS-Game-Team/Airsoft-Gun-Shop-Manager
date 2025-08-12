@@ -14,6 +14,6 @@ public class PaymentAnimEvents : MonoBehaviour
     /* 손이 완전히 뻗은 프레임 */
     public void OnOfferReached()
     {
-        carrier.PlaceToCounter();                           // 상품 내려놓기
+        // carrier.PlaceToCounter();                           // 상품 내려놓기
     }
 }
