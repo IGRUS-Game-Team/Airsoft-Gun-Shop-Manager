@@ -22,6 +22,7 @@ public class CountorMonitorController : MonoBehaviour
         var unit = data.baseCost;//unit = 원가 
 
         // 기존 카드 있는지 찾기
+        
         CheckoutCardView existingCard = null;
         foreach (Transform child in contentRoot)
         {
@@ -47,18 +48,24 @@ public class CountorMonitorController : MonoBehaviour
         }
 
         // 전체 합계 갱신
-        float total = 0f;
+        float calculatedTotal = 0f;
         foreach (Transform child in contentRoot)
         {
             var cardView = child.GetComponent<CheckoutCardView>();
             if (cardView != null)
             {
-                total += cardView.TotalPrice;
+                float cardTotal = cardView.TotalPrice;
+                calculatedTotal += cardTotal;
+                Debug.Log($"카드 {cardView.ItemData.itemName}: 개별 총액 {cardTotal}, 누적 총액: {calculatedTotal}");
             }
         }
 
-        totalPriceText.text = $"${total:F2}";
-        calculatorOk.SetTotalPrice(total);
+        // 멤버변수도 업데이트
+        total = calculatedTotal;
+        totalPriceText.text = $"${calculatedTotal:F2}";
+        calculatorOk.SetTotalPrice(calculatedTotal);
+        
+        Debug.Log($"최종 전체 총액: {calculatedTotal}");
     }
 
     public void Clear()
