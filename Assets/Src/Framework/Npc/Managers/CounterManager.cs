@@ -18,6 +18,11 @@ public class CounterManager : MonoBehaviour
     [SerializeField] Transform bagPoint;        // 봉투 위치
     [SerializeField] AudioClip beepClip;       // 삑 효과음
 
+    [Header("결제 지연 불평 설정")]
+    [SerializeField] float complainFirstDelay = 10f;   // 첫 불평까지 대기 시간(초)
+    [SerializeField] float complainRepeatDelay = 8f;   // 이후 반복 간격(초)
+    [SerializeField] string complainTrigger = "Complain"; // 애니메이터 트리거 이름
+
     readonly Dictionary<NpcController, Transform> npcToSlot = new();
     readonly Dictionary<NpcController, GameObject> npcToPay = new();
     readonly Dictionary<NpcController, int> npcScannedCount = new();
@@ -25,6 +30,7 @@ public class CounterManager : MonoBehaviour
     private readonly HashSet<NpcController> readyToPay = new();
     readonly Dictionary<NpcController, int> npcCheckoutTargetCount = new(); // ★추가
     private CountorMonitorController countorMonitorController;
+    private Coroutine paymentComplainRoutine;
 
 
     public bool IsReadyToPay(NpcController npc) => readyToPay.Contains(npc);
@@ -116,9 +122,38 @@ public class CounterManager : MonoBehaviour
         if (!freeSlots.Contains(slot)) freeSlots.Add(slot);
     }
 
+    private System.Collections.IEnumerator PaymentComplainTimer(NpcController npc)
+    {
+        // 첫 대기
+        yield return new WaitForSeconds(complainFirstDelay);
+
+        // currentNpcForPayment가 바뀌지 않는 동안 반복
+        while (currentNpcForPayment == npc)
+        {
+            var anim = npc?.Animator;
+            if (anim != null && !string.IsNullOrEmpty(complainTrigger))
+                anim.SetTrigger(complainTrigger);
+
+            // 이후 반복 간격 대기
+            yield return new WaitForSeconds(complainRepeatDelay);
+        }
+    }
+
+    private void StopComplainTimer()
+    {
+        if (paymentComplainRoutine != null)
+        {
+            StopCoroutine(paymentComplainRoutine);
+            paymentComplainRoutine = null;
+        }
+    }
+
     /* ─ 결제 완료 처리 ─ */
     public void CompletePayment(NpcController npc)
     {
+        // 불평 타이머 정지
+        StopComplainTimer();
+
         // 1) 돈/카드 파괴
         if (npcToPay.TryGetValue(npc, out var payObj))
         {
@@ -197,9 +232,13 @@ public class CounterManager : MonoBehaviour
     {
         currentNpcForPayment = npc; //계산을 처리할 npc
 
-            // ✅ 중복 구독 방지
+        // 중복 구독 방지
         UnsubscribeCalculatorEvents();  // 수정 (준서)
         SubscribeCalculatorEvents(); //계산 이벤트 시작
+        
+        // 불평 타이머 재시작
+        StopComplainTimer();
+        paymentComplainRoutine = StartCoroutine(PaymentComplainTimer(npc));
     }
 
 
@@ -210,6 +249,9 @@ public class CounterManager : MonoBehaviour
 
         if (currentNpcForPayment != null)
         {
+            // 불평 타이머 정지
+            StopComplainTimer();
+
             //결제 완료 처리
             CompletePayment(currentNpcForPayment);
             Debug.Log(npcPaymentAmount);
@@ -220,6 +262,7 @@ public class CounterManager : MonoBehaviour
         //이벤트 구독 해제
         UnsubscribeCalculatorEvents();
     }
+
     private void HandlePaymentFailure()//계산 실패
     {
         //계산 실패시 UI는 CalculatorErrorUI에 구현완료
