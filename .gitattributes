@@ -23,5 +23,9 @@
 *.mp4  filter=lfs diff=lfs merge=lfs -text
 *.db   filter=lfs diff=lfs merge=lfs -text
 
+# TextMesh Pro Fonts 
+"Assets/**/TextMesh Pro/Examples & Extras/**" merge=ours -diff
+"Assets/**/TextMesh Pro/**/Resources/Fonts & Materials/*SDF.asset" merge=ours -diff
+
 # Do NOT commit *.unitypackage ideally; if you must, it's binary:
 # *.unitypackage filter=lfs diff=lfs merge=lfs -text
