@@ -42,15 +42,12 @@ namespace StarterAssets
 			JumpInput(value.isPressed);
 		}
 
-		public void OnSprint(InputValue value)
-		{
-			SprintInput(value.isPressed);
-		}
+		// public void OnSprint(InputValue value)
+		// {
+		// 	SprintInput(value.isPressed);
+		// }
 
-		public void OnDayEnd(InputValue value)
-		{
-			DayEndInput(value.isPressed);
-		}
+
 #else
 	// old input sys if we do decide to have it (most likely wont)...
 #endif
@@ -76,10 +73,10 @@ namespace StarterAssets
 			sprint = newSprintState;
 		}
 
-		public void DayEndInput(bool newDayEndState)
-		{
-			dayEnd = newDayEndState;
-		}
+		// public void DayEndInput(bool newDayEndState)
+		// {
+		// 	dayEnd = newDayEndState;
+		// }
 
 #if !UNITY_IOS || !UNITY_ANDROID
 
