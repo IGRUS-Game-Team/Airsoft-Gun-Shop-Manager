@@ -9,7 +9,6 @@ using StarterAssets;
 /// OnDayEnd 오브젝트에 붙은 스크립트로, 액션맵 통해 enter 감지하면 Text가 0.4초마다 나타나는 기능입니다. 
 /// </summary>
 
-
 public class OnDayEnd : MonoBehaviour
 {
     [SerializeField] GameObject AdjustmentCanvas;
@@ -23,7 +22,7 @@ public class OnDayEnd : MonoBehaviour
 
 
     private bool isAdjustmentCanvasActive = false; // 시간이 지났을 때만 정산 UI가 활성화되어야 하므로 false가 기본값
-
+    private bool hasAutoEndTriggered = false; // 자동 종료
 
     void Update()
     {
@@ -31,7 +30,6 @@ public class OnDayEnd : MonoBehaviour
         bool isBetweenDeadline = hours >= 20; // 20:00 ~ 23:59 (마감시간)인지 
 
         if (playerInput.dayEnd && !isAdjustmentCanvasActive && isBetweenDeadline) // enter 인식 && 정산캔버스활성화X && 마감시간
-
         {
             OnEnterDayEnd(); // EnterDayEnd라는 액션 인식 함수 호출
         }
@@ -39,16 +37,37 @@ public class OnDayEnd : MonoBehaviour
         {
             Debug.Log("아직 마감 시간이 되지 않았습니다.");
         }
+        else if (timeUI.totalGameMinutes == 1440 && !hasAutoEndTriggered && !timeUI.isTimePaused) // 00:00 가 됐을 때 정산UI 띄우기
+        {
+            hasAutoEndTriggered = true; // 자동 종료 (Updeate 내에서 OnEnterDayEnd가 한 번만 호출되도록)
+            OnEnterDayEnd();
+        }
     }
 
     void OnEnterDayEnd()
     {
         audioSource.PlayOneShot(AdjustmentAppearSound);
-
-        AdjustmentCanvas.SetActive(true); 
-        BackgroundImage.SetActive(true); 
+        AdjustmentCanvas.SetActive(true);
+        BackgroundImage.SetActive(true);
         StartCoroutine(ShowDelayText());
         isAdjustmentCanvasActive = true;
+        timeUI.isTimePaused = true; // 시간 멈추기
+    }
+
+    public void StartNextDay()
+    {
+        AdjustmentCanvas.SetActive(false);
+        BackgroundImage.SetActive(false);
+        isAdjustmentCanvasActive = false;
+        hasAutoEndTriggered = false;
+        NextDayTime();
+    }
+
+    public void NextDayTime()
+    {
+        timeUI.totalGameMinutes = 480; // 다시 아침 8:00부터 시간 흐르기 시작
+        timeUI.isTimePaused = false; // 시간 멈춘 거 풀기
+        timeUI.ForceUpdate();
     }
 
     IEnumerator ShowDelayText()
