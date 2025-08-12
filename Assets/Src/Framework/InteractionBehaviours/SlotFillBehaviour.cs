@@ -12,27 +12,8 @@ public class SlotFillBehaviour : MonoBehaviour, IInteractable
 
     void Awake()
     {
-<<<<<<< HEAD
-        if (slot.IsFull) return;
-
-        GameObject prefab = defaultProduct;
-        if (prefab == null)
-        {
-            Debug.LogWarning($"{name} : defaultProduct 가 비어 있어 진열 불가");
-            return;
-        }
-
-        int idx = slot.ItemCount;                   // 0 또는 1
-        Transform snap = slot.GetSnapPoint(idx);
-
-        GameObject go = Instantiate(prefab, snap.position, snap.rotation, slot.transform);
-        go.transform.localScale = new Vector3(1.4f,1.4f,1.4f); //상품 프리팹 크기
-
-        slot.RegisterNewItem(go);                   // 리스트에 추가
-=======
         slot = GetComponent<ShelfSlot>();
         hold = FindFirstObjectByType<PlayerObjectHoldController>();
->>>>>>> eca2aeb92c6f4017336389b3ad1d5f921006303d
     }
 
 public void Interact()
@@ -62,7 +43,7 @@ public void Interact()
 
     // 생성
     GameObject go = Instantiate(prefab, snap.position, snap.rotation, slot.transform);
-    go.transform.localScale = Vector3.one;
+    go.transform.localScale = new Vector3(1.4f,1.4f,1.4f);
 
     // CounterSlotData 연결
     var csd = go.GetComponent<CounterSlotData>();
