@@ -32,7 +32,6 @@ public class CheckoutItemBehaviour : MonoBehaviour, IInteractable
     {
         countorMonitorController = FindFirstObjectByType<CountorMonitorController>();
         cashRegisterUI           = FindFirstObjectByType<CashRegisterUI>();
-        if (!countorMonitorController) Debug.Log("CountorMonitorController 없음");
     }
 
     public CheckoutItemBehaviour Init(
@@ -58,143 +57,89 @@ public class CheckoutItemBehaviour : MonoBehaviour, IInteractable
     /* 플레이어가 클릭했을 때 자동 호출 (InputContextRouter 경유) */
     public void Interact()
     {
-        if (!isInitialized)
-        {
-            Debug.LogWarning("CheckoutItemBehaviour: 아직 Init되지 않음");
-            return;
-        }
         if (moving) return;
+
+        // ★ 추가: 줄 맨 앞 + 결제 시작한 뒤에만 동작
+        bool isFront  = QueueManager.Instance != null && QueueManager.Instance.IsFront(owner);
+        bool started = CounterManager.Instance != null && CounterManager.Instance.HasCheckoutStarted(owner);
+
+        if (!isFront || !started) return;  // ← 여기서 막아줌
 
         moving = true;
         var col = GetComponent<Collider>();
-        if (col) col.enabled = false;   // 재클릭 방지
+        if (col) col.enabled = false;
         StartCoroutine(MoveRoutine());
     }
 
-IEnumerator MoveRoutine()
-{
-    Debug.Log($"[MoveRoutine] START for {gameObject.name}");
-    Debug.Log($"bag={bag}, scanner={scanner}, owner={owner}, manager={manager}, counterSlotData={counterSlotData}");
-
-    if (bag != null)
-        Debug.Log($"Start distance to bag: {Vector3.Distance(transform.position, bag.position)}");
-
-    // 시작 시 봉투 안에 이미 있는 경우
-    if (bag != null && InsideRadius2D(transform.position, bag.position, bagRadius))
+    IEnumerator MoveRoutine()
     {
-        var usedSlot = transform.parent;
-        Debug.Log($"[BAG-IMMEDIATE] owner={owner?.name}, item={gameObject.name}, parentSlot={usedSlot?.name}");
-
-        if (usedSlot == null)
-            Debug.LogWarning("[BAG-IMMEDIATE] usedSlot is NULL!");
-        else
-            CounterManager.Instance?.ReturnSlot(usedSlot);
-
-        // 다음 아이템 시도
-        if (owner == null)
-            Debug.LogWarning("[BAG-IMMEDIATE] owner is NULL!");
-        else
-            owner.GetComponent<CarriedItemHandler>()?.PlaceToCounter();
-
-        manager?.OnItemBagged(owner);
-        Destroy(gameObject);
-        yield break;
-    }
-
-    Vector3 dir = (bag != null) ? (bag.position - transform.position).normalized : Vector3.zero;
-    Debug.Log($"[MOVE] dir={dir}");
-
-    AudioSource src = gameObject.AddComponent<AudioSource>();
-    src.playOnAwake = false;
-
-    while (true)
-    {
-        transform.position += dir * speed * Time.deltaTime;
-
-        // 스캐너 판정
-        if (!beeped)
+        if (bag == null)
         {
-            if (scanner == null)
-            {
-                Debug.LogWarning("[SCANNER] scanner is NULL!");
-            }
-            else
-            {
-                if (InsideRadius2D(transform.position, scanner.position, scanRadius))
-                {
-                    Debug.Log("[SCANNER] Inside scan radius");
-                    if (Vector3.Dot(transform.position - scanner.position, dir) > 0f)
-                    {
-                        Debug.Log("[SCANNER] Passed scanner, triggering beep");
-                        if (beep != null) src.PlayOneShot(beep);
-                        else Debug.LogWarning("[SCANNER] beep clip is NULL");
-
-                        beeped = true;
-
-
-                        if (countorMonitorController == null)
-                            Debug.LogWarning("[SCANNER] countorMonitorController is NULL!");
-                        else
-                            countorMonitorController.Show(counterSlotData);
-
-                        if (cashRegisterUI == null)
-                            Debug.LogWarning("[SCANNER] cashRegisterUI is NULL!");
-                        else if (counterSlotData?.itemData == null)
-                            Debug.LogWarning("[SCANNER] counterSlotData.itemData is NULL!");
-                        else
-                            cashRegisterUI.SetValues(
-                                counterSlotData.itemData.baseCost - Random.Range(0, 100),
-                                counterSlotData.itemData.baseCost
-                            );
-
-
-                        countorMonitorController.Show(counterSlotData);
-                        //cashRegisterUI.SetValues(counterSlotData.itemData.baseCost - Random.Range(0, 100), counterSlotData.itemData.baseCost);
-
-                        Debug.Log($"{price} 계산 시퀀스");
-                    }
-                }
-            }
-        }
-
-        // 봉투 판정
-        // if (bag == null)
-        // {
-        //     Debug.LogWarning("[BAG] bag is NULL!");
-        // }
-        // else if (InsideRadius2D(transform.position, bag.position, bagRadius))
-        // {
-        //     Debug.Log($"[BAG] Packed item={gameObject.name}, owner={owner?.name}");
-
-        //     manager?.OnItemBagged(owner);
-        //     Destroy(gameObject);
-        //     yield break;
-        // }
-        // else
-        // {
-        //     Debug.Log($"[BAG] Not in radius yet. Dist={Vector3.Distance(transform.position, bag.position)}");
-        // }
-                // ② 봉투 반경 도착 → 슬롯 반납 + 다음 아이템 시도
-        if (bag != null && InsideRadius2D(transform.position, bag.position, bagRadius))
-        {
-            var usedSlot = transform.parent;
-            Debug.Log($"[BAG] Packed item={gameObject.name}, owner={owner?.name}, parentSlot={usedSlot?.name}");
-
-            if (usedSlot != null)
-                CounterManager.Instance.ReturnSlot(usedSlot);
-
-            manager.OnItemBagged(owner);
-
-            owner?.GetComponent<CarriedItemHandler>()?.PlaceToCounter();
-
-            Destroy(gameObject);
             yield break;
         }
 
-        yield return null;
-    }
-}
+        Vector3 dir = (bag.position - transform.position).normalized;
 
+        AudioSource src = gameObject.AddComponent<AudioSource>();
+        src.playOnAwake = false;
+
+        while (true)
+        {
+            // 이동
+            transform.position += dir * speed * Time.deltaTime;
+
+            // ① 스캐너 통과하면 삑 (넉넉한 반경 + 진행방향 확인)
+            if (!beeped && scanner != null)
+            {
+                if (InsideRadius2D(transform.position, scanner.position, scanRadius))
+                    if (Vector3.Dot(transform.position - scanner.position, dir) > 0f)
+                    {
+                        if (beep) src.PlayOneShot(beep);
+                        beeped = true;
+
+                        // ★추가: 이 아이템 '스캔 완료'로 집계
+                        manager.OnItemScanned(owner);
+
+                        // (기존 UI 갱신 그대로)
+                        countorMonitorController.Show(counterSlotData);
+                        cashRegisterUI.SetValues(counterSlotData.itemData.baseCost - Random.Range(0, 100), counterSlotData.itemData.baseCost);
+                    }
+            }
+
+
+            // ② 봉투 반경에 들어오면 포장 완료
+            if (bag != null && InsideRadius2D(transform.position, bag.position, bagRadius))
+            {
+                // ★추가: 스캔 누락 보정 (스캔 안 됐으면 여기서 강제 스캔 1회)
+                if (!beeped)
+                {
+                    if (beep) src.PlayOneShot(beep);
+                    beeped = true;
+                    manager.OnItemScanned(owner);
+                    // (원하면 여기서 모니터/캐셔 UI도 한 번 업데이트)
+                    if (counterSlotData)
+                    {
+                        countorMonitorController?.Show(counterSlotData);
+                        cashRegisterUI?.SetValues(
+                            counterSlotData.itemData.baseCost - Random.Range(0, 100),
+                            counterSlotData.itemData.baseCost
+                        );
+                    }
+                }
+
+
+                // 슬롯 반납 + 봉투 집계 + 파괴
+                var usedSlot = transform.parent;
+                if (usedSlot != null) CounterManager.Instance.ReturnSlot(usedSlot);
+
+                manager.OnItemBagged(owner);
+                Destroy(gameObject);
+                yield break;
+            }
+
+            yield return null;
+        }
+    }
 
     // 2D(수평) 반경 체크: y는 무시해서 판정 넉넉하게
     bool InsideRadius2D(Vector3 a, Vector3 b, float radius)
@@ -228,4 +173,29 @@ IEnumerator MoveRoutine()
             foreach (var c in cols) c.enabled = true;
         }
     }
+
+#if UNITY_EDITOR
+    void OnDrawGizmosSelected()
+    {
+        if (!drawGizmos) return;
+
+        Gizmos.matrix = Matrix4x4.identity;
+        Color scanC = new Color(0f, 1f, 0.5f, 0.25f);
+        Color bagC  = new Color(0.2f, 0.6f, 1f, 0.25f);
+
+        if (scanner != null)
+        {
+            Gizmos.color = scanC;
+            var p = scanner.position; p.y = 0f;
+            Gizmos.DrawSphere(p, scanRadius);
+        }
+
+        if (bag != null)
+        {
+            Gizmos.color = bagC;
+            var p = bag.position; p.y = 0f;
+            Gizmos.DrawSphere(p, bagRadius);
+        }
+    }
+#endif
 }
