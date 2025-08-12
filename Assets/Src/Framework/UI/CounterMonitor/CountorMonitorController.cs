@@ -25,23 +25,13 @@ public void Show(CounterSlotData items)//items = 게임 오브젝트, itemdata(�
     CheckoutCardView existingCard = null;
     foreach (Transform child in contentRoot)
     {
-        if (items == null || items.itemData == null) return;
-
-        var data = items.itemData;
-        var amount = items.amount;
-        var unit = data.baseCost;
-
-        // 기존 카드 있는지 찾기
-        CheckoutCardView existingCard = null;
-        foreach (Transform child in contentRoot)
+        var cardView = child.GetComponent<CheckoutCardView>();
+        if (cardView != null && cardView.ItemData == data)
         {
-            var cardView = child.GetComponent<CheckoutCardView>();
-            if (cardView != null && cardView.ItemData == data)
-            {
-                existingCard = cardView;
-                break;
-            }
+            existingCard = cardView;
+            break;
         }
+    }
 
         if (existingCard != null)
         {
@@ -63,31 +53,13 @@ public void Show(CounterSlotData items)//items = 게임 오브젝트, itemdata(�
         var cardView = child.GetComponent<CheckoutCardView>();
         if (cardView != null)
         {
-            // 기존 수량 증가
-            existingCard.AddAmount(amount);
+            total += cardView.TotalPrice;
         }
-        else
-        {
-            // 새 카드 생성
-            var card = Instantiate(cardPrefab, contentRoot);
-            card.Setup(data, amount);
-        }
-
-        // 전체 합계 갱신
-        float total = 0f;
-        foreach (Transform child in contentRoot)
-        {
-            var cardView = child.GetComponent<CheckoutCardView>();
-            if (cardView != null)
-            {
-                total += cardView.TotalPrice;
-            }
-        }
-
-        totalPriceText.text = $"${total:F2}";
-        calculatorOk.SetTotalPrice(total);
-
     }
+
+    totalPriceText.text = $"${total:F2}";
+    calculatorOk.SetTotalPrice(total);
+}
 
     public void Clear()
     {
@@ -97,21 +69,5 @@ public void Show(CounterSlotData items)//items = 게임 오브젝트, itemdata(�
         total = 0f;
         totalPriceText.text = "$0.00";
     }
-    
-    public float GetCurrentTotalAmount()
-{
-    float sum = 0f;
-
-    foreach (Transform child in contentRoot)
-    {
-        var cardView = child.GetComponent<CheckoutCardView>();
-        if (cardView != null)
-        {
-            sum += cardView.TotalPrice; // 각 카드의 총 가격 합산
-        }
-    }
-
-    return sum;
-}
 
 }
