@@ -17,22 +17,17 @@ public class NpcState_OfferPayment : IState
 
     private bool itemSpawned;                            // 소지품을 손에 생성했는가?
     private bool rotationComplete;                       // 목표 방향으로 정확히 선 뒤 true
-    private bool loggedReady;
     private PaymentContext paymentContext;               // 결제 정보
 
-    private CountorMonitorController countorMonitorController;
 
     /* ---------- 생성자 ---------- */
 
     // 외부에서 필요한 요소를 모두 주입받아 상태를 만든다.
-    // private void Awake() {
-    //     countorMonitorController = 
-    // }
     public NpcState_OfferPayment(
         NpcController npcController,
         Transform counter)
     {
-        this.npcController = npcController;            // 필드와 매개변수 이름 충돌 → this. 사용
+        this.npcController = npcController;
         counterTransform = counter;
     }
 
@@ -40,49 +35,43 @@ public class NpcState_OfferPayment : IState
 
     // 상태 시작: 결제 데이터를 준비하고 이동·회전을 잠시 멈춘다
     public void Enter()
+{
+    paymentContext = new PaymentContext {
+        totalPrice = 0f,
+        method = Random.value < 0.5f ? PaymentType.Cash : PaymentType.Card,
+        payer = npcController
+    };
+
+    npcController.Agent.isStopped = true;
+    npcController.Agent.updateRotation = false;
+
+    var carrier = npcController.GetComponent<CarriedItemHandler>();
+    if (carrier != null)
     {
-        // (1) 결제 정보 구조체 생성
-        paymentContext = new PaymentContext
-        {
-            totalPrice = 0f,                             // TODO: 실제 가격 로직
-            method = Random.value < 0.5f ? PaymentType.Cash : PaymentType.Card,
-            payer = npcController                   // 본인을 payer로 지정
-        };
+       carrier.FillCounterNow();  // ★변경: 먼저 한 번에 올리기
 
-        // (2) NavMeshAgent 이동·회전 중단
-        npcController.Agent.isStopped = true;       // 이동 정지
-        npcController.Agent.updateRotation = false;      // 자동 회전 끔
-
-        // ★추가: 들고 온 거 전부 계산대에 내려놓고, 총 개수 등록
-        var carrier = npcController.GetComponent<CarriedItemHandler>();
-        Debug.Log(carrier);
-        if (carrier != null)
-        {
-            Debug.Log($"[OfferPayment.Enter] CarriedCount = {carrier.CarriedCount}");
-            Debug.Log("들고 온 거 모두 놓기");
-            CounterManager.Instance.BeginCheckout(npcController, carrier.CarriedCount); // ★추가
-            carrier.PlaceAllToCounter();                                                // ★추가
-        }
+        // ★변경: "올려둔 개수"를 스캔 목표치로 세팅
+        CounterManager.Instance.BeginCheckout(npcController, carrier.PlacedCount);
     }
+}
 
     // 매 프레임: 몸을 계산대 쪽으로 돌리고, 다 돌면 결제 물건을 생성
     public void Tick()
     {
-        // 이미 정확히 돌았으면 이동·회전 로직 건너뜀
         if (rotationComplete)
-        {
-            bool ready = CounterManager.Instance.IsReadyToPay(npcController);
-            if (ready && !loggedReady) { Debug.Log($"[PAY][READY] {npcController.name}"); loggedReady = true; } // ★추가
-            if (!ready) return;
-
-            if (!itemSpawned)
-            {
-                npcController.Animator.SetTrigger("OfferPayment");
-                SpawnPaymentItem();  // ← 회전 끝난 순간 딱 1번만
-                itemSpawned = true;
-            }
+    {
+        // ★fix: 아직 결제 준비가 안 됐으면 그냥 대기 (안 내밈)
+        if (!CounterManager.Instance.IsReadyToPay(npcController))
             return;
+
+        if (!itemSpawned)
+        {
+            npcController.Animator.SetTrigger("OfferPayment");  
+            SpawnPaymentItem();
+            itemSpawned = true;
         }
+        return;
+    }
 
         // (1) NPC → 계산대 방향 벡터(수평) 계산
         Vector3 direction = counterTransform.position - npcController.transform.position;
@@ -138,11 +127,10 @@ public class NpcState_OfferPayment : IState
             payItem.Init(paymentContext, OnPaid);
     }
 
-    // 플레이어가 아이템을 클릭해서 결제를 완료했을 때 호출
+    // 플레이어가 아이템을 클릭하고, 결제를 완료했을 때 호출
     private void OnPaid()
     {
         CounterManager.Instance.CompletePayment(npcController);   // ★변경: 매니저에게 위임
         npcController.stateMachine.SetState(new NpcState_Leave(npcController));
-        Debug.Log("계산 완료 ㅅㅂ");
     }
 }
