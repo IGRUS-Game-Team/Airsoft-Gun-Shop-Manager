@@ -83,6 +83,9 @@ public class NpcController : MonoBehaviour
             targetShelfGroup.Release();
             targetShelfGroup = null;
         }
+        // ★ 결제 완료 집계 통지 (CounterManager 수정 없이 완료 시점 훅)
+        SettlementManager.Instance?.OnPaymentCompleted(this);
+        
         stateMachine.SetState(new NpcState_Leave(this));
     }
 }
