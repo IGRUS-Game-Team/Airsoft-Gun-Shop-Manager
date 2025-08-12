@@ -43,7 +43,7 @@ public void Interact()
 
     // 생성
     GameObject go = Instantiate(prefab, snap.position, snap.rotation, slot.transform);
-    go.transform.localScale = Vector3.one;
+    go.transform.localScale = new Vector3(1.4f,1.4f,1.4f);
 
     // CounterSlotData 연결
     var csd = go.GetComponent<CounterSlotData>();
