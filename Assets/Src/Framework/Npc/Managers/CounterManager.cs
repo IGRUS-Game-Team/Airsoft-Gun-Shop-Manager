@@ -7,7 +7,7 @@ public class CounterManager : MonoBehaviour
 
     [Header("카운터 슬롯들 (Inspector 순서대로 사용)")]
     [SerializeField] Transform[] counterSlots;
-    readonly List<Transform> freeSlots = new();     
+    readonly List<Transform> freeSlots = new();
 
     [Header("결제용 프리팹")]
     [SerializeField] GameObject cashPrefab;
@@ -18,6 +18,11 @@ public class CounterManager : MonoBehaviour
     [SerializeField] Transform bagPoint;        // 봉투 위치
     [SerializeField] AudioClip beepClip;       // 삑 효과음
 
+    [Header("결제 지연 불평 설정")]
+    [SerializeField] float complainFirstDelay = 10f;   // 첫 불평까지 대기 시간(초)
+    [SerializeField] float complainRepeatDelay = 8f;   // 이후 반복 간격(초)
+    [SerializeField] string complainTrigger = "Complain"; // 애니메이터 트리거 이름
+
     readonly Dictionary<NpcController, Transform> npcToSlot = new();
     readonly Dictionary<NpcController, GameObject> npcToPay = new();
     readonly Dictionary<NpcController, int> npcScannedCount = new();
@@ -25,6 +30,7 @@ public class CounterManager : MonoBehaviour
     private readonly HashSet<NpcController> readyToPay = new();
     readonly Dictionary<NpcController, int> npcCheckoutTargetCount = new(); // ★추가
     private CountorMonitorController countorMonitorController;
+    private Coroutine paymentComplainRoutine;
 
 
     public bool IsReadyToPay(NpcController npc) => readyToPay.Contains(npc);
@@ -44,40 +50,40 @@ public class CounterManager : MonoBehaviour
         }
         Instance = this;
 
-        freeSlots.AddRange(counterSlots);    
-        countorMonitorController = FindFirstObjectByType<CountorMonitorController>(); 
+        freeSlots.AddRange(counterSlots);
+        countorMonitorController = FindFirstObjectByType<CountorMonitorController>();
     }
 
     /* ─ NPC가 들고 온 상품 내려놓기 + 슬롯 배정 ─ */
     public Transform PlaceItem(NpcController npc, GameObject item, Vector3 worldScale)
-{
-    var rnd = TakeRandomFreeSlot();
+    {
+        var rnd = TakeRandomFreeSlot();
 
-    Transform slot = rnd;
-    item.transform.SetParent(slot, false);
-    item.transform.localPosition = Vector3.zero;
-    item.transform.localRotation = Quaternion.identity;
-    item.SetActive(true);
+        Transform slot = rnd;
+        item.transform.SetParent(slot, false);
+        item.transform.localPosition = Vector3.zero;
+        item.transform.localRotation = Quaternion.identity;
+        item.SetActive(true);
 
-    Vector3 p = slot.lossyScale;
-    item.transform.localScale = new Vector3(
-        p.x != 0 ? worldScale.x / p.x : 1f,
-        p.y != 0 ? worldScale.y / p.y : 1f,
-        p.z != 0 ? worldScale.z / p.z : 1f
-    );
+        Vector3 p = slot.lossyScale;
+        item.transform.localScale = new Vector3(
+            p.x != 0 ? worldScale.x / p.x : 1f,
+            p.y != 0 ? worldScale.y / p.y : 1f,
+            p.z != 0 ? worldScale.z / p.z : 1f
+        );
 
-    var beh = item.GetComponent<CheckoutItemBehaviour>();
+        var beh = item.GetComponent<CheckoutItemBehaviour>();
         beh.Init(this, npc, scannerPoint, bagPoint, beepClip);
 
-    return slot;
-}
+        return slot;
+    }
 
     // ★추가: 이번 손님 총 개수 세팅 (계산대에 다 올리기 “직전”에 호출)
     public void BeginCheckout(NpcController npc, int totalItems)
     {
         npcCheckoutTargetCount[npc] = Mathf.Max(0, totalItems);
         npcBaggedCount[npc] = 0;
-        npcScannedCount[npc]  = 0;           // ★추가: 스캔 카운트 초기화
+        npcScannedCount[npc] = 0;           // ★추가: 스캔 카운트 초기화
         readyToPay.Remove(npc);
     }
 
@@ -104,11 +110,11 @@ public class CounterManager : MonoBehaviour
         if (ready)
         {
             readyToPay.Add(npc);
-        } 
+        }
 
     }
 
-    
+
     /* ─ 슬롯 반납 전용 ─ */
     public void ReturnSlot(Transform slot)
     {
@@ -116,9 +122,38 @@ public class CounterManager : MonoBehaviour
         if (!freeSlots.Contains(slot)) freeSlots.Add(slot);
     }
 
+    private System.Collections.IEnumerator PaymentComplainTimer(NpcController npc)
+    {
+        // 첫 대기
+        yield return new WaitForSeconds(complainFirstDelay);
+
+        // currentNpcForPayment가 바뀌지 않는 동안 반복
+        while (currentNpcForPayment == npc)
+        {
+            var anim = npc?.Animator;
+            if (anim != null && !string.IsNullOrEmpty(complainTrigger))
+                anim.SetTrigger(complainTrigger);
+
+            // 이후 반복 간격 대기
+            yield return new WaitForSeconds(complainRepeatDelay);
+        }
+    }
+
+    private void StopComplainTimer()
+    {
+        if (paymentComplainRoutine != null)
+        {
+            StopCoroutine(paymentComplainRoutine);
+            paymentComplainRoutine = null;
+        }
+    }
+
     /* ─ 결제 완료 처리 ─ */
     public void CompletePayment(NpcController npc)
     {
+        // 불평 타이머 정지
+        StopComplainTimer();
+
         // 1) 돈/카드 파괴
         if (npcToPay.TryGetValue(npc, out var payObj))
         {
@@ -155,9 +190,9 @@ public class CounterManager : MonoBehaviour
     }
 
     public bool HasCheckoutStarted(NpcController npc)
-{
-    return npcCheckoutTargetCount.ContainsKey(npc);
-}
+    {
+        return npcCheckoutTargetCount.ContainsKey(npc);
+    }
 
     Transform TakeRandomFreeSlot()
     {
@@ -168,7 +203,7 @@ public class CounterManager : MonoBehaviour
         return t;
     }
 
-    #if UNITY_EDITOR
+#if UNITY_EDITOR
     [SerializeField] bool debugDrawSlots = true;
 
     void OnDrawGizmos()
@@ -179,11 +214,11 @@ public class CounterManager : MonoBehaviour
         foreach (var s in counterSlots)
         {
             if (s == null) continue;
-            Gizmos.color = free.Contains(s) ? new Color(0,1,0,0.35f) : new Color(1,0,0,0.35f); // free=초록, 점유=빨강
-            Gizmos.DrawSphere(s.position + Vector3.up*0.05f, 0.05f);
+            Gizmos.color = free.Contains(s) ? new Color(0, 1, 0, 0.35f) : new Color(1, 0, 0, 0.35f); // free=초록, 점유=빨강
+            Gizmos.DrawSphere(s.position + Vector3.up * 0.05f, 0.05f);
         }
     }
-    #endif
+#endif
 
 
     //추가 === 장지원
@@ -197,10 +232,16 @@ public class CounterManager : MonoBehaviour
     {
         currentNpcForPayment = npc; //계산을 처리할 npc
 
+        // 중복 구독 방지
+        UnsubscribeCalculatorEvents();  // 수정 (준서)
         SubscribeCalculatorEvents(); //계산 이벤트 시작
+        
+        // 불평 타이머 재시작
+        StopComplainTimer();
+        paymentComplainRoutine = StartCoroutine(PaymentComplainTimer(npc));
     }
 
-    
+
     //success 이벤트가 진행할 메서드
     private void HandlePaymentSuccess() //계산 성공
     {
@@ -208,6 +249,9 @@ public class CounterManager : MonoBehaviour
 
         if (currentNpcForPayment != null)
         {
+            // 불평 타이머 정지
+            StopComplainTimer();
+
             //결제 완료 처리
             CompletePayment(currentNpcForPayment);
             Debug.Log(npcPaymentAmount);
@@ -218,6 +262,7 @@ public class CounterManager : MonoBehaviour
         //이벤트 구독 해제
         UnsubscribeCalculatorEvents();
     }
+
     private void HandlePaymentFailure()//계산 실패
     {
         //계산 실패시 UI는 CalculatorErrorUI에 구현완료
@@ -234,6 +279,14 @@ public class CounterManager : MonoBehaviour
     {
         CalculatorOk.SuccessCompare -= HandlePaymentSuccess;
         CalculatorOk.FailedCompare -= HandlePaymentFailure;
+    }
+
+    // 기존 카드 로직은 그대로 냅두고 새롭게 현금 로직만 여기 추가하면 됨.
+    public void StartCashPayment(NpcController npc)
+    {
+        //TODO : 여기에 Cash 계산 로직 넣기
+        CompletePayment(npc);
+
     }
     #endregion
 }
