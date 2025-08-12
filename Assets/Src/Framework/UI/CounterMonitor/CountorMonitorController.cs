@@ -9,7 +9,7 @@ public class CountorMonitorController : MonoBehaviour
     [SerializeField] TextMeshProUGUI totalPriceText;
     [SerializeField] CalculatorOk calculatorOk;
 
-    [Header("PriceObserver")]
+     [Header("PriceObserver")]
     [SerializeField] PriceObserver priceObserver; // 가격 옵저버 
 
     private float total = 0f;
