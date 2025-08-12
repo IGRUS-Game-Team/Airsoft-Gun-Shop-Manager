@@ -223,8 +223,15 @@ public class CounterManager : MonoBehaviour
 
     //추가 === 장지원
     #region 계산 결제 로직
+    [Header("Cash UI")]
+    [SerializeField] private CashRegisterUI cashUI;
+    [SerializeField] private CashRegisterEnterHandler cashRegisterEnterHandler;
     private NpcController currentNpcForPayment;
     private float npcPaymentAmount; // 손님 결제 금액
+    private float npcSendMe { get; set; }
+
+    // 내부 상태
+    private bool cashSessionActive = false;
 
 
     //계산 시작
@@ -243,7 +250,7 @@ public class CounterManager : MonoBehaviour
 
 
     //success 이벤트가 진행할 메서드
-    private void HandlePaymentSuccess() //계산 성공
+    private void HandleCardPaymentSuccess() //계산 성공
     {
         Debug.Log(currentNpcForPayment);
 
@@ -262,8 +269,7 @@ public class CounterManager : MonoBehaviour
         //이벤트 구독 해제
         UnsubscribeCalculatorEvents();
     }
-
-    private void HandlePaymentFailure()//계산 실패
+    private void HandleCardPaymentFailure()//계산 실패
     {
         //계산 실패시 UI는 CalculatorErrorUI에 구현완료
     }
@@ -271,22 +277,90 @@ public class CounterManager : MonoBehaviour
 
     private void SubscribeCalculatorEvents()
     {
-        CalculatorOk.SuccessCompare += HandlePaymentSuccess;
-        CalculatorOk.FailedCompare += HandlePaymentFailure;
+        CalculatorOk.SuccessCompare += HandleCardPaymentSuccess;
+        CalculatorOk.FailedCompare += HandleCardPaymentFailure;
     }
 
     private void UnsubscribeCalculatorEvents()
     {
-        CalculatorOk.SuccessCompare -= HandlePaymentSuccess;
-        CalculatorOk.FailedCompare -= HandlePaymentFailure;
+        CalculatorOk.SuccessCompare -= HandleCardPaymentSuccess;
+        CalculatorOk.FailedCompare -= HandleCardPaymentFailure;
     }
+
+
+
+
+
 
     // 기존 카드 로직은 그대로 냅두고 새롭게 현금 로직만 여기 추가하면 됨.
     public void StartCashPayment(NpcController npc)
     {
-        //TODO : 여기에 Cash 계산 로직 넣기
-        CompletePayment(npc);
+        Debug.Log("현금계산 시작");
+        currentNpcForPayment = npc;
 
+        // 1) 이번 손님 총 결제금액 계산(모니터에서 가져오거나, 보유한 API 사용)
+        //    상황에 맞게 치환하세요.
+        npcPaymentAmount = (countorMonitorController != null)
+            ? countorMonitorController.GetCurrentTotalAmount()   
+            : 0f;
+        
+        float value = npcPaymentAmount + npcPaymentAmount / Random.Range(10, 15);
+        value = Mathf.Round(value * 100f) / 100f; // 숫자 자체 반올림
+        npcSendMe = value;
+        Debug.Log( countorMonitorController.GetCurrentTotalAmount());
+        // 2) 캐시 UI 초기화(손님이 낸 돈은 일단 0, 총액은 npcPaymentAmount)
+        if (cashUI != null)
+        {
+            cashUI.SetValues(received: npcSendMe, total: npcPaymentAmount);
+        }
+        Debug.Log(countorMonitorController.GetCurrentTotalAmount());
+        // 3) 이벤트 구독 + 세션 on
+        UnsubscribeCashRegisterEvents(); // 혹시 남아있으면 정리
+        SubscribeCashRegisterEvents();
+        cashSessionActive = true;
+
+        // (선택) 서랍 열기/프리팹 노출 등은 여기서 처리
+        cashRegisterEnterHandler.OpenBasket();
+        // registerMoneyRoot.SetActive(true);
+    }
+
+    private void SubscribeCashRegisterEvents()
+    {
+        CashRegisterUI.SuccessCompare += HandleCashPaymentSuccess;
+        CashRegisterUI.FailedCompare += HandleCashPaymentFailure;
+    }
+
+    private void UnsubscribeCashRegisterEvents()
+    {
+        CashRegisterUI.SuccessCompare -= HandleCashPaymentSuccess;
+        CashRegisterUI.FailedCompare  -= HandleCashPaymentFailure;
+    }
+
+    private void HandleCashPaymentSuccess() //계산 성공
+    {
+        // 매출 반영
+        GameState.Instance.AddMoney(npcSendMe - cashUI.GetCurrentGiven());
+        Debug.Log(npcSendMe + " "+ cashUI.GetCurrentGiven());
+        // 결제 완료 처리
+        if (currentNpcForPayment != null)
+            CompletePayment(currentNpcForPayment);
+
+        // UI 정리
+        countorMonitorController.Clear();
+        cashUI?.Clear();
+
+        // 상태/이벤트 정리
+        //cashRegisterEnterHandler.CloseBasket();
+        npcSendMe = 0;
+        cashSessionActive = false;
+        UnsubscribeCashRegisterEvents();
+    }
+
+    private void HandleCashPaymentFailure()//계산 실패(= 아직 모자람)
+    {
+        // 굳이 세션 종료하지 않고 계속 입력 받도록 둔다.
+        // 필요하면 여기서 "금액이 부족합니다" 같은 피드백 UI 호출
+        // cashUI.ShowNotEnoughMessage();
     }
     #endregion
 }
