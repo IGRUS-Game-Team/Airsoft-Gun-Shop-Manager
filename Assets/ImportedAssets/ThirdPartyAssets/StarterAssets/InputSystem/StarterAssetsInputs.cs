@@ -13,6 +13,7 @@ namespace StarterAssets
 		public bool jump;
 		public bool sprint;
 		public bool dayEnd;
+		public bool range;
 
 		[Header("Movement Settings")]
 		public bool analogMovement;
@@ -51,6 +52,11 @@ namespace StarterAssets
 		{
 			DayEndInput(value.isPressed);
 		}
+
+		public void OnRange(InputValue value)
+		{
+			RangeInput(value.isPressed);
+		}
 #else
 	// old input sys if we do decide to have it (most likely wont)...
 #endif
@@ -79,6 +85,11 @@ namespace StarterAssets
 		public void DayEndInput(bool newDayEndState)
 		{
 			dayEnd = newDayEndState;
+		}
+
+		public void RangeInput(bool newRangeState)
+		{
+			range = newRangeState;
 		}
 
 #if !UNITY_IOS || !UNITY_ANDROID
