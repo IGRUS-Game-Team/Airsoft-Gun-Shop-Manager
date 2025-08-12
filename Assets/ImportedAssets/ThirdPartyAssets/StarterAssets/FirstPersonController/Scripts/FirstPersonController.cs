@@ -115,8 +115,11 @@ namespace StarterAssets
 
 			// 8/2 추가
 			// ui모드 진입시 플레이어 움직임 막기
+			// 8/12 추가
+			// 정산 창 진입시 플레이어 움직임 막기
 			if (MonitorUIModeManager.Instance.getInUIMode()) return;
 			if (InGameSettingManager.Instance.GetIsSettingOpen()) return;
+			if (OnDayEnd.isDayEndUIActive) return;
 			JumpAndGravity();
 			GroundedCheck();
 			Move();
@@ -126,8 +129,11 @@ namespace StarterAssets
 		{
 			// 8/2 추가
 			// ui모드 진입시 카메라 회전 막기
+			// 8/12 추가
+			// 정산 창 진입시 카메라 회전 막기
 			if (MonitorUIModeManager.Instance.getInUIMode()) return;
 			if (InGameSettingManager.Instance.GetIsSettingOpen()) return;
+			if (OnDayEnd.isDayEndUIActive) return;
 			CameraRotation();
 		}
 
