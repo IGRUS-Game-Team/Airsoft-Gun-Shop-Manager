@@ -12,12 +12,6 @@ public class PriceObserver : MonoBehaviour
     private Dictionary<int, List<IPriceChangeable>> observers = new();//상품 구독중인 관찰자 목록<상품id,>
 
 
-    // // 상품 데이터 등록/업데이트
-    // public void RegisterProduct(ItemData itemData)
-    // {
-    //     //currentItemData[itemData.ItemId] = itemData;
-    // }
-    
     //관찰자 등록
     public void Subscribe(int itemId, IPriceChangeable observer)
     {
