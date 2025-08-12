@@ -23,8 +23,14 @@ public class CheckoutCardView : MonoBehaviour,IPriceChangeable
         baseCost = itemData.baseCost;
 
         priceObserver = observer;
-        priceObserver.Subscribe(itemData.itemId, this);//가격 옵저버 구독
+
+        // 아이템을 PriceObserver에 등록 (초기 가격 설정)
+        priceObserver.RegisterProduct(itemData);
+        priceObserver.Subscribe(itemData.itemId, this);
+        
         currentPrice = priceObserver.GetPrice(itemData.itemId);//현재 가격 저장
+        Debug.Log($"아이템 {itemData.itemName} (ID: {itemData.itemId}) 초기 가격: {currentPrice}, 원가: {baseCost}");
+
 
         RefreshUI();
     }
