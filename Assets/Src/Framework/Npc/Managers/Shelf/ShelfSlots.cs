@@ -38,11 +38,12 @@ public class ShelfSlot : MonoBehaviour
     /* ---------- 외부에서 아이템 추가 ---------- */ //수정 so값 넘기기
     public void RegisterNewItem(GameObject go)
     {
-         items.Add(go);
+        Debug.Log("레지스터뉴아이템");
+        items.Add(go);
         var itemDataManager = go.GetComponent<ItemDataManager>();
         ItemData itemDatas = itemDataManager.GetItemData();
 
-        Vector3 priceCardPosition = transform.position + new Vector3(-0.14f,0.3f,-0.14f);
+        Vector3 priceCardPosition = transform.position; //+ new Vector3(-0.14f,0.3f,-0.14f);
 
         // 3. 이벤트 호출 수정: 부모 Transform(priceCardParent)을 함께 전달
         if (priceCardParent != null)
