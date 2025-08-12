@@ -43,8 +43,8 @@ GameObject:
   - component: {fileID: 817005876151078155}
   - component: {fileID: 1545716370963322316}
   - component: {fileID: 1298908733229369176}
-  - component: {fileID: 4724006857511464507}
   - component: {fileID: -2152964939115698566}
+  - component: {fileID: -4519443924278667986}
   m_Layer: 3
   m_Name: Money
   m_TagString: Untagged
@@ -94,19 +94,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   selected: 0
   sharedOutlineMaterial: {fileID: 2100000, guid: b42560bf0c4ffd0458a491ad48a0a66c, type: 2}
---- !u!114 &4724006857511464507
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4025612861382877536}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a9f7bd229c0d6e444b90e2a8016fee31, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  standingStateName: Standing
 --- !u!54 &-2152964939115698566
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -134,6 +121,19 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
+--- !u!114 &-4519443924278667986
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4025612861382877536}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eb10abc05fa93ea40a1148f4f5e097a1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  standingStateName: Standing
 --- !u!1001 &3585135554118081181
 PrefabInstance:
   m_ObjectHideFlags: 0
