@@ -9,14 +9,17 @@ public class CountorMonitorController : MonoBehaviour
     [SerializeField] TextMeshProUGUI totalPriceText;
     [SerializeField] CalculatorOk calculatorOk;
 
+    [Header("PriceObserver")]
+    [SerializeField] PriceObserver priceObserver; // 가격 옵저버 
+
     private float total = 0f;
-public void Show(CounterSlotData items)
+public void Show(CounterSlotData items)//items = 게임 오브젝트, itemdata(원가, id), 수량
 {
     if (items == null || items.itemData == null) return;
 
     var data = items.itemData;
     var amount = items.amount;
-    var unit = data.baseCost;
+    var unit = data.baseCost;//unit = 원가 
 
     // 기존 카드 있는지 찾기
     CheckoutCardView existingCard = null;
@@ -30,16 +33,17 @@ public void Show(CounterSlotData items)
         }
     }
 
-    if (existingCard != null)
-    {
-        // 기존 수량 증가
-        existingCard.AddAmount(amount);
-    }
-    else
-    {
-        // 새 카드 생성
-        var card = Instantiate(cardPrefab, contentRoot);
-        card.Setup(data, amount);
+        if (existingCard != null)
+        {
+            // 기존 수량 증가
+            existingCard.AddAmount(amount);
+        }
+        else
+        {
+            // 새 카드 생성
+            var card = Instantiate(cardPrefab, contentRoot);
+            card.Setup(data, amount, priceObserver); //옵저버 추가
+            //새 카드 생성시 priceobserver에게 참조 전달
     }
 
     // 전체 합계 갱신

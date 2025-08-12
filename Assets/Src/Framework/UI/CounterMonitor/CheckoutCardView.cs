@@ -1,24 +1,31 @@
 using TMPro;
 using UnityEngine;
 
-public class CheckoutCardView : MonoBehaviour
+public class CheckoutCardView : MonoBehaviour,IPriceChangeable
 {
     [SerializeField] TextMeshProUGUI nameText;
     [SerializeField] TextMeshProUGUI unitText;
     [SerializeField] TextMeshProUGUI priceText;
     [SerializeField] TextMeshProUGUI totalText;
 
+    private PriceObserver priceObserver;//가격 옵저버
+
     public ItemData ItemData { get; private set; }
-    public float TotalPrice => baseCost * currentAmount;
+    public float TotalPrice => currentPrice * currentAmount; //총 금액
+    private float currentPrice; //판매액<= 신호가 오면 얘가 바뀐다
+    private int currentAmount; //현재 수량
+    private float baseCost; //원가
 
-    private int currentAmount;
-    private float baseCost;
-
-    public void Setup(ItemData itemData, int amount)
+    public void Setup(ItemData itemData, int amount, PriceObserver observer)
     {
         ItemData = itemData;
         currentAmount = amount;
         baseCost = itemData.baseCost;
+
+        priceObserver = observer;
+        priceObserver.Subscribe(itemData.itemId, this);//가격 옵저버 구독
+        currentPrice = priceObserver.GetPrice(itemData.itemId);//현재 가격 저장
+
         RefreshUI();
     }
 
@@ -32,7 +39,17 @@ public class CheckoutCardView : MonoBehaviour
     {
         nameText.text = ItemData.itemName;
         unitText.text = currentAmount.ToString();
-        priceText.text = $"${baseCost:F2}";
-        totalText.text = $"${baseCost * currentAmount:F2}";
+        priceText.text = $"${currentPrice:F2}";
+        totalText.text = $"${currentPrice * currentAmount:F2}";
+    }
+
+    //input창에 의해 값이 변경되면 호출되는 메서드
+    public void OnPriceChanged(int itemId, float newPrice, float oldPrice)
+    {
+        if (itemId == ItemData.itemId)
+        {
+            currentPrice = newPrice; // 새 가격으로 변경
+            RefreshUI(); // 화면에 반영
+        }
     }
 }
