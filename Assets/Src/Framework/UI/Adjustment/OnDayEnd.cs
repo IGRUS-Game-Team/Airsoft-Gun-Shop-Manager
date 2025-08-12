@@ -28,6 +28,7 @@ public class OnDayEnd : MonoBehaviour
     private void Start()
     {
         InteractionController.Instance.OnDayEnd += HandleExitKeyPressed;
+        isDayEndUIActive = false;
     }
 
     private void OnDisable()
@@ -91,10 +92,13 @@ public class OnDayEnd : MonoBehaviour
 
     public void StartNextDay()
     {
+        CloseSetting(); //추가함 -박정민-
         AdjustmentCanvas.SetActive(false);
         BackgroundImage.SetActive(false);
         isAdjustmentCanvasActive = false;
         hasAutoEndTriggered = false;
+
+
         NextDayTime();
     }
 
