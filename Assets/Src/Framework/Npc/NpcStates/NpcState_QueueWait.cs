@@ -39,7 +39,7 @@ public class NpcState_QueueWait : IState
         if (npcController.QueueTarget != myNode)
         {
             npcController.Agent.ResetPath();
-            npcController.Agent.isStopped = false;
+            npcController.Agent.isStopped      = false;
             npcController.Agent.updateRotation = true;
             npcController.Agent.SetDestination(npcController.QueueTarget.position);
             npcController.Animator.Play(WalkingAnim);
@@ -49,13 +49,13 @@ public class NpcState_QueueWait : IState
 
         // 도착 판정(간단)
         NavMeshAgent agent = npcController.Agent;
-
+        
         if (agent.pathPending) return;
         if (agent.pathStatus == NavMeshPathStatus.PathInvalid) return;
 
         // ── 속도→버킷→동적 여유 거리 계산 ─────────────────────────
         float speed = agent.velocity.magnitude;                      // m/s
-        int bucket = Mathf.Clamp(Mathf.CeilToInt(speed), 0, 12);    // 1~2 => 2
+        int bucket  = Mathf.Clamp(Mathf.CeilToInt(speed), 0, 12);    // 1~2 => 2
         float dynTol = 0.06f + (0.02f * bucket);                     // 기본 0.06 + 버킷당 0.02
         if (dynTol > 0.32f) dynTol = 0.32f;                          // 상한
         // ──────────────────────────────────────────────────────────
@@ -71,18 +71,34 @@ public class NpcState_QueueWait : IState
 
                 // ★ 서 있는 동안에도 같은 원칙으로 바라보기 유지
                 FaceToPoint(npcController.transform, queueManager.IsFront(npcController) ? queueManager.CounterTransform.position : queueManager.CounterNode.position
-                );
+            );
 
                 npcController.Animator.Play(StandingAnim);
+            // ★ 맨 앞이면: 상품을 카운터에 '한 번만' 올려두고(스캔 대기)
+            if (queueManager.IsFront(npcController) && !itemPlacedOnCounter)
+            {
+                npcController.GetComponent<CarriedItemHandler>()?.PlaceToCounter();
+                itemPlacedOnCounter = true;
+            }
 
-                // ★ 스캔/봉투 끝났는지 확인 → 끝났으면 이제 Offer 상태로 전환
-                if (queueManager.IsFront(npcController))
+            // ★ 스캔/봉투 끝났는지 확인 → 끝났으면 이제 Offer 상태로 전환
+            if (queueManager.IsFront(npcController)
+                && CounterManager.Instance.IsReadyToPay(npcController))
                 {
-                    npcController.stateMachine.SetState(
-                        new NpcState_OfferPayment(npcController, queueManager.CounterTransform));
+                    npcController.stateMachine.SetState(new NpcState_OfferPayment(npcController, queueManager.CounterTransform));
                     return;
                 }
             }
+
+        }
+        
+        // ★ 스캔/봉투 끝났는지 확인 → 끝났으면 이제 Offer 상태로 전환
+        if (queueManager.IsFront(npcController)
+        && CounterManager.Instance.IsReadyToPay(npcController))
+        {
+            npcController.stateMachine.SetState(
+            new NpcState_OfferPayment(npcController, queueManager.CounterTransform));
+            return;
         }
     }
 
