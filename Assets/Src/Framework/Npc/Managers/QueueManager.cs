@@ -57,22 +57,22 @@ public class QueueManager : MonoBehaviour
 
     // 맨 앞 NPC 결제 완료 → 한 칸씩 앞으로 (배정만 + LookTarget 갱신)
     public void DequeueFront()
-{
-    if (waitingLine.Count == 0) return;
-
-    var removed = waitingLine[0];
-    waitingLine.RemoveAt(0);
-    lookTargets.Remove(removed);
-
-    // ★핵심: 새 맨 앞은 counterNode, 나머지는 spots[i-1]
-    for (int i = 0; i < waitingLine.Count; i++)
     {
-        Transform newNode = (i == 0) ? counterNode : spots[i - 1];
-        waitingLine[i].AcceptQueueAssignment(newNode);   // QueueTarget 참조가 바뀌어야 함
-    }
+        if (waitingLine.Count == 0) return;
 
-    RefreshLookTargets();
-}
+        var removed = waitingLine[0];
+        waitingLine.RemoveAt(0);
+        lookTargets.Remove(removed);
+
+        // ★핵심: 새 맨 앞은 counterNode, 나머지는 spots[i-1]
+        for (int i = 0; i < waitingLine.Count; i++)
+        {
+            Transform newNode = (i == 0) ? counterNode : spots[i - 1];
+            waitingLine[i].AcceptQueueAssignment(newNode);   // QueueTarget 참조가 바뀌어야 함
+        }
+
+        RefreshLookTargets();
+    }
 
     // 특정 NPC가 맨 앞인지
     public bool IsFront(NpcController npcController)

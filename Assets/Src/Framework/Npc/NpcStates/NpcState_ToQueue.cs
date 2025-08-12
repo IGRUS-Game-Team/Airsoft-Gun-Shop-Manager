@@ -19,6 +19,8 @@ public class NpcState_ToQueue : IState
     public void Enter()
     {
         NavMeshAgent agent = npcController.Agent;
+        Debug.Log("[ToQueue] 상태 진입");
+
         if (npcController.targetShelfGroup != null)
         {
             npcController.targetShelfGroup.Release();
@@ -27,6 +29,7 @@ public class NpcState_ToQueue : IState
 
         if (!queueManager.TryEnqueue(npcController, out Transform assignedSpot) || assignedSpot == null)
         {
+            Debug.Log("[ToQueue] 줄이 가득 → 배회 또는 퇴장");
             npcController.Agent.updateRotation = true;
             npcController.Agent.isStopped = false;
 
@@ -70,7 +73,19 @@ public class NpcState_ToQueue : IState
 
         bool nearByPath = agent.remainingDistance <= agent.stoppingDistance + dynTol;
         bool partialOK = agent.pathStatus == NavMeshPathStatus.PathPartial && planarDist <= dynTol + 0.05f;
-      
+        // 추가 end
+        // ──────────────────────────────────────────────────────────
+
+        // // 2) 남은 거리 ≤ (stoppingDistance + 속도기반 여유)
+        // if (agent.remainingDistance <= agent.stoppingDistance + dynTol)
+        // {
+        //     // 3) 거의 멈췄는지(완전 0 대신 작은 값)
+        //     if (!agent.hasPath || agent.velocity.sqrMagnitude <= 0.002f)
+        //     {
+        //         npcController.stateMachine.SetState(
+        //         new NpcState_QueueWait(npcController, queueManager, destination));
+        //     }
+        // }
         if (nearByPath || partialOK)
         {
             if (!agent.hasPath || agent.velocity.sqrMagnitude <= 0.002f)

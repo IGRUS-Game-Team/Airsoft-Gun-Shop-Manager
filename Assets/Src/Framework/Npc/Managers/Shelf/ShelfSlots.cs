@@ -36,9 +36,10 @@ public class ShelfSlot : MonoBehaviour
     public void RegisterNewItem(GameObject go)
     {
         items.Add(go);
-        ItemDataManager itemDataManager = go.GetComponent<ItemDataManager>(); //상품 정보 가져오기
+        var itemDataManager = go.GetComponent<ItemDataManager>(); //상품 정보 가져오기
         ItemData itemDatas = itemDataManager.GetItemData();
         OnProductPlacedToFactory?.Invoke(itemDatas); //가격표 팩토리에게 so를 전달
+        Debug.Log($"상품 등록: {itemDataManager.ItemName} (ID: {itemDataManager.ItemId})");
     } 
 
     /* ---------- NPC 가 꺼낼 때 ---------- */
@@ -59,6 +60,9 @@ public class ShelfSlot : MonoBehaviour
     {
         if (ParentGroup == null)
             ParentGroup = GetComponentInParent<ShelfGroup>(true);
+
+        if (points.Length != Capacity)
+            Debug.LogWarning($"{name} : Points 배열에 2개(안쪽·바깥쪽) 넣어 주세요");
     }
 
 #if UNITY_EDITOR
