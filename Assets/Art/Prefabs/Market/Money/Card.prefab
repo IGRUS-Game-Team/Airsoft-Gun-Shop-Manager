@@ -129,13 +129,13 @@ GameObject:
   - component: {fileID: 5362168792814290032}
   - component: {fileID: 4709276057592071672}
   - component: {fileID: 5014922409549436286}
-  - component: {fileID: 8641756130845161365}
   - component: {fileID: 5120295155258766271}
   - component: {fileID: 117808001593994341}
   - component: {fileID: 3725590872904509281}
+  - component: {fileID: 4612547035856928950}
   m_Layer: 3
   m_Name: Card
-  m_TagString: Untagged
+  m_TagString: CardTerminal
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -182,19 +182,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   selected: 0
   sharedOutlineMaterial: {fileID: 2100000, guid: b42560bf0c4ffd0458a491ad48a0a66c, type: 2}
---- !u!114 &8641756130845161365
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8827973011339687832}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a9f7bd229c0d6e444b90e2a8016fee31, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  standingStateName: Standing
 --- !u!65 &5120295155258766271
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -255,3 +242,17 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
+--- !u!114 &4612547035856928950
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8827973011339687832}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 300517c07995dc44a8721047978745a1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  standingStateName: Standing
+  cardReceiverTag: CardTerminal
