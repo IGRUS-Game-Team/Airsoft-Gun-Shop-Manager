@@ -26,7 +26,7 @@ public class SlotFillBehaviour : MonoBehaviour, IInteractable
         Transform snap = slot.GetSnapPoint(idx);
 
         GameObject go = Instantiate(prefab, snap.position, snap.rotation, slot.transform);
-        go.transform.localScale = Vector3.one;
+        go.transform.localScale = new Vector3(1.4f,1.4f,1.4f); //상품 프리팹 크기
 
         slot.RegisterNewItem(go);                   // 리스트에 추가
     }
