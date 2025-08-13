@@ -777,7 +777,8 @@ PrefabInstance:
       value: IngameSettingUI
       objectReference: {fileID: 0}
     m_RemovedComponents: []
-    m_RemovedGameObjects: []
+    m_RemovedGameObjects:
+    - {fileID: 3672771537123614304, guid: 020845f61fd5ee544b5ed796aed6fae3, type: 3}
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 020845f61fd5ee544b5ed796aed6fae3, type: 3}
@@ -1258,6 +1259,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   money: 300000
+  moneyText: {fileID: 0}
 --- !u!1 &1364855093
 GameObject:
   m_ObjectHideFlags: 0
