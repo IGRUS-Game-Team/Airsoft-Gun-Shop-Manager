@@ -7,32 +7,5 @@ using UnityEngine;
 
 public class Guns : MonoBehaviour
 {
-    [SerializeField] StarterAssets.StarterAssetsInputs playerInput;
-    [SerializeField] ParticleSystem ShootingParticle;
-
-    void Awake()
-    {
-        if (InteractionController.Instance != null)
-        {
-            InteractionController.Instance.OnClick += Shooting;
-        } 
-    }
-
-    void Start()
-    {
-
-    }
-
-    void Update()
-    {
-        if (playerInput.range)
-        {
-            Shooting();
-        }
-    }
-
-    void Shooting()
-    {
-        ShootingParticle.Play();
-    }
+    
 }
