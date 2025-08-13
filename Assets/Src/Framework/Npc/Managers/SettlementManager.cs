@@ -56,27 +56,18 @@ public class SettlementManager : MonoBehaviour
     // 불평 발생 표시(중복 호출 무해)
     public void MarkNpcComplained(NpcController npc)
     {
-        if (npc == null) return;
+        if (npc == null) { Debug.LogWarning("[Settle] MarkNpcComplained npc=null"); return; }
         complained.Add(npc);
+        Debug.Log($"[Settle] COMPLAINED + npc={npc.name} id={npc.GetInstanceID()} cnt={complained.Count}");
     }
 
     // 결제 완료 시 호출: 만족/불만족 분류 + 레벨/평판 반영
     public void OnPaymentCompleted(NpcController npc)
     {
-        if (npc == null) return;
-
-        bool wasUnhappy = complained.Remove(npc); // 있었으면 true + 동시에 정리
-        if (wasUnhappy)
-        {
-            dissatisfiedCustomers += 1;
-        }
-        else
-        {
-            satisfiedCustomers += 1;
-            shopLevel += happyLevelGain;
-            reputation += happyReputationGain;
-        }
-
+        bool had = complained.Remove(npc);
+        Debug.Log($"[Settle] PAY DONE npc={npc?.name} id={npc?.GetInstanceID()} hadComplained={had}");
+        if (had) { dissatisfiedCustomers++; }
+        else     { satisfiedCustomers++; shopLevel+=happyLevelGain; reputation+=happyReputationGain; }
         OnChanged?.Invoke(GetSnapshot());
         LogChange("PaymentCompleted");      // ★ 추가
     }
