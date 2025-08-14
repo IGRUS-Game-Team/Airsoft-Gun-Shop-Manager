@@ -64,8 +64,12 @@ public class QueueManager : MonoBehaviour
         waitingLine.RemoveAt(0);
         lookTargets.Remove(removed);
 
+        // ★핵심: 새 맨 앞은 counterNode, 나머지는 spots[i-1]
         for (int i = 0; i < waitingLine.Count; i++)
-            waitingLine[i].AcceptQueueAssignment(spots[i]);
+        {
+            Transform newNode = (i == 0) ? counterNode : spots[i - 1];
+            waitingLine[i].AcceptQueueAssignment(newNode);   // QueueTarget 참조가 바뀌어야 함
+        }
 
         RefreshLookTargets();
     }

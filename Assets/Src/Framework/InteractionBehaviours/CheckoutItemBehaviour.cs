@@ -32,7 +32,6 @@ public class CheckoutItemBehaviour : MonoBehaviour, IInteractable
     {
         countorMonitorController = FindFirstObjectByType<CountorMonitorController>();
         cashRegisterUI           = FindFirstObjectByType<CashRegisterUI>();
-        if (!countorMonitorController) Debug.Log("CountorMonitorController 없음");
     }
 
     public CheckoutItemBehaviour Init(
@@ -58,16 +57,17 @@ public class CheckoutItemBehaviour : MonoBehaviour, IInteractable
     /* 플레이어가 클릭했을 때 자동 호출 (InputContextRouter 경유) */
     public void Interact()
     {
-        if (!isInitialized)
-        {
-            Debug.LogWarning("CheckoutItemBehaviour: 아직 Init되지 않음");
-            return;
-        }
         if (moving) return;
+
+        // ★ 추가: 줄 맨 앞 + 결제 시작한 뒤에만 동작
+        bool isFront  = QueueManager.Instance != null && QueueManager.Instance.IsFront(owner);
+        bool started = CounterManager.Instance != null && CounterManager.Instance.HasCheckoutStarted(owner);
+
+        if (!isFront || !started) return;  // ← 여기서 막아줌
 
         moving = true;
         var col = GetComponent<Collider>();
-        if (col) col.enabled = false;   // 재클릭 방지
+        if (col) col.enabled = false;
         StartCoroutine(MoveRoutine());
     }
 
@@ -75,7 +75,6 @@ public class CheckoutItemBehaviour : MonoBehaviour, IInteractable
     {
         if (bag == null)
         {
-            Debug.LogWarning("CheckoutItemBehaviour: bag Transform이 비어있음");
             yield break;
         }
 
@@ -92,27 +91,48 @@ public class CheckoutItemBehaviour : MonoBehaviour, IInteractable
             // ① 스캐너 통과하면 삑 (넉넉한 반경 + 진행방향 확인)
             if (!beeped && scanner != null)
             {
-                // 수평 거리로 반경 판정(높이 차이는 무시)
                 if (InsideRadius2D(transform.position, scanner.position, scanRadius))
-                {
-                    // 스캐너를 ‘지나쳤다’ 판정(스캐너 기준 앞으로 진행 중)
                     if (Vector3.Dot(transform.position - scanner.position, dir) > 0f)
                     {
                         if (beep) src.PlayOneShot(beep);
                         beeped = true;
 
+                        // ★추가: 이 아이템 '스캔 완료'로 집계
+                        manager.OnItemScanned(owner);
 
+                        // (기존 UI 갱신 그대로)
                         countorMonitorController.Show(counterSlotData);
                         cashRegisterUI.SetValues(counterSlotData.itemData.baseCost - Random.Range(0, 100), counterSlotData.itemData.baseCost);
-                        Debug.Log($"{price} 계산 시퀀스");
                     }
-                }
             }
+
 
             // ② 봉투 반경에 들어오면 포장 완료
             if (bag != null && InsideRadius2D(transform.position, bag.position, bagRadius))
             {
-                manager.OnItemBagged(owner); // “상품 담김” 알림
+                // ★추가: 스캔 누락 보정 (스캔 안 됐으면 여기서 강제 스캔 1회)
+                if (!beeped)
+                {
+                    if (beep) src.PlayOneShot(beep);
+                    beeped = true;
+                    manager.OnItemScanned(owner);
+                    // (원하면 여기서 모니터/캐셔 UI도 한 번 업데이트)
+                    if (counterSlotData)
+                    {
+                        countorMonitorController?.Show(counterSlotData);
+                        cashRegisterUI?.SetValues(
+                            counterSlotData.itemData.baseCost - Random.Range(0, 100),
+                            counterSlotData.itemData.baseCost
+                        );
+                    }
+                }
+
+
+                // 슬롯 반납 + 봉투 집계 + 파괴
+                var usedSlot = transform.parent;
+                if (usedSlot != null) CounterManager.Instance.ReturnSlot(usedSlot);
+
+                manager.OnItemBagged(owner);
                 Destroy(gameObject);
                 yield break;
             }

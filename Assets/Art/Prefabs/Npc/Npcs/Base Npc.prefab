@@ -8877,6 +8877,7 @@ GameObject:
   - component: {fileID: 3203375538200117699}
   - component: {fileID: 5493456544360893570}
   - component: {fileID: 5934322677227377499}
+  - component: {fileID: -7502953359489541757}
   m_Layer: 9
   m_Name: Base Npc
   m_TagString: Npc
@@ -9018,6 +9019,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   handSocket: {fileID: 0}
+  desiredMin: 1
+  desiredMax: 3
 --- !u!114 &3203375538200117699
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -9058,6 +9061,18 @@ MonoBehaviour:
   lineColor: {r: 0, g: 1, b: 1, a: 1}
   pointColor: {r: 1, g: 0, b: 1, a: 1}
   sphereSize: 0.03
+--- !u!114 &-7502953359489541757
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6402854509689175362}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 81ccc7442e1d701459aa534ad0f41a0f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &6474276988879965623
 GameObject:
   m_ObjectHideFlags: 0

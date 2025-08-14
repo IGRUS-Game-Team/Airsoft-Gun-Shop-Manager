@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -7,7 +8,11 @@ using UnityEngine;
 public class ShelfSlot : MonoBehaviour
 {
     public ShelfGroup ParentGroup { get; internal set; }
-
+    public static event Action<ItemData, Vector3, Transform> OnProductPlacedToFactory; //so 가격표를 전달
+    //Transform은 부모가 된 카드슬롯의 위치
+    [Header("shelf slot 오브젝트")]
+    [SerializeField] private Transform priceCardParent;
+    [SerializeField] private Vector3 controll=new (0,0.3f,0.18f);    
     /* ---------- 설정 ---------- */
     public const int Capacity = 2;
 
@@ -30,8 +35,23 @@ public class ShelfSlot : MonoBehaviour
     /* ---------- 외부에서 위치 얻기 ---------- */
     public Transform GetSnapPoint(int idx) => points[idx];
 
-    /* ---------- 외부에서 아이템 추가 ---------- */
-    public void RegisterNewItem(GameObject go) => items.Add(go);
+    /* ---------- 외부에서 아이템 추가 ---------- */ //수정 so값 넘기기
+    public void RegisterNewItem(GameObject go)
+    {
+        Debug.Log("레지스터뉴아이템");
+        items.Add(go);
+        var itemDataManager = go.GetComponent<ItemDataManager>();
+        ItemData itemDatas = itemDataManager.GetItemData();
+
+        Vector3 priceCardPosition = transform.position + controll;
+
+        // 3. 이벤트 호출 수정: 부모 Transform(priceCardParent)을 함께 전달
+        if (priceCardParent != null)
+        {
+            OnProductPlacedToFactory?.Invoke(itemDatas, priceCardPosition, priceCardParent);
+        }
+        
+    } 
 
     /* ---------- NPC 가 꺼낼 때 ---------- */
     public GameObject PopItem()

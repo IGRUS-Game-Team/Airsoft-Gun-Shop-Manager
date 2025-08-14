@@ -126,6 +126,24 @@ public partial class @PlayerInteraction: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""DayEnd"",
+                    ""type"": ""Button"",
+                    ""id"": ""8b9f8ac1-6ca6-48ed-a264-011e69610037"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": ""Press"",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""CashRegister"",
+                    ""type"": ""Button"",
+                    ""id"": ""41ecf96d-d0e0-48c2-97b7-5d27163bc003"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -172,6 +190,28 @@ public partial class @PlayerInteraction: IInputActionCollection2, IDisposable
                     ""action"": ""ExitUI"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""8f691bb2-3462-402b-9c41-0480fd952bd9"",
+                    ""path"": ""<Keyboard>/enter"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""DayEnd"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""5ddbb3d6-a542-478e-a7f8-cee42749bc19"",
+                    ""path"": ""<Keyboard>/e"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""CashRegister"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -184,6 +224,8 @@ public partial class @PlayerInteraction: IInputActionCollection2, IDisposable
         m_Player_ThrowBox = m_Player.FindAction("ThrowBox", throwIfNotFound: true);
         m_Player_DropBox = m_Player.FindAction("DropBox", throwIfNotFound: true);
         m_Player_ExitUI = m_Player.FindAction("ExitUI", throwIfNotFound: true);
+        m_Player_DayEnd = m_Player.FindAction("DayEnd", throwIfNotFound: true);
+        m_Player_CashRegister = m_Player.FindAction("CashRegister", throwIfNotFound: true);
     }
 
     ~@PlayerInteraction()
@@ -268,6 +310,8 @@ public partial class @PlayerInteraction: IInputActionCollection2, IDisposable
     private readonly InputAction m_Player_ThrowBox;
     private readonly InputAction m_Player_DropBox;
     private readonly InputAction m_Player_ExitUI;
+    private readonly InputAction m_Player_DayEnd;
+    private readonly InputAction m_Player_CashRegister;
     /// <summary>
     /// Provides access to input actions defined in input action map "Player".
     /// </summary>
@@ -295,6 +339,14 @@ public partial class @PlayerInteraction: IInputActionCollection2, IDisposable
         /// Provides access to the underlying input action "Player/ExitUI".
         /// </summary>
         public InputAction @ExitUI => m_Wrapper.m_Player_ExitUI;
+        /// <summary>
+        /// Provides access to the underlying input action "Player/DayEnd".
+        /// </summary>
+        public InputAction @DayEnd => m_Wrapper.m_Player_DayEnd;
+        /// <summary>
+        /// Provides access to the underlying input action "Player/CashRegister".
+        /// </summary>
+        public InputAction @CashRegister => m_Wrapper.m_Player_CashRegister;
         /// <summary>
         /// Provides access to the underlying input action map instance.
         /// </summary>
@@ -333,6 +385,12 @@ public partial class @PlayerInteraction: IInputActionCollection2, IDisposable
             @ExitUI.started += instance.OnExitUI;
             @ExitUI.performed += instance.OnExitUI;
             @ExitUI.canceled += instance.OnExitUI;
+            @DayEnd.started += instance.OnDayEnd;
+            @DayEnd.performed += instance.OnDayEnd;
+            @DayEnd.canceled += instance.OnDayEnd;
+            @CashRegister.started += instance.OnCashRegister;
+            @CashRegister.performed += instance.OnCashRegister;
+            @CashRegister.canceled += instance.OnCashRegister;
         }
 
         /// <summary>
@@ -356,6 +414,12 @@ public partial class @PlayerInteraction: IInputActionCollection2, IDisposable
             @ExitUI.started -= instance.OnExitUI;
             @ExitUI.performed -= instance.OnExitUI;
             @ExitUI.canceled -= instance.OnExitUI;
+            @DayEnd.started -= instance.OnDayEnd;
+            @DayEnd.performed -= instance.OnDayEnd;
+            @DayEnd.canceled -= instance.OnDayEnd;
+            @CashRegister.started -= instance.OnCashRegister;
+            @CashRegister.performed -= instance.OnCashRegister;
+            @CashRegister.canceled -= instance.OnCashRegister;
         }
 
         /// <summary>
@@ -424,5 +488,19 @@ public partial class @PlayerInteraction: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnExitUI(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "DayEnd" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnDayEnd(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "CashRegister" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnCashRegister(InputAction.CallbackContext context);
     }
 }

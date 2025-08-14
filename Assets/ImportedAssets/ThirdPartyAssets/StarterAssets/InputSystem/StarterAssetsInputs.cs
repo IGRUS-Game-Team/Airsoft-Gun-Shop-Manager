@@ -43,15 +43,10 @@ namespace StarterAssets
 			JumpInput(value.isPressed);
 		}
 
-		public void OnSprint(InputValue value)
-		{
-			SprintInput(value.isPressed);
-		}
-
-		public void OnDayEnd(InputValue value)
-		{
-			DayEndInput(value.isPressed);
-		}
+		// public void OnSprint(InputValue value)
+		// {
+		// 	SprintInput(value.isPressed);
+		// }
 
 		public void OnRange(InputValue value)
 		{
@@ -82,10 +77,10 @@ namespace StarterAssets
 			sprint = newSprintState;
 		}
 
-		public void DayEndInput(bool newDayEndState)
-		{
-			dayEnd = newDayEndState;
-		}
+		// public void DayEndInput(bool newDayEndState)
+		// {
+		// 	dayEnd = newDayEndState;
+		// }
 
 		public void RangeInput(bool newRangeState)
 		{

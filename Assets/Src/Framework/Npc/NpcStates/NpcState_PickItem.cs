@@ -49,26 +49,67 @@ public class NpcState_PickItem : IState
 
     // 매 프레임 호출: 손에 물건이 생기면 다음 상태로 전환
     public void Tick()
-    {
-        // 아직 물건을 집지 못했으면 대기
-        if (!npcController.hasItemInHand)
-            return;
+{
+    var carrier = npcController.GetComponent<CarriedItemHandler>();
+    if (carrier == null) return;
 
-        // ① 혹시 아이템이 아직 켜져 있으면 여기서도 한 번 더 숨김
-        if (npcController.heldItem != null &&
-            npcController.heldItem.activeSelf)
-            npcController.heldItem.SetActive(false);
+    // ✅ 목표 개수 채웠으면 즉시 큐 이동 (그리고 픽업 차단)
+    if (carrier.CarriedCount >= carrier.DesiredCount)
+    {
+        carrier.ClosePicking();                 // ★추가: 이후 Attach 무시
+        npcController.hasItemInHand = false;    // ★추가: 중복 흐름 방지
 
         if (queueManager == null)
             queueManager = Object.FindFirstObjectByType<QueueManager>();
 
         if (queueManager != null)
-            npcController.stateMachine.SetState(
-                new NpcState_ToQueue(npcController, queueManager));
+            npcController.stateMachine.SetState(new NpcState_ToQueue(npcController, queueManager));
         else
-            npcController.stateMachine.SetState(
-                new NpcState_Leave(npcController));
+            npcController.stateMachine.SetState(new NpcState_Leave(npcController));
+        return;
     }
+
+    if (!npcController.hasItemInHand)
+        return;
+
+    if (npcController.heldItem != null && npcController.heldItem.activeSelf)
+        npcController.heldItem.SetActive(false);
+
+    // 아직 목표 못 채웠으면 다음 슬롯 탐색...
+    if (!carrier.HasAllDesired)
+    {
+        ShelfSlot cur = npcController.targetShelfSlot ? npcController.targetShelfSlot.GetComponent<ShelfSlot>() : null;
+        ShelfSlot next = null;
+
+        if (cur != null && cur.HasItem)
+            next = cur; // 같은 슬롯에서 한 번 더
+        else
+        {
+            if (ShelfManager.Instance != null && ShelfManager.Instance.TryGetAvailableSlot(out var other))
+                next = other;
+        }
+
+        if (next != null)
+        {
+            npcController.hasItemInHand = false;
+            npcController.heldItem = null;
+            npcController.targetShelfSlot = next.transform;
+            npcController.targetShelfGroup = next.ParentGroup;
+            npcController.stateMachine.SetState(new NpcState_ToShelf(npcController));
+            return;
+        }
+    }
+
+    // 슬롯 없으면(재고 없음) → 더 못 채워도 줄로
+    carrier.ClosePicking();                     // ★추가: 더 이상 Attach 들어오면 무시
+    if (queueManager == null)
+        queueManager = Object.FindFirstObjectByType<QueueManager>();
+
+    if (queueManager != null)
+        npcController.stateMachine.SetState(new NpcState_ToQueue(npcController, queueManager));
+    else
+        npcController.stateMachine.SetState(new NpcState_Leave(npcController));
+}
 
     // 상태 종료 시 호출: 별도 정리할 작업 없음
     public void Exit()

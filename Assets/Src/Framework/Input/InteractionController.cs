@@ -18,7 +18,8 @@ public class InteractionController : MonoBehaviour
     public event Action OnDrop;
     public event Action OnThrowBox;
     public event Action OnExitUI;
-
+    public event Action OnDayEnd;
+    public event Action OnCashRegister;
     private void Awake()
     {
         if (Instance != null && Instance != this)
@@ -35,6 +36,8 @@ public class InteractionController : MonoBehaviour
         inputActions.Player.ThrowBox.performed += ctx => OnThrowBox?.Invoke();
         inputActions.Player.DropBox.performed += ctx => OnDrop?.Invoke();
         inputActions.Player.ExitUI.performed += ctx => OnExitUI?.Invoke();
+        inputActions.Player.DayEnd.performed += ctx => OnDayEnd?.Invoke();
+        inputActions.Player.CashRegister.performed += ctx => OnCashRegister?.Invoke();
     }
 
     private void OnDestroy()
@@ -43,5 +46,7 @@ public class InteractionController : MonoBehaviour
         inputActions.Player.ThrowBox.performed -= ctx => OnThrowBox?.Invoke();
         inputActions.Player.DropBox.performed -= ctx => OnDrop?.Invoke();
         inputActions.Player.ExitUI.performed -= ctx => OnExitUI?.Invoke();
+        inputActions.Player.DayEnd.performed -= ctx => OnDayEnd?.Invoke();
+        inputActions.Player.CashRegister.performed -= ctx => OnCashRegister?.Invoke();
     }
 }

@@ -9,63 +9,88 @@ public class CountorMonitorController : MonoBehaviour
     [SerializeField] TextMeshProUGUI totalPriceText;
     [SerializeField] CalculatorOk calculatorOk;
 
-public void Show(CounterSlotData items)
-{
-    // 0) null 검사
-    if (items == null)
-    {
-        Debug.LogError("[Show] items == null");
-        return;
-    }
-    if (items.itemData == null)
-    {
-        Debug.LogError("[Show] items.itemData == null");
-        return;
-    }
-    if (cardPrefab == null)
-    {
-        Debug.LogError("[Show] cardPrefab not assigned");
-        return;
-    }
-    if (contentRoot == null)
-    {
-        Debug.LogError("[Show] contentRoot not assigned");
-        return;
-    }
-    if (totalPriceText == null)
-    {
-        Debug.LogError("[Show] totalPriceText not assigned");
-        return;
-    }
-    if (calculatorOk == null)
-    {
-        Debug.LogError("[Show] calculatorOk not assigned");
-        return;
-    }
+     [Header("PriceObserver")]
+    [SerializeField] PriceObserver priceObserver; // 가격 옵저버 
 
-    // 1) 안전하게 값 복사 (코루틴 중 원본 파괴 방지)
-    var data   = items.itemData;
-    var amount = items.amount;
-    var unit   = data.baseCost;
+    private float total = 0f;
+    public void Show(CounterSlotData items)//items = 게임 오브젝트, itemdata(원가, id), 수량
+    {
+        if (items == null || items.itemData == null) return;
 
-    // 2) UI 갱신
-    Clear();
+        var data = items.itemData;
+        var amount = items.amount;
+        var unit = data.baseCost;//unit = 원가 
 
-    float total = unit * amount;
+        // 기존 카드 있는지 찾기
+        
+        CheckoutCardView existingCard = null;
+        foreach (Transform child in contentRoot)
+        {
+            var cardView = child.GetComponent<CheckoutCardView>();
+            if (cardView != null && cardView.ItemData == data)
+            {
+                existingCard = cardView;
+                break;
+            }
+        }
 
-    var card = Instantiate(cardPrefab, contentRoot);
-    card.Setup(data, amount);
+        if (existingCard != null)
+        {
+            // 기존 수량 증가
+            existingCard.AddAmount(amount);
+        }
+        else
+        {
+            // 새 카드 생성
+            var card = Instantiate(cardPrefab, contentRoot);
+            card.Setup(data, amount, priceObserver); //옵저버 추가
+                                                     //새 카드 생성시 priceobserver에게 참조 전달
+        }
 
-    totalPriceText.text = $"${total:F2}";
-    calculatorOk.SetTotalPrice(total);
-}
+        // 전체 합계 갱신
+        float calculatedTotal = 0f;
+        foreach (Transform child in contentRoot)
+        {
+            var cardView = child.GetComponent<CheckoutCardView>();
+            if (cardView != null)
+            {
+                float cardTotal = cardView.TotalPrice;
+                calculatedTotal += cardTotal;
+                Debug.Log($"카드 {cardView.ItemData.itemName}: 개별 총액 {cardTotal}, 누적 총액: {calculatedTotal}");
+            }
+        }
 
+        // 멤버변수도 업데이트
+        total = calculatedTotal;
+        totalPriceText.text = $"${calculatedTotal:F2}";
+        calculatorOk.SetTotalPrice(calculatedTotal);
+        
+        Debug.Log($"최종 전체 총액: {calculatedTotal}");
+    }
 
     public void Clear()
     {
         foreach (Transform child in contentRoot)
             Destroy(child.gameObject);
 
+        total = 0f;
         totalPriceText.text = "$0.00";
     }
+    
+        public float GetCurrentTotalAmount()
+{
+    float sum = 0f;
+
+    foreach (Transform child in contentRoot)
+    {
+        var cardView = child.GetComponent<CheckoutCardView>();
+        if (cardView != null)
+        {
+            sum += cardView.TotalPrice; // 각 카드의 총 가격 합산
+        }
+    }
+
+    return sum;
+}
+
 }
