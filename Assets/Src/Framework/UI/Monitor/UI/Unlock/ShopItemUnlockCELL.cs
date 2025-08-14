@@ -17,22 +17,26 @@ public class ShopItemUnlockCELL : MonoBehaviour
     private bool unlocked;
 
     // 외부에서 셋업
-    public void Setup(ItemData item, CatalogUIManager owner)
-    {
-        this.data = item; this.owner = owner;
-        
-        if (icon != null && item.icon != null)
-            icon.sprite = item.icon;
-        txtPrice.text = "";  // 처음엔 가격 숨김
-        unlocked = UnlockedItemsStore.IsUnlocked(item.itemId);
-        priceRevealed = unlocked; // 이미 해금된 건 가격표시 생략
+public void Setup(ItemData item, CatalogUIManager owner)
+{
+    this.data = item; 
+    this.owner = owner;
+    
+    if (icon != null && item.icon != null)
+        icon.sprite = item.icon;
+    
+    txtPrice.text = data.baseCost.ToString();
 
-        btnUnlock.onClick.RemoveAllListeners();
-        btnUnlock.onClick.AddListener(OnClickUnlock);
+    unlocked = UnlockedItemsStore.IsUnlocked(item.itemId);
+    priceRevealed = true; // 원래 unlocked 였는데 → true로 바꿔서 항상 가격 표시
 
-        RefreshText();
-        RefreshButtonVisual();
-    }
+    btnUnlock.onClick.RemoveAllListeners();
+    btnUnlock.onClick.AddListener(OnClickUnlock);
+
+    RefreshText();
+    RefreshButtonVisual();
+}
+
 
     public void RefreshText()
     {
