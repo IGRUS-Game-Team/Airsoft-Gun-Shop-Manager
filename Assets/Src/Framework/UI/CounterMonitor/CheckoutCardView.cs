@@ -39,7 +39,7 @@ public class CheckoutCardView : MonoBehaviour,IPriceChangeable
 
     private void RefreshUI()
     {
-        nameText.text = ItemData.itemName;
+        nameText.text = ItemNameResolver.Get(ItemData);
         unitText.text = currentAmount.ToString();
         priceText.text = $"${currentPrice:F2}";
         totalText.text = $"${currentPrice * currentAmount:F2}";

@@ -25,7 +25,7 @@ public class ItemCardView : MonoBehaviour
     {
         data = item;
         //  icon.sprite = data.icon;
-        nameText.text = data.itemName;
+        nameText.text = ItemNameResolver.Get(data);
         unitPriceText.text = $"${data.baseCost:F2}";
         UpdateAmount(amount);
 
