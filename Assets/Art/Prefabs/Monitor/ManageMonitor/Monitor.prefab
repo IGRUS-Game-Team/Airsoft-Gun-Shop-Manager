@@ -171,6 +171,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0ccb6c0d3408f134b929a7b03ee477cd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  selected: 0
   sharedOutlineMaterial: {fileID: 2100000, guid: b42560bf0c4ffd0458a491ad48a0a66c, type: 2}
 --- !u!1 &1403244519024238388
 GameObject:
@@ -269,6 +270,7 @@ GameObject:
   - component: {fileID: 6638916368175609542}
   - component: {fileID: 5492256991928485974}
   - component: {fileID: 8247727240492464410}
+  - component: {fileID: 8722603535457206772}
   m_Layer: 3
   m_Name: ToMonitorCam
   m_TagString: MonitorCam
@@ -386,3 +388,11 @@ MonoBehaviour:
     m_MipBias: 0
     m_VarianceClampScale: 0.9
     m_ContrastAdaptiveSharpening: 0
+--- !u!81 &8722603535457206772
+AudioListener:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4761585830286154234}
+  m_Enabled: 1

@@ -18,12 +18,8 @@ public class NpcState_ToQueue : IState
 
     public void Enter()
     {
+        npcController.targetShelfGroup?.Release();
         NavMeshAgent agent = npcController.Agent;
-        if (npcController.targetShelfGroup != null)
-        {
-            npcController.targetShelfGroup.Release();
-            npcController.targetShelfGroup = null;
-        }
 
         if (!queueManager.TryEnqueue(npcController, out Transform assignedSpot) || assignedSpot == null)
         {
