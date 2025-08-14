@@ -10,14 +10,14 @@ public class ItemDatabase : ScriptableObject
     [System.NonSerialized] private Dictionary<int, ItemData> _byId;
     [System.NonSerialized] private Dictionary<string, ItemData> _byName; // 소문자 키
 
-    void OnEnable()  => RebuildIndex();
+    void OnEnable() => RebuildIndex();
 #if UNITY_EDITOR
     void OnValidate() => RebuildIndex(); // 에디터에서 리스트 수정 시 자동 갱신
 #endif
 
     public void RebuildIndex()
     {
-        _byId   = new Dictionary<int, ItemData>();
+        _byId = new Dictionary<int, ItemData>();
         _byName = new Dictionary<string, ItemData>();
 
         foreach (var it in items)
@@ -66,7 +66,7 @@ public class ItemDatabase : ScriptableObject
         {
             if (!x) continue;
             if (NormalizeName(x.itemName) == key) return x;
-            if (NormalizeName(x.name)     == key) return x; // SO 파일명으로도 폴백
+            if (NormalizeName(x.name) == key) return x; // SO 파일명으로도 폴백
         }
         return null;
     }
@@ -81,5 +81,14 @@ public class ItemDatabase : ScriptableObject
         if (it != null && (cat == 0 || it.category == cat)) return it;
 
         return it; // cat이 다르더라도 일단 반환(원하면 여기서 null로)
+    }
+    
+
+    //랜덤 아이템 전달
+    public ItemData GetRandomItemData()
+    {
+        if (_byId == null || _byId.Count == 0) { return null; }
+        return GetById(UnityEngine.Random.Range(0, _byId.Count + 1));
+
     }
 }
