@@ -235,40 +235,52 @@ public class CounterManager : MonoBehaviour
 
 
     //계산 시작
-    public void StartCalculatorPayment(NpcController npc)
+        public void StartCalculatorPayment(NpcController npc)
     {
-        currentNpcForPayment = npc; //계산을 처리할 npc
+        currentNpcForPayment = npc;  //계산을 처리할 npc
+
+        // 합계 설정(카드 결제 금액)
+        npcPaymentAmount = (countorMonitorController != null)
+            ? countorMonitorController.GetCurrentTotalAmount()
+            : 0f;
 
         // 중복 구독 방지
-        UnsubscribeCalculatorEvents();  // 수정 (준서)
-        SubscribeCalculatorEvents(); //계산 이벤트 시작
-        
+        UnsubscribeCalculatorEvents();   // 수정 (준서)
+        SubscribeCalculatorEvents();  //계산 이벤트 시작
+
         // 불평 타이머 재시작
         StopComplainTimer();
         paymentComplainRoutine = StartCoroutine(PaymentComplainTimer(npc));
     }
 
 
-    //success 이벤트가 진행할 메서드
-    private void HandleCardPaymentSuccess() //계산 성공
+    //success 이벤트가 진행할 메서드 / 2025-08-14 이준서 (수정)
+    private void HandleCardPaymentSuccess()
     {
-        Debug.Log(currentNpcForPayment);
-
         if (currentNpcForPayment != null)
         {
-            // 불평 타이머 정지
             StopComplainTimer();
 
-            //결제 완료 처리
+            // ★ 결제 성공 → 오늘 매출(이익) 반영
+            if (countorMonitorController != null)
+            {
+                float sale = countorMonitorController.GetCurrentTotalAmount();
+                SettlementManager.Instance?.RegisterSaleAmount(sale);
+            }
+
+            // 플레이어 자금 반영(기존 로직 유지)
+            GameState.Instance.AddMoney(npcPaymentAmount);
+
+            // 모니터 비우기 전에 완료 처리/정산 마무리
             CompletePayment(currentNpcForPayment);
-            Debug.Log(npcPaymentAmount);
-            GameState.Instance.AddMoney(npcPaymentAmount); //손님이 결제한 금액 매출액에 추가
             countorMonitorController.Clear();
         }
 
         //이벤트 구독 해제
         UnsubscribeCalculatorEvents();
     }
+
+
     private void HandleCardPaymentFailure()//계산 실패
     {
         //계산 실패시 UI는 CalculatorErrorUI에 구현완료
@@ -308,6 +320,7 @@ public class CounterManager : MonoBehaviour
         value = Mathf.Round(value * 100f) / 100f; // 숫자 자체 반올림
         npcSendMe = value;
         Debug.Log( countorMonitorController.GetCurrentTotalAmount());
+        
         // 2) 캐시 UI 초기화(손님이 낸 돈은 일단 0, 총액은 npcPaymentAmount)
         if (cashUI != null)
         {
@@ -340,7 +353,15 @@ public class CounterManager : MonoBehaviour
     {
         // 매출 반영
         GameState.Instance.AddMoney(npcSendMe - cashUI.GetCurrentGiven());
+        SettlementManager.Instance?.RegisterSaleAmount(npcPaymentAmount); // 현금 계산 값 최종 정산 변수에 가져가기 / 수정 : 준서
         Debug.Log(npcSendMe + " "+ cashUI.GetCurrentGiven());
+
+        if (npcSendMe - npcPaymentAmount - cashUI.GetCurrentGiven() < 0f)
+        {
+            float excessChange = - (npcSendMe - npcPaymentAmount - cashUI.GetCurrentGiven());  // 거스름돈 초과 된 돈 최종 정산에서 빼기
+            SettlementManager.Instance?.ExcessChangeCost(excessChange);
+        }
+
         // 결제 완료 처리
         if (currentNpcForPayment != null)
             CompletePayment(currentNpcForPayment);

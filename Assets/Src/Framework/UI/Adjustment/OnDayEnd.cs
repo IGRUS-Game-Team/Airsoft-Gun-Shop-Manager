@@ -78,7 +78,7 @@ public class OnDayEnd : MonoBehaviour
         }
     }
 
-    void OnEnterDayEnd()
+    public void OnEnterDayEnd()
     {
         OpenSetting();
         audioSource.PlayOneShot(AdjustmentAppearSound);
@@ -97,7 +97,6 @@ public class OnDayEnd : MonoBehaviour
         BackgroundImage.SetActive(false);
         isAdjustmentCanvasActive = false;
         hasAutoEndTriggered = false;
-
 
         NextDayTime();
     }
