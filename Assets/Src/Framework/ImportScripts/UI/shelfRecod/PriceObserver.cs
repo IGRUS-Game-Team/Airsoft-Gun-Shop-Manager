@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 /// <summary>
@@ -6,23 +7,51 @@ using UnityEngine;
 /// </summary>
 public class PriceObserver : MonoBehaviour
 {
+    public static PriceObserver Instance{ get; private set; }
     // 전역 가격 관리자
     private Dictionary<int, ItemData> currentItemData = new();
     private Dictionary<int, float> currentPrices = new();//각 상품의 현재 가격을 저장하는 딕셔너리<상품id,현재 가격>
     private Dictionary<int, List<IPriceChangeable>> observers = new();//상품 구독중인 관찰자 목록<상품id,>
 
+    [SerializeField] private ItemDatabase itemDatabase;
 
-    // // 상품 데이터 등록/업데이트
-    public void RegisterProduct(ItemData itemData)
+     void Awake()
     {
-        currentItemData[itemData.itemId] = itemData;
-        // 초기 가격을 원가로 설정 (또는 다른 기본값)
-        if (!currentPrices.ContainsKey(itemData.itemId))
+        // 싱글톤 설정
+        if (Instance == null)
         {
-            currentPrices[itemData.itemId] = itemData.baseCost;
-            Debug.Log($"상품 등록: {itemData.itemName} (ID: {itemData.itemId}) 초기 가격: {itemData.baseCost}");
+            Instance = this;
+            DontDestroyOnLoad(gameObject); // 씬 전환 시에도 유지
+        }
+        else
+        {
+            Destroy(gameObject);
         }
     }
+    void Start()
+    {
+        InitializePrices();// 초반 가격 딕셔너리에 원가 등록
+    }
+
+    private void InitializePrices() //초반 원가등록 메서드
+    {
+        
+        if (itemDatabase != null)
+        {
+            foreach (var itemData in itemDatabase.items)//데이터베이스의 모든 itemdata를 순회
+            {
+                if (!currentPrices.ContainsKey(itemData.itemId)) // 판매가 딕셔너리에 so에 해당하는 상품 id 잇는지 확인 없다면
+                {
+                    currentPrices[itemData.itemId] = itemData.baseCost; //판매가 딕셔너리에 원가 등록
+                    Debug.Log($"옵저버 상품 등록: {itemData.itemName} (ID: {itemData.itemId}) 초기 가격: {itemData.baseCost}"); //여기서부터 뭔가 이상함
+                }
+
+                currentItemData[itemData.itemId] = itemData; 
+            }
+        }
+    }
+
+
     
     //관찰자 등록
     public void Subscribe(int itemId, IPriceChangeable observer)
