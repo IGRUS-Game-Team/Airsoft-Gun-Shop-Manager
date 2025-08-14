@@ -78,7 +78,7 @@ public class OnDayEnd : MonoBehaviour
         }
     }
 
-    void OnEnterDayEnd()
+    public void OnEnterDayEnd()
     {
         OpenSetting();
         audioSource.PlayOneShot(AdjustmentAppearSound);
@@ -98,7 +98,6 @@ public class OnDayEnd : MonoBehaviour
         isAdjustmentCanvasActive = false;
         hasAutoEndTriggered = false;
 
-
         NextDayTime();
     }
 
@@ -109,7 +108,7 @@ public class OnDayEnd : MonoBehaviour
         timeUI.ForceUpdate();
     }
 
-    IEnumerator ShowDelayText()
+    public IEnumerator ShowDelayText()
     {
         foreach (Transform text in TextGroup) // TextGroup 내에 있는 Text들 0.4초 간격으로 띄우기
         {
