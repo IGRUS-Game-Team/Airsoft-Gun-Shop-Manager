@@ -11,7 +11,8 @@ public interface ISocialEventStrategy
 
     //대상 아이템들
     float MarketModifier { get; } // 시세 변동률
-    int Duration { get; } //지속시간 (일)
-    
+    //int Duration { get; } //지속시간 (일)
+
+    void GetEventStrategyData(); //저장을 돕기 위한 메서드?
 
 }
