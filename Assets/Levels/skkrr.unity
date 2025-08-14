@@ -613,6 +613,17 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 1307955881781261984, guid: c29610e0722016a448a05a13a07f5055, type: 3}
   m_PrefabInstance: {fileID: 157466208}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &423490713 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 43932100024292320, guid: 54d72669751f0cc4c89f8974a61d84ad, type: 3}
+  m_PrefabInstance: {fileID: 1970392432}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5144e8f91912c0d4fb7fb5b9ec868e85, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!4 &428367174 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 2095843478121146175, guid: 028a36ccc3c20e942b11c4a992480c6d, type: 3}
@@ -1398,6 +1409,22 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 292953569665379006, guid: 4f3e1293042b09148b255bd36fcef3d1, type: 3}
+      propertyPath: timeUI
+      value: 
+      objectReference: {fileID: 1774414743}
+    - target: {fileID: 292953569665379006, guid: 4f3e1293042b09148b255bd36fcef3d1, type: 3}
+      propertyPath: openHour
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 292953569665379006, guid: 4f3e1293042b09148b255bd36fcef3d1, type: 3}
+      propertyPath: closeHour
+      value: 20
+      objectReference: {fileID: 0}
+    - target: {fileID: 292953569665379006, guid: 4f3e1293042b09148b255bd36fcef3d1, type: 3}
+      propertyPath: priceObserver
+      value: 
+      objectReference: {fileID: 423490713}
     - target: {fileID: 410020315464713874, guid: 4f3e1293042b09148b255bd36fcef3d1, type: 3}
       propertyPath: counter
       value: 
