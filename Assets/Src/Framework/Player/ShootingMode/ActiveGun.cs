@@ -6,10 +6,10 @@ public class ActiveGun : MonoBehaviour
     [SerializeField] StarterAssets.StarterAssetsInputs playerInput;
     [SerializeField] ShootingGunSO shootingGunSO;
     [SerializeField] Animator animator;
-   
+
     ShootingGun currentGun;
     public AudioSource audiosource;
-    
+
     const string SHOOT_STRING = "Shoot";
 
     float timeSinceLastShot = 0f;
@@ -42,5 +42,12 @@ public class ActiveGun : MonoBehaviour
             timeSinceLastShot = 0f;
         }
 
+    }
+    void OnDestroy()
+    {
+        if (InteractionController.Instance != null)
+        {
+            InteractionController.Instance.OnClick -= Shooting;
+        }
     }
 }
