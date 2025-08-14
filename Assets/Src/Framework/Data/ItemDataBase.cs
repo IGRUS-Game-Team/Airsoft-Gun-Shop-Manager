@@ -91,4 +91,17 @@ public class ItemDatabase : ScriptableObject
         return GetById(UnityEngine.Random.Range(0, _byId.Count + 1));
 
     }
+    public bool TryGet(int itemId, out ItemData result)
+    {
+        result = null;
+        foreach (var item in items)
+        {
+            if (item != null && item.itemId == itemId)
+            {
+                result = item;
+                return true;
+            }
+        }
+        return false;
+}
 }
