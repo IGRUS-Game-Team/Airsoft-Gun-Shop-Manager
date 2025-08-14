@@ -2,6 +2,7 @@ using UnityEngine;
 
 public class MonitorPanelManager : MonoBehaviour
 {
+    ShopUIController shopUIController;
     [SerializeField] GameObject panelMain;
     [SerializeField] GameObject panelStockOrder;
     [SerializeField] GameObject panelBank;
@@ -14,6 +15,7 @@ public class MonitorPanelManager : MonoBehaviour
     }
     public void ShowPanel(int index)
     {
+        if (index == 2) shopUIController.Populate();
         panelMain.SetActive(index == 1);
         panelStockOrder.SetActive(index == 2);
         panelBank.SetActive(index == 3);
