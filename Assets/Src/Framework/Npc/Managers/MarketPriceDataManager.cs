@@ -4,7 +4,7 @@ using UnityEngine;
 /// <summary>
 /// 장지원 8.14 시세 관리하는 곳
 /// 
-/// 시세 = 원가 *120% + 시장변동률
+/// 시세 = 원가 *20% + 시장변동률
 /// socialeventmanager에서 시장변동률을 가져와 시세 리스트에 적용한다.
 /// </summary>
 public class MarketPriceDataManager : MonoBehaviour
