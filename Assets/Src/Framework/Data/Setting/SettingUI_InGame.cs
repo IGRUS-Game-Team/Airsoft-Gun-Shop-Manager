@@ -31,7 +31,7 @@ public class SettingsUI_InGame : MonoBehaviour
         if (resolutionDropdown) resolutionDropdown.interactable = false;
         if (fullscreenDropdown) fullscreenDropdown.interactable = false;
         if (qualityDropdown) qualityDropdown.interactable = false;
-        if (disabledHint) disabledHint.text = "해상도/창모드/품질 프리셋은 메인 메뉴에서 변경하세요.";
+        if (disabledHint) disabledHint.text = "Change resolution/window mode/quality presets in the main menu.";
     }
 
     public void OnVSync(bool on)
