@@ -34,6 +34,7 @@ public class DoorTrigger : MonoBehaviour
 
         /* ── 입장 확정 ── */
         insideCount++;
+        SettlementManager.Instance?.RegisterCustomerEnter(npc);
         npc.SetDoor(this);
         npc.inStore = true;
         npc.AllowEntry(slot.transform, exitPoint);

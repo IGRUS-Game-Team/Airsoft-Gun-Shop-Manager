@@ -13,10 +13,16 @@ public class PriceObserver : MonoBehaviour
 
 
     // // 상품 데이터 등록/업데이트
-    // public void RegisterProduct(ItemData itemData)
-    // {
-    //     //currentItemData[itemData.ItemId] = itemData;
-    // }
+    public void RegisterProduct(ItemData itemData)
+    {
+        currentItemData[itemData.itemId] = itemData;
+        // 초기 가격을 원가로 설정 (또는 다른 기본값)
+        if (!currentPrices.ContainsKey(itemData.itemId))
+        {
+            currentPrices[itemData.itemId] = itemData.baseCost;
+            Debug.Log($"상품 등록: {itemData.itemName} (ID: {itemData.itemId}) 초기 가격: {itemData.baseCost}");
+        }
+    }
     
     //관찰자 등록
     public void Subscribe(int itemId, IPriceChangeable observer)
@@ -32,7 +38,11 @@ public class PriceObserver : MonoBehaviour
     //특정 상품 가격(정가)조회
     public float GetPrice(int itemId)
     {
-        return currentPrices.TryGetValue(itemId, out float price) ? price : 0f;
+        bool exists = currentPrices.TryGetValue(itemId, out float price);
+        Debug.Log($"가격 조회 - 아이템 ID: {itemId}, 존재 여부: {exists}, 가격: {price}");
+        return exists ? price : 0f; 
+
+        //return currentPrices.TryGetValue(itemId, out float price) ? price : 0f;
     } 
 
 

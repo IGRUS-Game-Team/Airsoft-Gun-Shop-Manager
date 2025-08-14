@@ -10,11 +10,12 @@ using UnityEngine;
 //       그 후 주석 풀기
 public class GameState : MonoBehaviour
 {
+    
     public static GameState Instance { get; private set; }
 
     [Header("돈 상태")]
     [SerializeField] private float money = 0;
-    //[SerializeField] private TextMeshProUGUI moneyText;
+    [SerializeField] private TextMeshProUGUI moneyText;
 
 
     public float Money => money;
@@ -30,7 +31,7 @@ public class GameState : MonoBehaviour
 
     private void Start()
     {
-        //UpdateMoneyUI();
+        UpdateMoneyUI();
     }
 
     public void SetMoney(float value)
@@ -40,7 +41,7 @@ public class GameState : MonoBehaviour
     public void AddMoney(float amount)
     {
         money += amount;
-        //UpdateMoneyUI();
+        UpdateMoneyUI();
     }
 
     public bool SpendMoney(float amount)
@@ -48,7 +49,7 @@ public class GameState : MonoBehaviour
         if (money >= amount)
         {
             money -= amount;
-            //UpdateMoneyUI();
+            UpdateMoneyUI();
             return true;
         }
         else
@@ -58,9 +59,9 @@ public class GameState : MonoBehaviour
         }
     }
 
-    // private void UpdateMoneyUI()
-    // {
-    //     if (moneyText != null)
-    //         moneyText.text = $"${money}";
-    // }
+    private void UpdateMoneyUI()
+    {
+        if (moneyText != null)
+            moneyText.text = $"${money}";
+    }
 }
