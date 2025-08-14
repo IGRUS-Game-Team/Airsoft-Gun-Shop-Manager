@@ -46,8 +46,17 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   happyLevelGain: 1
   happyReputationGain: 3
-  debugLog: 1
-  logEveryEvent: 0
+  openHour: 8
+  closeHour: 9
+  timeUI: {fileID: 0}
+  satisfiedCustomers: 0
+  dissatisfiedCustomers: 0
+  shopLevel: 0
+  reputation: 0
+  totalCustomersToday: 0
+  grossProfitToday: 0
+  purchaseCostToday: 0
+  netProfitToday: 0
 --- !u!1 &1401113380881662057
 GameObject:
   m_ObjectHideFlags: 0
@@ -93,6 +102,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   priceCardWithSetting: {fileID: 3957045897057976294, guid: a47101ea77504674dbce66aacad9321d, type: 3}
+  x: 0
+  y: 0
+  z: 0
   priceObserver: {fileID: 7528120537147826777}
 --- !u!1 &1858723617614231079
 GameObject:

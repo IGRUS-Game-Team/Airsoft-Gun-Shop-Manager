@@ -58,19 +58,25 @@ public class OnDayEnd : MonoBehaviour
 
     void Update()
     {
-        int hours = (timeUI.totalGameMinutes / 60) % 24; // 시간 계산 (TimeUI)
-        bool isBetweenDeadline = hours >= 20; // 20:00 ~ 23:59 (마감시간)인지
+        var sm = SettlementManager.Instance;
+        int open  = sm != null ? sm.OpenHour  : 8;
+        int close = sm != null ? sm.CloseHour : 20;
 
-        if (isEnterPressed && !isAdjustmentCanvasActive && isBetweenDeadline) // enter 인식 && 정산캔버스활성화X && 마감시간
+        int hours = (timeUI.totalGameMinutes / 60) % 24;
+        bool isAfterClose = hours >= close; // ← 하드코드 20 대신
+
+       if (isEnterPressed && !isAdjustmentCanvasActive && isAfterClose)
         {
-            OnEnterDayEnd(); // EnterDayEnd라는 액션 인식 함수 호출
+            OnEnterDayEnd();
             isEnterPressed = false;
-        }
-        else if (isEnterPressed && !isAdjustmentCanvasActive && !isBetweenDeadline)
+        }   
+    
+        else if (isEnterPressed && !isAdjustmentCanvasActive && !isAfterClose)
         {
             isEnterPressed = false;
             Debug.Log("아직 마감 시간이 되지 않았습니다.");
         }
+
         else if (timeUI.totalGameMinutes == 1440 && !hasAutoEndTriggered && !timeUI.isTimePaused) // 00:00 가 됐을 때 정산UI 띄우기
         {
             hasAutoEndTriggered = true; // 자동 종료 (Updeate 내에서 OnEnterDayEnd가 한 번만 호출되도록)
@@ -98,13 +104,17 @@ public class OnDayEnd : MonoBehaviour
         isAdjustmentCanvasActive = false;
         hasAutoEndTriggered = false;
 
+        SettlementManager.Instance?.ResetToday(); // 하루 집계 초기화 추가함 -이준서-
+
         NextDayTime();
     }
 
     public void NextDayTime()
     {
-        timeUI.totalGameMinutes = 480; // 다시 아침 8:00부터 시간 흐르기 시작
-        timeUI.isTimePaused = false; // 시간 멈춘 거 풀기
+        var sm = SettlementManager.Instance;
+        int open = sm != null ? sm.OpenHour : 8;
+        timeUI.totalGameMinutes = open * 60;
+        timeUI.isTimePaused = false;
         timeUI.ForceUpdate();
     }
 

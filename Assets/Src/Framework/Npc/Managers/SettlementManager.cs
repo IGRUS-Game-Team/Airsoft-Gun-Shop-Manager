@@ -66,6 +66,9 @@ public class SettlementManager : MonoBehaviour
     public float CogsToday             => purchaseCostToday; // ▼ 호환용 별칭(기존 cogsToday 참조 대비)
     public float NetProfitToday        => netProfitToday;
 
+    public int OpenHour  => openHour;
+    public int CloseHour => closeHour;
+    
     void Awake()
     {
         if (Instance != null && Instance != this) { Destroy(gameObject); return; }
