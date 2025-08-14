@@ -5,5 +5,5 @@ public class ShootingGunSO : ScriptableObject
 {
     public float FireRate = .5f;
     public AudioClip GunSound;
-    public GameObject HitVFXPrefab;
+    public AnimationClip ShootAnimation;
 }

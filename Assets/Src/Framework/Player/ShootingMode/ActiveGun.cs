@@ -5,12 +5,11 @@ public class ActiveGun : MonoBehaviour
 {
     [SerializeField] StarterAssets.StarterAssetsInputs playerInput;
     [SerializeField] ShootingGunSO shootingGunSO;
-    [SerializeField] Animator animator;
+    // [SerializeField] Animator animator;
 
     ShootingGun currentGun;
-    public AudioSource audiosource;
 
-    const string SHOOT_STRING = "Shoot";
+    // const string SHOOT_STRING = "Shoot";
 
     float timeSinceLastShot = 0f;
 
@@ -30,7 +29,7 @@ public class ActiveGun : MonoBehaviour
     void Update()
     {
         timeSinceLastShot += Time.deltaTime;
-        if (playerInput.range) Shooting();
+        // if (playerInput.range) Shooting();
     }
 
     void Shooting()
@@ -38,11 +37,11 @@ public class ActiveGun : MonoBehaviour
         if (timeSinceLastShot >= shootingGunSO.FireRate)
         {
             currentGun.Shoot(shootingGunSO);
-            animator.Play(SHOOT_STRING, 0, 0f);
+            // animator.Play(SHOOT_STRING, 0, 0f);
             timeSinceLastShot = 0f;
         }
-
     }
+
     void OnDestroy()
     {
         if (InteractionController.Instance != null)

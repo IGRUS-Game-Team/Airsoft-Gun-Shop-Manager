@@ -9,11 +9,20 @@ public class ShootingGun : MonoBehaviour
 {
     [SerializeField] StarterAssets.StarterAssetsInputs playerInput;
     [SerializeField] ParticleSystem ShootingParticle;
-    [SerializeField] ParticleSystem muzzleFlash;
+    [SerializeField] ParticleSystem HitVFXParticle;
+    [SerializeField] Animator animator;
 
     public void Shoot(ShootingGunSO shootingGunSO)
     {
         ShootingParticle.Play();
-        muzzleFlash.Play();
+        HitVFXParticle.Play();
+        animator.Play(shootingGunSO.ShootAnimation.name, 0, 0f);
+
+        RaycastHit hit;
+
+        if (Physics.Raycast(Camera.main.transform.position, Camera.main.transform.forward, out hit, Mathf.Infinity))
+        {
+            Debug.Log(hit.collider.name);
+        }
     }
 }
