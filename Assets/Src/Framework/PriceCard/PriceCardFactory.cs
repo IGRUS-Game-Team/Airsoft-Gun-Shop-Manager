@@ -13,11 +13,6 @@ public class PriceCardFactory : MonoBehaviour
     [SerializeField] float y = 0;
     [SerializeField] float z = 0;
     
-
-    [Header("PriceObserver")]
-    [SerializeField] private PriceObserver priceObserver;
-
-
     // 현재 생성된 가격표 추적 (딕셔너리로 변경)
     private Dictionary<Vector3, GameObject> priceCardDictionary = new Dictionary<Vector3, GameObject>();
 
@@ -82,14 +77,14 @@ public class PriceCardFactory : MonoBehaviour
         {
             priceCardController.UpdateName(itemData);
             priceCardController.UpdatePrice(itemData);
-            priceObserver.Subscribe(itemData.itemId, priceCardController);//옵저버 구독
+            PriceObserver.Instance.Subscribe(itemData.itemId, priceCardController);//옵저버 구독
         }
 
         PriceSettingController priceSettingController = newPriceCard.GetComponentInChildren<PriceSettingController>(true);
         if (priceSettingController)
         {
             priceSettingController.GetScriptableObject(itemData);
-            priceObserver.Subscribe(itemData.itemId, priceSettingController);//옵저버 구독
+            PriceObserver.Instance.Subscribe(itemData.itemId, priceSettingController);//옵저버 구독
         }
         
         

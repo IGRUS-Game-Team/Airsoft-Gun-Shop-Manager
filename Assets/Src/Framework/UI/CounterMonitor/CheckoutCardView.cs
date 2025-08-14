@@ -8,27 +8,23 @@ public class CheckoutCardView : MonoBehaviour,IPriceChangeable
     [SerializeField] TextMeshProUGUI priceText;
     [SerializeField] TextMeshProUGUI totalText;
 
-    private PriceObserver priceObserver;//가격 옵저버
-
     public ItemData ItemData { get; private set; }
     public float TotalPrice => currentPrice * currentAmount; //총 금액
     private float currentPrice; //판매액<= 신호가 오면 얘가 바뀐다
     private int currentAmount; //현재 수량
     private float baseCost; //원가
 
-    public void Setup(ItemData itemData, int amount, PriceObserver observer)
+
+    //처음 상품 바코드 찍을 때 가격 세팅
+    public void Setup(ItemData itemData, int amount)
     {
         ItemData = itemData;
         currentAmount = amount;
         baseCost = itemData.baseCost;
 
-        priceObserver = observer;
+        PriceObserver.Instance.Subscribe(itemData.itemId, this);
 
-        // 아이템을 PriceObserver에 등록 (초기 가격 설정)
-        priceObserver.RegisterProduct(itemData);
-        priceObserver.Subscribe(itemData.itemId, this);
-        
-        currentPrice = priceObserver.GetPrice(itemData.itemId);//현재 가격 저장
+        currentPrice = PriceObserver.Instance.GetPrice(itemData.itemId);//현재 가격 저장
         Debug.Log($"아이템 {itemData.itemName} (ID: {itemData.itemId}) 초기 가격: {currentPrice}, 원가: {baseCost}");
 
 
@@ -43,7 +39,7 @@ public class CheckoutCardView : MonoBehaviour,IPriceChangeable
 
     private void RefreshUI()
     {
-        nameText.text = ItemData.itemName;
+        nameText.text = ItemNameResolver.Get(ItemData);
         unitText.text = currentAmount.ToString();
         priceText.text = $"${currentPrice:F2}";
         totalText.text = $"${currentPrice * currentAmount:F2}";
@@ -52,8 +48,10 @@ public class CheckoutCardView : MonoBehaviour,IPriceChangeable
     //input창에 의해 값이 변경되면 호출되는 메서드
     public void OnPriceChanged(int itemId, float newPrice, float oldPrice)
     {
+        
         if (itemId == ItemData.itemId)
         {
+            Debug.Log("변경된 price 모니터에 적용준비");
             currentPrice = newPrice; // 새 가격으로 변경
             RefreshUI(); // 화면에 반영
         }

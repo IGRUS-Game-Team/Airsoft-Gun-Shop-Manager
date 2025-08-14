@@ -9,8 +9,6 @@ public class CountorMonitorController : MonoBehaviour
     [SerializeField] TextMeshProUGUI totalPriceText;
     [SerializeField] CalculatorOk calculatorOk;
 
-     [Header("PriceObserver")]
-    [SerializeField] PriceObserver priceObserver; // 가격 옵저버 
 
     private float total = 0f;
     public void Show(CounterSlotData items)//items = 게임 오브젝트, itemdata(원가, id), 수량
@@ -43,7 +41,7 @@ public class CountorMonitorController : MonoBehaviour
         {
             // 새 카드 생성
             var card = Instantiate(cardPrefab, contentRoot);
-            card.Setup(data, amount, priceObserver); //옵저버 추가
+            card.Setup(data, amount); //옵저버 추가
                                                      //새 카드 생성시 priceobserver에게 참조 전달
         }
 

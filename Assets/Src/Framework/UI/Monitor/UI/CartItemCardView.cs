@@ -24,7 +24,7 @@ public class CartItemCardView : MonoBehaviour
     {
         currentItem = data;
 
-        nameText.text = data.itemName;
+        nameText.text = ItemNameResolver.Get(data);
         quantityText.text = $"x{quantity}";
         totalCost.text = cost.ToString("F2") + "$";
 

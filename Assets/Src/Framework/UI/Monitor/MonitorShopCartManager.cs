@@ -90,7 +90,7 @@ public class MonitorShopCartManager : MonoBehaviour
                 itemId = kvp.Key.itemId,
                 amount = kvp.Value,
                 unitPrice = kvp.Key.baseCost,
-                itemName = kvp.Key.itemName,
+                itemName = ItemNameResolver.Get(kvp.Key),
                 category = kvp.Key.category
             };
 
