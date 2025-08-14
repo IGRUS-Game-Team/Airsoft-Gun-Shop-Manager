@@ -108,7 +108,7 @@ public class OnDayEnd : MonoBehaviour
         timeUI.ForceUpdate();
     }
 
-    public IEnumerator ShowDelayText()
+    IEnumerator ShowDelayText()
     {
         foreach (Transform text in TextGroup) // TextGroup 내에 있는 Text들 0.4초 간격으로 띄우기
         {
