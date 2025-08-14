@@ -21,6 +21,7 @@ public class PurchaseProcessor : MonoBehaviour
         }
 
         gameState.SpendMoney(totalCost);
+        SettlementManager.Instance?.RegisterPurchaseCost(totalCost); // 카트에 담긴 돈 최종 정산 값에서 제외 / 수정 : 준서
         Debug.Log($"결제 성공! {totalCost}원 사용됨");
 
         foreach (var item in cartItems)
