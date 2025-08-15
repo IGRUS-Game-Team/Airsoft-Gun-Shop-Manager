@@ -4,9 +4,7 @@ using UnityEngine;
 public class NewsPaperController : MonoBehaviour
 {
     [Header("신문 text 요소")]
-    [SerializeField] TextMeshProUGUI title; //신문 제목
-    [SerializeField] TextMeshProUGUI eventState; //이벤트 효과
-    [SerializeField] TextMeshProUGUI itemName; // 대상 아이템
+    [SerializeField] TextMeshProUGUI sentence;
 
     private string currentTitle;
     private string currentEventState;
@@ -33,10 +31,9 @@ public class NewsPaperController : MonoBehaviour
         currentTitle = EeventName;
         currentEventState = EeventStatus;
         currentItemName = EitemName;
-
-        title.text = currentTitle;
-        eventState.text = currentEventState;
-        itemName.text = currentItemName;
+///////문장 {} 형식으로 모듈 넣기 필요
+        
     }
 
 }
+

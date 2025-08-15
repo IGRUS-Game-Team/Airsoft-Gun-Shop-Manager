@@ -87,8 +87,20 @@ public class ItemDatabase : ScriptableObject
     //랜덤 아이템 전달
     public ItemData GetRandomItemData()
     {
-        if (_byId == null || _byId.Count == 0) { return null; }
-        return GetById(UnityEngine.Random.Range(0, _byId.Count + 1));
+        if (_byId == null || _byId.Count == 0) 
+        {
+            Debug.LogWarning("[ItemDatabase] 유효한 아이템이 없습니다.");
+            return null; 
+        }
+        
+        // Dictionary의 실제 키들을 배열로 변환
+        var keys = new List<int>(_byId.Keys);
+        
+        // 랜덤 인덱스로 키 선택
+        int randomIndex = Random.Range(0, keys.Count);
+        int randomId = keys[randomIndex];
+        
+        return _byId[randomId];
 
     }
     public bool TryGet(int itemId, out ItemData result)
