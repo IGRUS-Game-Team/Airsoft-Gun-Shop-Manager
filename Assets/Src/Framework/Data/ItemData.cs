@@ -19,7 +19,7 @@ public class ItemData : ScriptableObject
     public DisplayType displayType; // 선반(유리창 안, 벽걸이 선반, 일반 선반들 등등 중 어디에 놓이는지)
     public GameObject displayPrefab; //제품 박스 프리팹
     public float unlockCost;
-
+    
     
 #if UNITY_EDITOR
     private void OnValidate()

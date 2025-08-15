@@ -10,7 +10,7 @@ public class SaveManager : MonoBehaviour
 
     private GameState gameState;
     private FirstPersonController playerController;
-    [SerializeField ] private MonitorShopCartManager cartManager;
+    [SerializeField] private MonitorShopCartManager cartManager;
     private TimeUI timeUI;
     
     private bool isInitialized = false;
@@ -57,30 +57,39 @@ public class SaveManager : MonoBehaviour
     private bool IsInGameScene()
     {
         string currentScene = UnityEngine.SceneManagement.SceneManager.GetActiveScene().name;
-        return currentScene != "MainMenu";
+        return currentScene != "RealFinal";
     }
 
     private void TryInitialize()
     {
-        gameState = FindFirstObjectByType<GameState>();
-        playerController = FindFirstObjectByType<FirstPersonController>();
-        //cartManager = FindFirstObjectByType<MonitorShopCartManager>();
-        timeUI = FindFirstObjectByType<TimeUI>();
+        // gameState = FindFirstObjectByType<GameState>();
+        // playerController = FindFirstObjectByType<FirstPersonController>();
+        // //cartManager = FindFirstObjectByType<MonitorShopCartManager>();
+        // timeUI = FindFirstObjectByType<TimeUI>();
 
         saveables = FindObjectsOfType<MonoBehaviour>().OfType<ISaveable>().ToList();
 
-        if (gameState != null && playerController != null && cartManager != null)
-        {
-            isInitialized = true;
-            Debug.Log("SaveManager 초기화 완료");
-        }
-        else
-        {
-            Debug.LogWarning("SaveManager 초기화 대기 중...");
-            if (gameState == null) Debug.LogWarning("→ GameState가 null입니다");
-            if (playerController == null) Debug.LogWarning("→ FirstPersonController가 null입니다");
-            if (cartManager == null) Debug.LogWarning("→ MonitorShopCartManager가 null입니다");
-        }
+        // if (gameState != null && playerController != null && cartManager != null)
+        // {
+        //     isInitialized = true;
+        //     Debug.Log("SaveManager 초기화 완료");
+        // }
+        // else
+        // {
+        //     Debug.LogWarning("SaveManager 초기화 대기 중...");
+        //     if (gameState == null) Debug.LogWarning("→ GameState가 null입니다");
+        //     if (playerController == null) Debug.LogWarning("→ FirstPersonController가 null입니다");
+        //     if (cartManager == null) Debug.LogWarning("→ MonitorShopCartManager가 null입니다");
+        // }
+            if (saveables.Count > 0)
+    {
+        isInitialized = true;
+        Debug.Log($"SaveManager 초기화 완료 (ISaveable {saveables.Count}개)");
+    }
+    else
+    {
+        //Debug.LogWarning("저장 가능한 객체(ISaveable)가 없습니다.");
+    }
     }
 
     public void NewGame()

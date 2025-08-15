@@ -27,7 +27,7 @@ public class PurchaseProcessor : MonoBehaviour
         foreach (var item in cartItems)
         {
             string prefabName = $"Box_{item.itemName}";
-            boxSpawner.BoxDrop(item.itemId, item.amount, item.category, item.itemName);
+            boxSpawner.BoxDrop(item.itemId, item.amount);
         }
 
         monitorShopCartManager.ClearCart();

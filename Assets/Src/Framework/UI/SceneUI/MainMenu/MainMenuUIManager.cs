@@ -10,7 +10,7 @@ public class MainMenuUIManager : MonoBehaviour
     public void OnClickNewGame()
     {
         Debug.Log("새 게임 시작");
-        SceneManager.LoadScene("MainScene");
+        SceneManager.LoadScene("RealFinal");
     }
 
     public void OnClickLoadSave()
@@ -23,8 +23,7 @@ public class MainMenuUIManager : MonoBehaviour
     public void OnClickSetting()
     {
         Debug.Log("설정창 열기");
-        if (settingPopup != null)
-            settingPopup.SetActive(true);
+        settingPopup.SetActive(true);
     }
 
     public void OnClickQuit()
