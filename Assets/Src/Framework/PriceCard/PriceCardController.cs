@@ -69,7 +69,7 @@ public class PriceCardController : MonoBehaviour, IInteractable, IPriceChangeabl
     }
     public void UpdateName(ItemData itemData)
     {
-        productname.text = itemData.name;
+        productname.text = ItemNameResolver.Get(itemData);
     }
 
 

@@ -46,14 +46,9 @@ public class SocialEventManager : MonoBehaviour
             Destroy(gameObject);
         }
     }
+    //특정 사이클마다 전략 바뀌는거 구현//
 
-
-    //전략 선택적으로 바꾸기
-    public void SetSocialEventStrategy(ISocialEventStrategy Isocialevent)
-    {
-        this.currentStrategy = Isocialevent; //가져온 전략을 본 ScialEventManager에 저장하는 것
-    }
-
+    
     //전략 실행 및 데이터 전달
     public void ExecuteStrategy()
     {
@@ -65,11 +60,7 @@ public class SocialEventManager : MonoBehaviour
 
         currentStrategy.GetEventStrategyData(); // 전략에서 랜덤 데이터 생성
 
-        SelectRandomGun(); //사회이벤트 매니저에 랜덤 상품 저장
-
-        //저장한것을 넘겨줘야함
-        //근데 옵저버의 순서를 고려해서 내부로직인 marketpricemanager에게 줄 : 시장변동률, id
-        //ui에게 그 다음으로 줄 id , 이벤트 이름, 이벤트 상태, 상품 이름 정도? 2갈래로 나뉠듯
+        SelectRandomGun(); //사회이벤트 매니저에 랜덤 상품 저w장
 
         DeliverMarketPriceData();  // 먼저 시장 가격 업데이트
         DeliverEventUIData();      // 그 다음 UI 업데이트
@@ -102,7 +93,7 @@ public class SocialEventManager : MonoBehaviour
         {
             string eventName = currentStrategy.EventName ?? "알 수 없는 이벤트";
             string eventStatus = currentStrategy.StatusText ?? "사회 상태?";
-            string itemName = selectedItemData.itemName ?? "알 수 없는 상품";
+            string itemName = ItemNameResolver.Get(selectedItemData)?? "알 수 없는 상품";
 
             // 옵저버로 UI에 전달
             OnEventUIUpdate?.Invoke(eventName, eventStatus, itemName);
@@ -113,13 +104,20 @@ public class SocialEventManager : MonoBehaviour
     //랜덤한 아이템 가져오기, 이름 아이디 저장
     private void SelectRandomGun() {
         selectedItemData = itemDatabase.GetRandomItemData(); //아이템 데이터에 저장
-        itemName = selectedItemData.itemName;
+        itemName = ItemNameResolver.Get(selectedItemData);
         itemId = selectedItemData.itemId;
     }
+
+    //전략 선택적으로 바꾸기
+    public void SetSocialEventStrategy(ISocialEventStrategy Isocialevent)
+    {
+        this.currentStrategy = Isocialevent; //가져온 전략을 본 ScialEventManager에 저장하는 것
+    }
+
     
     // 외부에서 현재 선택된 아이템 정보를 가져올 수 있는 메서드들
     public ItemData GetSelectedItem() => selectedItemData;
     public int GetSelectedItemId() => selectedItemData?.itemId ?? 0;
-    public string GetSelectedItemName() => selectedItemData?.itemName ?? "없음";
+    public string GetSelectedItemName() => ItemNameResolver.Get(selectedItemData) ?? "없음";
 
 }
