@@ -94,14 +94,9 @@ public class RevenueXPTracker : MonoBehaviour
         OnLevelChanged.Invoke(CurrentLevel);
     }
 
-    // (선택) ES3 저장/로드
-    public void SaveES3()
-    {
-        ES3.Save("xp_totalRevenue", totalRevenueXP);
-    }
-    public void LoadES3()
-    {
-        totalRevenueXP = ES3.KeyExists("xp_totalRevenue") ? ES3.Load<float>("xp_totalRevenue") : 0f;
-        BroadcastAll();
-    }
+public void ForceSetXP(float value)
+{
+    totalRevenueXP = Mathf.Max(0f, value); // 음수 방지
+    BroadcastAll(); // UI/레벨/진행도 이벤트 다시 쏨
+}
 }

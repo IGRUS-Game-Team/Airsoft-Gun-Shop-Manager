@@ -78,12 +78,12 @@ public void Setup(ItemData item, CatalogUIManager owner)
 
         // 2클릭: 구매 시도 → 돈 확인 후 차감
         var gs = FindFirstObjectByType<GameState>();
-        int price = Mathf.RoundToInt(data.baseCost);
+        int price = Mathf.RoundToInt(data.unlockCost);
         if (gs == null) { Debug.LogWarning("GameState 없음"); return; }
 
         if (gs.Money >= price) // Money/SetMoney는 기존 세이브 파이프라인과 연결됨 
         {
-            gs.SetMoney(gs.Money - price);
+            gs.SpendMoney(price);
 
             unlocked = true;
             UnlockedItemsStore.MarkUnlocked(data.itemId);

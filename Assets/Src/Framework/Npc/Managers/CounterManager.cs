@@ -271,7 +271,7 @@ public class CounterManager : MonoBehaviour
             }
 
             // 플레이어 자금 반영(기존 로직 유지)
-            GameState.Instance.AddMoney(npcPaymentAmount);
+            GameState.Instance.AddRevenue(npcPaymentAmount);
 
             // 모니터 비우기 전에 완료 처리/정산 마무리
             CompletePayment(currentNpcForPayment);
@@ -355,7 +355,8 @@ public class CounterManager : MonoBehaviour
     private void HandleCashPaymentSuccess() //계산 성공
     {
         // 매출 반영
-        GameState.Instance.AddMoney(npcSendMe - cashUI.GetCurrentGiven());
+        if ((npcSendMe - cashUI.GetCurrentGiven()) >= 0) GameState.Instance.AddRevenue(npcSendMe - cashUI.GetCurrentGiven());
+        else GameState.Instance.AddMoney(npcSendMe - cashUI.GetCurrentGiven());
         SettlementManager.Instance?.RegisterSaleAmount(npcPaymentAmount); // 현금 계산 값 최종 정산 변수에 가져가기 / 수정 : 준서
         Debug.Log(npcSendMe + " " + cashUI.GetCurrentGiven());
 
