@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 8501276675227712059}
   - component: {fileID: 2901864241967689852}
   - component: {fileID: 7056868084749415686}
-  m_Layer: 11
+  m_Layer: 0
   m_Name: ShootingParticle5
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4845,7 +4845,7 @@ GameObject:
   - component: {fileID: 2576905171720961890}
   - component: {fileID: 2234140490866747957}
   - component: {fileID: 4258712449017324550}
-  m_Layer: 11
+  m_Layer: 0
   m_Name: HitVFX5
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -9683,7 +9683,7 @@ GameObject:
   - component: {fileID: 7785749378026898127}
   - component: {fileID: 8842149615208564611}
   - component: {fileID: 4729697708598856557}
-  m_Layer: 11
+  m_Layer: 0
   m_Name: Gun5
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -9723,6 +9723,7 @@ MonoBehaviour:
   ShootingParticle: {fileID: 2901864241967689852}
   HitVFXParticle: {fileID: 2234140490866747957}
   animator: {fileID: 1114968518569713383}
+  GunIndex: 4
 --- !u!95 &1114968518569713383
 Animator:
   serializedVersion: 7
@@ -9873,7 +9874,7 @@ MonoBehaviour:
     m_DissipationMode: 2
     m_DissipationDistance: 100
     m_PropagationSpeed: 343
-  m_DefaultVelocity: {x: 0, y: -1, z: 0}
+  m_DefaultVelocity: {x: 0, y: -0.1, z: 0}
   m_LayerMask:
     serializedVersion: 2
     m_Bits: 1

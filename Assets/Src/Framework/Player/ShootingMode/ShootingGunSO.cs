@@ -5,7 +5,6 @@ public class ShootingGunSO : ScriptableObject
 {
     public GameObject GunPrefab;
     public float FireRate = .5f;
-    public AudioClip GunSound;
     public AnimationClip ShootAnimation;
     public bool CanZoom = false;
     public float ZoonAmount = 10f;

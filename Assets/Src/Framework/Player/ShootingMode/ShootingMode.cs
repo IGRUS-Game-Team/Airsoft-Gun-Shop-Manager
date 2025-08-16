@@ -3,7 +3,7 @@ using UnityEngine;
 public class ShootingMode : MonoBehaviour
 {
     [SerializeField] ShootingGunSO shootingGunSO;
-
+ 
     const string PLAYER_STRING = "Player";
 
     void OnTriggerEnter(Collider other)
