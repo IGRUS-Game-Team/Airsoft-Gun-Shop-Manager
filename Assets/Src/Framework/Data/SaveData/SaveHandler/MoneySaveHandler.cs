@@ -2,25 +2,32 @@ using UnityEngine;
 
 public class MoneySaveHandler : MonoBehaviour, ISaveable
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
     private GameState gameState;
 
     private void Awake()
     {
         gameState = FindFirstObjectByType<GameState>();
     }
+
+    private void EnsureRefs()
+    {
+        if (gameState == null)
+            gameState = FindFirstObjectByType<GameState>(FindObjectsInactive.Include);
+    }
+
     public object CaptureData()
     {
-        return new MoneySaveData
-        {
-            money = gameState.Money
-        };
+        EnsureRefs();
+        return new MoneySaveData { money = gameState ? gameState.Money : 0 };
     }
+
     public void RestoreData(object data)
     {
-        MoneySaveData moneyData = data as MoneySaveData;
-        if (moneyData == null) return;
+        EnsureRefs();
+        var moneyData = data as MoneySaveData;
+        if (moneyData == null || gameState == null) return;
 
         gameState.SetMoney(moneyData.money);
+        Debug.Log($"[Load] Money ← {moneyData.money}");
     }
 }

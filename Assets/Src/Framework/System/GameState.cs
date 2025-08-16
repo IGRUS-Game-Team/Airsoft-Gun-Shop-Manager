@@ -37,6 +37,7 @@ public class GameState : MonoBehaviour
     public void SetMoney(float value)
     {
         money = value;
+        UpdateMoneyUI();
     }
     public void AddMoney(float amount)
     {

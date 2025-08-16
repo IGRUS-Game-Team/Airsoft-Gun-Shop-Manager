@@ -6,7 +6,8 @@ public class GameTimeSaveHandler : MonoBehaviour, ISaveable
 
     void Awake()
     {
-        timeUI = FindFirstObjectByType<TimeUI>(); 
+        timeUI = FindFirstObjectByType<TimeUI>();
+        if (timeUI == null) Debug.Log("ㅇ");
     }
     
 
@@ -26,5 +27,6 @@ public class GameTimeSaveHandler : MonoBehaviour, ISaveable
 
         timeUI.totalGameMinutes = loaded.totalGameMinutes;
         timeUI.ForceUpdate(); // 시간 UI 갱신용 함수 (아래에 정의함)
+        Debug.Log("와 ! 시간 로드 성공!");
     }
 }
