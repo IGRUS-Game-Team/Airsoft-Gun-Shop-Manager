@@ -22,7 +22,7 @@ public class MarketPriceDataManager : MonoBehaviour
     void OnEnable()
     {
         SocialEventManager.OnMarketPriceChanged += ChangeMarketPrice;
-    }   
+    }
     void OnDisable()
     {
         SocialEventManager.OnMarketPriceChanged -= ChangeMarketPrice;
@@ -81,6 +81,24 @@ public class MarketPriceDataManager : MonoBehaviour
     public float GetMarketPrice(int id)
     {
         return currentMarketPrice[id];
+    }
+
+    // 추가 : id키 없을 때 에러나는 거 막기 - 준서
+    public bool TryGetMarketPrice(int id, out float price)
+    {
+        if (currentMarketPrice.TryGetValue(id, out price))
+            return true;
+
+        var item = itemDatabase.GetById(id);
+        if (item != null)
+        {
+            price = item.baseCost * 1.2f;      // 기본 시세 규칙
+            currentMarketPrice[id] = price;    // 캐시
+            return true;
+        }
+
+        price = 0f;
+        return false;
     }
 
 }

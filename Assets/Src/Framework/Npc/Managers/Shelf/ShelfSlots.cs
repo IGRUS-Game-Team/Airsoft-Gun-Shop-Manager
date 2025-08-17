@@ -12,7 +12,7 @@ public class ShelfSlot : MonoBehaviour
     //Transform은 부모가 된 카드슬롯의 위치
     [Header("shelf slot 오브젝트")]
     [SerializeField] private Transform priceCardParent;
-    [SerializeField] private Vector3 controll=new (0,0.3f,0.18f);    
+    [SerializeField] private Vector3 controll = new(0, 0.3f, 0.18f);
     /* ---------- 설정 ---------- */
     public const int Capacity = 2;
 
@@ -28,9 +28,9 @@ public class ShelfSlot : MonoBehaviour
     readonly List<GameObject> items = new();
 
     /* ---------- 프로퍼티 ---------- */
-    public int  ItemCount => items.Count;      // ← SlotFillBehaviour가 사용
-    public bool IsFull    => items.Count >= Capacity;
-    public bool HasItem   => items.Count > 0;
+    public int ItemCount => items.Count;      // ← SlotFillBehaviour가 사용
+    public bool IsFull => items.Count >= Capacity;
+    public bool HasItem => items.Count > 0;
 
     /* ---------- 외부에서 위치 얻기 ---------- */
     public Transform GetSnapPoint(int idx) => points[idx];
@@ -50,8 +50,8 @@ public class ShelfSlot : MonoBehaviour
         {
             OnProductPlacedToFactory?.Invoke(itemDatas, priceCardPosition, priceCardParent);
         }
-        
-    } 
+
+    }
 
     /* ---------- NPC 가 꺼낼 때 ---------- */
     public GameObject PopItem()
@@ -97,5 +97,41 @@ public class ShelfSlot : MonoBehaviour
         Gizmos.DrawSphere(standPoint.position, 0.08f);
         // forward 확인(선반을 바라보게 맞춰 두는 걸 권장)
         Gizmos.DrawRay(standPoint.position, standPoint.forward * 0.35f);
+    }
+
+    // 슬롯 바깥쪽 상품의 ItemData 꺼내기
+    public bool TryGetTopItemData(out ItemData data)
+    {
+        data = null;
+        if (items == null || items.Count == 0) return false;
+
+        var go = items[items.Count - 1];                      // 바깥쪽
+        var mgr = go != null ? go.GetComponent<ItemDataManager>() : null;
+        if (mgr == null) return false;
+
+        data = mgr.GetItemData();
+        return data != null;
+    }
+
+    // NPC 판단에 필요한 값 2개: itemId + offerPrice(진열가)
+    public bool TryGetPricing(out int itemId, out float offerPrice)
+    {
+        itemId = 0; offerPrice = 0f;
+
+        if (!TryGetTopItemData(out var data)) return false;
+        itemId = data.itemId;
+
+        // 1) 진열가는 PriceObserver(정가/가격표 관리자)에서 가져온다
+        if (PriceObserver.Instance != null)
+            offerPrice = PriceObserver.Instance.GetPrice(itemId);
+
+        // 2) 보호 장치: 진열가가 0이면 임시로 시세를 진열가처럼 사용(테스트용)
+        if (offerPrice <= 0f && MarketPriceDataManager.Instance != null &&
+            MarketPriceDataManager.Instance.TryGetMarketPrice(itemId, out var market))
+        {
+            offerPrice = market;
+        }
+
+        return offerPrice > 0f;
     }
 }
