@@ -48,6 +48,7 @@ public class DoorTrigger : MonoBehaviour
 
     void OnTriggerEnter(Collider other)
     {
+        Debug.Log(other.name);
         if (!other.CompareTag(TagNpc)) return;
 
         var npc = other.GetComponent<NpcController>();
@@ -108,6 +109,7 @@ public class DoorTrigger : MonoBehaviour
 
         // 최종 확률 클램프
         chance = Mathf.Clamp(chance, minFinalChance, maxFinalChance);
+        Debug.Log("보정 확률 값: " + chance);
 
         return Mathf.RoundToInt(chance);
     }
