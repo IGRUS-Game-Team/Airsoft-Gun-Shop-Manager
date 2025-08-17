@@ -17,22 +17,26 @@ public class ShopItemUnlockCELL : MonoBehaviour
     private bool unlocked;
 
     // 외부에서 셋업
-    public void Setup(ItemData item, CatalogUIManager owner)
-    {
-        this.data = item; this.owner = owner;
-        
-        if (icon != null && item.icon != null)
-            icon.sprite = item.icon;
-        txtPrice.text = "";  // 처음엔 가격 숨김
-        unlocked = UnlockedItemsStore.IsUnlocked(item.itemId);
-        priceRevealed = unlocked; // 이미 해금된 건 가격표시 생략
+public void Setup(ItemData item, CatalogUIManager owner)
+{
+    this.data = item; 
+    this.owner = owner;
+    
+    if (icon != null && item.icon != null)
+        icon.sprite = item.icon;
+    
+    txtPrice.text = data.baseCost.ToString();
 
-        btnUnlock.onClick.RemoveAllListeners();
-        btnUnlock.onClick.AddListener(OnClickUnlock);
+    unlocked = UnlockedItemsStore.IsUnlocked(item.itemId);
+    priceRevealed = true; // 원래 unlocked 였는데 → true로 바꿔서 항상 가격 표시
 
-        RefreshText();
-        RefreshButtonVisual();
-    }
+    btnUnlock.onClick.RemoveAllListeners();
+    btnUnlock.onClick.AddListener(OnClickUnlock);
+
+    RefreshText();
+    RefreshButtonVisual();
+}
+
 
     public void RefreshText()
     {
@@ -74,12 +78,12 @@ public class ShopItemUnlockCELL : MonoBehaviour
 
         // 2클릭: 구매 시도 → 돈 확인 후 차감
         var gs = FindFirstObjectByType<GameState>();
-        int price = Mathf.RoundToInt(data.baseCost);
+        int price = Mathf.RoundToInt(data.unlockCost);
         if (gs == null) { Debug.LogWarning("GameState 없음"); return; }
 
         if (gs.Money >= price) // Money/SetMoney는 기존 세이브 파이프라인과 연결됨 
         {
-            gs.SetMoney(gs.Money - price);
+            gs.SpendMoney(price);
 
             unlocked = true;
             UnlockedItemsStore.MarkUnlocked(data.itemId);

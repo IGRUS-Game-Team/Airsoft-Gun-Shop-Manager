@@ -4,7 +4,7 @@ using UnityEngine;
 /// <summary>
 /// 장지원 8.14 시세 관리하는 곳
 /// 
-/// 시세 = 원가 *120% + 시장변동률
+/// 시세 = 원가 *20% + 시장변동률
 /// socialeventmanager에서 시장변동률을 가져와 시세 리스트에 적용한다.
 /// </summary>
 public class MarketPriceDataManager : MonoBehaviour
@@ -14,9 +14,7 @@ public class MarketPriceDataManager : MonoBehaviour
 
     [Header("ItemDatabase 상품 데이터베이스")]
     [SerializeField] private ItemDatabase itemDatabase;
-    //시세 딕셔너리는 필요하다
-    //모든 so의 원가를 가져와서 딕셔너리화 시켜야할까
-    //아니면 database에서 빼오고 정제된 값을 시세 딕셔너리에 넣어야할까<<일단 이거 채택
+    
     private Dictionary<int, float> currentMarketPrice = new Dictionary<int, float>(); //시세 저장 딕셔너리 : id, 시세
 
     void OnEnable()
@@ -59,8 +57,6 @@ public class MarketPriceDataManager : MonoBehaviour
         {
             currentMarketPrice.Add(selectItem.itemId, marketPrice);//없다면 추가
         }
-
-        //근데 드는 의문하도 idid이래놔서 이 아이디가 과연 다 같은 아이디인가 조심해야할듯?
     }
 
     //초기 시세 설정 원가 *1.2
@@ -77,11 +73,12 @@ public class MarketPriceDataManager : MonoBehaviour
         }
     }
 
-    //딕셔너리의 시장변동 get
+    //딕셔너리의 시세 get
     public float GetMarketPrice(int id)
     {
         return currentMarketPrice[id];
     }
+    
 
     // 추가 : id키 없을 때 에러나는 거 막기 - 준서
     public bool TryGetMarketPrice(int id, out float price)

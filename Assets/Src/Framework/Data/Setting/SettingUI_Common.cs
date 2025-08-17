@@ -12,7 +12,7 @@ public class SettingsUI_Common : MonoBehaviour
     [Header("Controls")]
     public Slider mouseSensitivity; // 0.1~5.0
     public Toggle invertY;
-    public Toggle vibration;
+    //public Toggle vibration;
 
     [Header("Accessibility/UI")]
     public Toggle subtitles;
@@ -29,7 +29,7 @@ public class SettingsUI_Common : MonoBehaviour
 
         mouseSensitivity.SetValueWithoutNotify(d.mouseSensitivity);
         invertY.SetIsOnWithoutNotify(d.invertY);
-        vibration.SetIsOnWithoutNotify(d.gamepadVibration);
+       // vibration.SetIsOnWithoutNotify(d.gamepadVibration);
 
         subtitles.SetIsOnWithoutNotify(d.subtitles);
         subtitleScale.SetValueWithoutNotify(d.subtitleScale);
@@ -67,11 +67,11 @@ public class SettingsUI_Common : MonoBehaviour
         SettingsManager.Instance.inputApplier.Apply(SettingsManager.Instance.Data);
         SettingsManager.Instance.Save();
     }
-    public void OnVibration(bool on)
-    {
-        SettingsManager.Instance.Data.gamepadVibration = on;
-        SettingsManager.Instance.Save();
-    }
+    // public void OnVibration(bool on)
+    // {
+    //     SettingsManager.Instance.Data.gamepadVibration = on;
+    //     SettingsManager.Instance.Save();
+    // }
 
     public void OnSubtitles(bool on)
     {

@@ -226,6 +226,7 @@ public class CounterManager : MonoBehaviour
     [Header("Cash UI")]
     [SerializeField] private CashRegisterUI cashUI;
     [SerializeField] private CashRegisterEnterHandler cashRegisterEnterHandler;
+    [SerializeField] private GameObject counterCashUI;
     private NpcController currentNpcForPayment;
     private float npcPaymentAmount; // 손님 결제 금액
     private float npcSendMe { get; set; }
@@ -237,6 +238,7 @@ public class CounterManager : MonoBehaviour
     //계산 시작
         public void StartCalculatorPayment(NpcController npc)
     {
+        
         currentNpcForPayment = npc;  //계산을 처리할 npc
 
         // 합계 설정(카드 결제 금액)
@@ -269,7 +271,7 @@ public class CounterManager : MonoBehaviour
             }
 
             // 플레이어 자금 반영(기존 로직 유지)
-            GameState.Instance.AddMoney(npcPaymentAmount);
+            GameState.Instance.AddRevenue(npcPaymentAmount);
 
             // 모니터 비우기 전에 완료 처리/정산 마무리
             CompletePayment(currentNpcForPayment);
@@ -308,6 +310,7 @@ public class CounterManager : MonoBehaviour
     public void StartCashPayment(NpcController npc)
     {
         Debug.Log("현금계산 시작");
+        counterCashUI.SetActive(true);
         currentNpcForPayment = npc;
 
         // 1) 이번 손님 총 결제금액 계산(모니터에서 가져오거나, 보유한 API 사용)
@@ -352,13 +355,14 @@ public class CounterManager : MonoBehaviour
     private void HandleCashPaymentSuccess() //계산 성공
     {
         // 매출 반영
-        GameState.Instance.AddMoney(npcSendMe - cashUI.GetCurrentGiven());
+        if ((npcSendMe - cashUI.GetCurrentGiven()) >= 0) GameState.Instance.AddRevenue(npcSendMe - cashUI.GetCurrentGiven());
+        else GameState.Instance.AddMoney(npcSendMe - cashUI.GetCurrentGiven());
         SettlementManager.Instance?.RegisterSaleAmount(npcPaymentAmount); // 현금 계산 값 최종 정산 변수에 가져가기 / 수정 : 준서
-        Debug.Log(npcSendMe + " "+ cashUI.GetCurrentGiven());
+        Debug.Log(npcSendMe + " " + cashUI.GetCurrentGiven());
 
         if (npcSendMe - npcPaymentAmount - cashUI.GetCurrentGiven() < 0f)
         {
-            float excessChange = - (npcSendMe - npcPaymentAmount - cashUI.GetCurrentGiven());  // 거스름돈 초과 된 돈 최종 정산에서 빼기
+            float excessChange = -(npcSendMe - npcPaymentAmount - cashUI.GetCurrentGiven());  // 거스름돈 초과 된 돈 최종 정산에서 빼기
             SettlementManager.Instance?.ExcessChangeCost(excessChange);
         }
 
@@ -375,6 +379,7 @@ public class CounterManager : MonoBehaviour
         npcSendMe = 0;
         cashSessionActive = false;
         UnsubscribeCashRegisterEvents();
+        counterCashUI.SetActive(false);
     }
 
     private void HandleCashPaymentFailure()//계산 실패(= 아직 모자람)
