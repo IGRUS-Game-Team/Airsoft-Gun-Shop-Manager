@@ -37,7 +37,7 @@ public class ClickObjectUIManager : MonoBehaviour
         SetCursorState(defaultCursorVisible, defaultLockMode);
     }
 
-    public void OpenUI(GameObject uiPanel) //계산기 시네머신으로 가버린다.
+    public void OpenUI(GameObject uiPanel) 
     {
         if (uiPanel == null)
         {
@@ -48,7 +48,7 @@ public class ClickObjectUIManager : MonoBehaviour
         isUIOpen = true;
         uiPanel.SetActive(isUIOpen);
         SetCursorState(isUIOpen, CursorLockMode.None);
-        FreezeCamera(isUIOpen); //얘가 문제임
+        FreezeCamera(isUIOpen); 
 
     }
 
