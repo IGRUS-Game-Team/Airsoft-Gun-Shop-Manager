@@ -26,8 +26,13 @@ public class CatalogUIManager : MonoBehaviour
         btnExhibition.onClick.AddListener(() => Populate(ItemCategory.Exhibition));
     }
 
-    void OnEnable() => Populate(null); // 기본: 전체
-    public void Reloading() => Populate(null);
+
+    void Start()
+    {
+       Populate(ItemCategory.MainWeapon); // 기본: 전체
+    }
+   
+    public void Reloading() => Populate(ItemCategory.MainWeapon);
 
 public void Populate(ItemCategory? filter)
     {
