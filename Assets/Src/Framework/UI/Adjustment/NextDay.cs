@@ -13,13 +13,13 @@ public class NextDay : MonoBehaviour
         nextDayButton.onClick.AddListener(ChangeNextDay);
     }
 
-    void Update()
-        {
-            if (Input.GetKeyDown(KeyCode.Space))
-            {
-                ChangeNextDay();
-            }
-        }
+    // void Update()
+    //     {
+    //         if (Input.GetKeyDown(KeyCode.Space))
+    //         {
+    //             ChangeNextDay();
+    //         }
+    //     }
 
     public void ChangeNextDay()
     {

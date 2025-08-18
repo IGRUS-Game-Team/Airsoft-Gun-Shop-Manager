@@ -153,6 +153,20 @@ public class SettlementManager : MonoBehaviour
         OnChanged?.Invoke(GetSnapshot());
     }
 
+    // 손님이 불평 기록이 있는 상태에서 결제 없이 나간 경우, 불만족 집계
+    public void OnCustomerLeftUnhappy(NpcController npc)
+    {
+        if (npc == null) return;
+
+        // complained HashSet에 들어 있었으면 1회만 카운트
+        bool had = complained.Remove(npc);
+        if (had)
+        {
+            dissatisfiedCustomers++;
+            OnChanged?.Invoke(GetSnapshot());
+        }
+    }
+
     // ───────── 라운드/하루 리셋(만족/불만족/레벨/평판 세트) ─────────
     [Flags] public enum KeepFlags { None = 0, KeepLevel = 1, KeepReputation = 2, KeepBoth = KeepLevel | KeepReputation }
     public void ResetForNewDay(KeepFlags keep = KeepFlags.KeepBoth)
@@ -165,7 +179,7 @@ public class SettlementManager : MonoBehaviour
 
         OnChanged?.Invoke(GetSnapshot());
     }
-
+    
     // ───────── Snapshot (UI에 한 번에 바인딩) ─────────
     public Snapshot GetSnapshot() => new Snapshot
     {
