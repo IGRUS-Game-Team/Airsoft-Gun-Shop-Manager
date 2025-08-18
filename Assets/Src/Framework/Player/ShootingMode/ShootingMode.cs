@@ -12,7 +12,7 @@ public class ShootingMode : MonoBehaviour
         {
             ActiveGun activeGun = other.GetComponentInChildren<ActiveGun>();
             activeGun.SwitchGun(shootingGunSO);
-            Destroy(this.gameObject);
+            this.gameObject.SetActive(false);
         }      
     }
 

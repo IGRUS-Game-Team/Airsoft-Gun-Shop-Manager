@@ -10,6 +10,7 @@ public class ActiveGun : MonoBehaviour
     [SerializeField] private PlayerShooting playerShooting;
     [SerializeField] CinemachineVirtualCamera playerFollowCamera;
     [SerializeField] GameObject zoomVignette;
+    [SerializeField] ShootingZoneManager shootingZoneManager;
 
     FirstPersonController firstPersonController;
     ShootingGun currentGun;
@@ -41,6 +42,10 @@ public class ActiveGun : MonoBehaviour
     void OnEnable()
     {
         playerShooting.Enable();
+        playerShooting.Player.Range.performed += ctx =>
+        {
+            shootingZoneManager.ToggleZones(this);
+        };
     }
 
     void OnDisable()
@@ -51,7 +56,7 @@ public class ActiveGun : MonoBehaviour
     void Update()
     {
         HandleZoom();
-
+        if (shootingGunSO == null || currentGun == null) return;
         if (isShooting && Time.time >= nextFireTime)
         {
             currentGun.Shoot(shootingGunSO);
@@ -61,6 +66,8 @@ public class ActiveGun : MonoBehaviour
 
     void Shooting()
     {
+        if (currentGun == null || shootingGunSO == null) return;
+
         timeSinceLastShot += Time.deltaTime;
 
         if (timeSinceLastShot >= shootingGunSO.FireRate)
@@ -72,6 +79,7 @@ public class ActiveGun : MonoBehaviour
 
     void HandleZoom()
     {
+        if (shootingGunSO == null) return;
         if (!shootingGunSO.CanZoom) return;
 
         if (playerShooting.Player.zoom.IsPressed())
@@ -93,15 +101,17 @@ public class ActiveGun : MonoBehaviour
         Debug.Log($"Player picked up {shootingGunSO.name}");
 
         if (currentGun) Destroy(currentGun.gameObject);
-        ShootingGun newGun = Instantiate(shootingGunSO.GunPrefab, transform).GetComponent<ShootingGun>();
-        currentGun = newGun;
+
+        currentGun = Instantiate(shootingGunSO.GunPrefab, transform).GetComponent<ShootingGun>();
         this.shootingGunSO = shootingGunSO;
+
+        InteractionController.Instance.OnClick -= Shooting;
+        var shootAction = playerShooting.Player.Shoot;
+        shootAction.started -= ctx => StartShooting();
+        shootAction.canceled -= ctx => StopShooting();
 
         if (shootingGunSO.IsAuto)
         {
-            InteractionController.Instance.OnClick -= Shooting;
-
-            var shootAction = playerShooting.Player.Shoot;
             shootAction.started += ctx => StartShooting();
             shootAction.canceled += ctx => StopShooting();
         }
@@ -115,12 +125,21 @@ public class ActiveGun : MonoBehaviour
     {
         isShooting = true;
         nextFireTime = Time.time;
-        AudioManager.Instance.PlayGunSound(currentGun.GunIndex); // 첫 클릭에만 소리 나오도록
     }
 
     void StopShooting()
     {
         isShooting = false;
+    }
+
+    public void DropGun()
+    {
+        if (currentGun != null)
+        {
+            Destroy(currentGun.gameObject);
+            currentGun = null;
+            shootingGunSO = null;
+        }
     }
 
     void OnDestroy()
