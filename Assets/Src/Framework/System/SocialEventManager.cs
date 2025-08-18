@@ -22,11 +22,16 @@ public class SocialEventManager : MonoBehaviour
     [Header("전략 확률 설정 (%)")]
     [SerializeField] private int[] strategyChances = { 50, 30, 20 }; // 배열로 관리
 
+    [Header("신문 화면 UI")]
+    [SerializeField] private GameObject newsPaperUI;
+
     //전략들 저장
     private ISocialEventStrategy currentStrategy; //인스턴스 참조
     private int itemId;  //상품 id -> 시장 변동률 적용할 상품
     private string itemName; //상품 이름
     private ItemData selectedItemData; //아이템 so
+    private int dailySentenceIndex; // 오늘의 문장 패턴
+    //private NewsPaperController newsPaperController;
 
 
     // 옵저버 패턴을 위한 이벤트들
@@ -38,9 +43,9 @@ public class SocialEventManager : MonoBehaviour
         if (Instance == null) Instance = this;
         else Destroy(gameObject);
     }
-    
-    
-    //전략 실행 및 데이터 전달
+
+
+    //전략 실행 및 데이터 전달 -> 8시가 되었을 때 불러짐
     public void ExecuteStrategy()
     {
         SelectRandomStrategy();//전략 랜덤 선택
@@ -49,14 +54,13 @@ public class SocialEventManager : MonoBehaviour
             Debug.Log("전략 설정 안됨");
             return;
         }
-        Debug.Log(" ExecuteStrategy 시작");
-        
+        Debug.Log(" ExecuteStrategy 매일 8시 갱신 시작");
 
         currentStrategy.GetEventStrategyData(); // 전략에서 랜덤 데이터 생성
 
         SelectRandomGun(); //사회이벤트 매니저에 랜덤 상품 저w장
         DeliverMarketPriceData();  // 먼저 시장 가격 업데이트
-        DeliverEventUIData();      // 그 다음 UI 업데이트
+        DeliverEventUIData();      // 그 다음 UI 업데이트 -> savecurrent정보들 랜덤값 셀렉 정보 저장
 
     }
 
@@ -77,10 +81,11 @@ public class SocialEventManager : MonoBehaviour
             string itemName = ItemNameResolver.Get(selectedItemData)?? "알 수 없는 상품";
 
             // 옵저버로 UI에 전달
+            Debug.Log("전달");
             OnEventUIUpdate?.Invoke(eventName, eventStatus, itemName);
+      
         }
     }
-
 
     //랜덤한 아이템 가져오기, 이름 아이디 저장
     private void SelectRandomGun()

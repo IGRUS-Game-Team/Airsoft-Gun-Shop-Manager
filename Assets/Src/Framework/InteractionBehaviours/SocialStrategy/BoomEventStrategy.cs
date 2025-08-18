@@ -12,10 +12,10 @@ public class BoomEventStrategy : ISocialEventStrategy
     private ItemDatabase itemDatabase;
     private List<int> cachedItemIds; // 아이템 id만
     private List<string> EventNames = new List<string>() {
-        "총기 규제 완화",
-        "슈팅 게임 히트",
-        "건 액션 영화 히트",
-        "밀리터리 페스티벌 개최"
+        "[ Relaxation of gun regulations ]", //0
+        "[ Popularity of shooting game ]", //1
+        "[ Popularity of gun-action movies ]", //2
+        "[ Military festival opens ]" //3
     }; //이벤트 이름 리스트 
 
 
@@ -24,7 +24,7 @@ public class BoomEventStrategy : ISocialEventStrategy
     private float currentMarketModifier;
     //private int currentDuration;
 
-    // 생성자 -> 호출시 랜덤값 생성
+    // -> 호출시 랜덤값 생성
     public void GetEventStrategyData()
     {
         GenerateRandomEventData();
@@ -40,7 +40,7 @@ public class BoomEventStrategy : ISocialEventStrategy
     }
 
     public string EventName => currentEventName;        
-    public string StatusText => "수요 증가";             
+    public string StatusText => "Increase in demand";             
     public float MarketModifier => currentMarketModifier; 
     // public int Duration => currentDuration;             
 }

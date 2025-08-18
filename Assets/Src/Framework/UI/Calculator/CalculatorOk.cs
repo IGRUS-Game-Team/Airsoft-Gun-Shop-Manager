@@ -29,7 +29,7 @@ public class CalculatorOk : MonoBehaviour
     //set 함수 
     public void SetInputPrice(string newPrice)
     {
-        Debug.Log("값 받기"); //왜 나오는거냐고
+        Debug.Log("값 받기"); 
         inputPrice = newPrice;
     }
 
