@@ -94,10 +94,11 @@ public class SocialEventManager : MonoBehaviour
             string itemName = ItemNameResolver.Get(selectedItemData)?? "알 수 없는 상품";
 
             // 옵저버로 UI에 전달
+            Debug.Log("전달");
             OnEventUIUpdate?.Invoke(eventName, eventStatus, itemName);
+      
         }
     }
-
 
     //랜덤한 아이템 가져오기, 이름 아이디 저장
     private void SelectRandomGun()
