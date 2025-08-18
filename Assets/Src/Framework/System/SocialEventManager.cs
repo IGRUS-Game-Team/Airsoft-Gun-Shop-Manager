@@ -15,6 +15,9 @@ public class SocialEventManager : MonoBehaviour
 {
     public static SocialEventManager Instance { get; private set; }//싱글톤
 
+     // === (추가) 시위 신호 이벤트 ===
+    public static event Action<bool> OnProtestToggled; // true=시작, false=종료
+
     //상품 목록 가져오기
     [Header("ItemDatabase 상품 데이터베이스")]
     [SerializeField] private ItemDatabase itemDatabase;
@@ -22,16 +25,18 @@ public class SocialEventManager : MonoBehaviour
     [Header("전략 확률 설정 (%)")]
     [SerializeField] private int[] strategyChances = { 50, 30, 20 }; // 배열로 관리
 
-    [Header("신문 화면 UI")]
-    [SerializeField] private GameObject newsPaperUI;
+      // === (추가) 시위 트리거 옵션 ===
+    [Header("시위 트리거(간단 키워드 매칭)")]
+    [SerializeField] private bool enableProtestSignal = true;
+    [SerializeField] private float protestAutoStopAfter = 25f;   // 초. 0 이하면 자동 종료 안 함
+    [SerializeField] private string[] protestKeywords = { "총기사건", "여론 악화", "Protest" };
 
     //전략들 저장
     private ISocialEventStrategy currentStrategy; //인스턴스 참조
     private int itemId;  //상품 id -> 시장 변동률 적용할 상품
     private string itemName; //상품 이름
     private ItemData selectedItemData; //아이템 so
-    private int dailySentenceIndex; // 오늘의 문장 패턴
-    //private NewsPaperController newsPaperController;
+    private Coroutine protestTimer;
 
 
     // 옵저버 패턴을 위한 이벤트들
@@ -45,7 +50,7 @@ public class SocialEventManager : MonoBehaviour
     }
 
 
-    //전략 실행 및 데이터 전달 -> 8시가 되었을 때 불러짐
+    //전략 실행 및 데이터 전달
     public void ExecuteStrategy()
     {
         SelectRandomStrategy();//전략 랜덤 선택
@@ -54,13 +59,21 @@ public class SocialEventManager : MonoBehaviour
             Debug.Log("전략 설정 안됨");
             return;
         }
-        Debug.Log(" ExecuteStrategy 매일 8시 갱신 시작");
+        Debug.Log(" ExecuteStrategy 시작");
+
 
         currentStrategy.GetEventStrategyData(); // 전략에서 랜덤 데이터 생성
 
         SelectRandomGun(); //사회이벤트 매니저에 랜덤 상품 저w장
         DeliverMarketPriceData();  // 먼저 시장 가격 업데이트
-        DeliverEventUIData();      // 그 다음 UI 업데이트 -> savecurrent정보들 랜덤값 셀렉 정보 저장
+        DeliverEventUIData();      // 그 다음 UI 업데이트
+        
+        // === (추가) 시위 신호 ===
+        if (enableProtestSignal)
+        {
+            if (ShouldStartProtest()) ToggleProtest(true);
+            else                      ToggleProtest(false); // 이번 전략이 시위가 아니면 종료 신호
+        }
 
     }
 
@@ -141,6 +154,47 @@ public class SocialEventManager : MonoBehaviour
             case 2: return new BoomEventStrategy();
             default: return new NormalEventStrategy();
         }
+    }
+
+     // === (추가) 시위 시작/종료 신호 쏘기 ===
+    public void ToggleProtest(bool on)
+    {
+        OnProtestToggled?.Invoke(on);
+
+        // 자동 종료 타이머
+        if (on && protestAutoStopAfter > 0f)
+        {
+            if (protestTimer != null) StopCoroutine(protestTimer);
+            protestTimer = StartCoroutine(CoStopProtestAfter(protestAutoStopAfter));
+        }
+        else
+        {
+            if (protestTimer != null) { StopCoroutine(protestTimer); protestTimer = null; }
+        }
+    }
+
+    private System.Collections.IEnumerator CoStopProtestAfter(float sec)
+    {
+        yield return new WaitForSeconds(sec);
+        OnProtestToggled?.Invoke(false);
+        protestTimer = null;
+    }
+
+    // === (추가) 현재 전략이 시위 트리거인지 간단 판정 ===
+    private bool ShouldStartProtest()
+    {
+        if (currentStrategy == null) return false;
+
+        string name   = currentStrategy.EventName  ?? string.Empty;
+        string status = currentStrategy.StatusText ?? string.Empty;
+
+        foreach (var k in protestKeywords)
+        {
+            if (string.IsNullOrEmpty(k)) continue;
+            if (name.Contains(k, StringComparison.OrdinalIgnoreCase))   return true;
+            if (status.Contains(k, StringComparison.OrdinalIgnoreCase)) return true;
+        }
+        return false;
     }
 
     
