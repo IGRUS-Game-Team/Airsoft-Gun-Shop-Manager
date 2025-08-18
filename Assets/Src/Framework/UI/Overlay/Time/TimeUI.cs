@@ -93,12 +93,10 @@ public class TimeUI : MonoBehaviour
 
         if (hours == 8 && minutes == 0)
         {
+            Debug.Log("8시 정각 - CheckAndExecute8AM");
             SocialEventManager.Instance.ExecuteStrategy();
-            Debug.Log("8시 정각 - 이벤트 실행");
+            
         }
     }
 
-    
-
-    
 }
