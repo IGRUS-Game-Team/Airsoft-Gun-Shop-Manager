@@ -8,6 +8,7 @@ public class LevelUpPopupUI : MonoBehaviour
     [Header("Refs")]
     [SerializeField] GameObject popupRoot;          // 전체 패널 오브젝트
     [SerializeField] TextMeshProUGUI levelTMP;      // "LV. 2" 텍스트
+    [SerializeField] TextMeshProUGUI levelBody;      // "LV. 2" 텍스트
     [SerializeField] CanvasGroup cg;                // UI 패널일 때
     [SerializeField] Image panelImage;              // UI Image일 때
     [SerializeField] SpriteRenderer panelSprite;    // 2D Sprite일 때
@@ -40,6 +41,18 @@ public class LevelUpPopupUI : MonoBehaviour
     IEnumerator ShowRoutine(int level)
     {
         if (levelTMP) levelTMP.text = $"LV. {level}";
+        switch (level)
+        {
+            case 1:
+                levelTMP.text = "";
+                break;
+            case 2:
+                levelTMP.text = " ";
+                break;
+            case 3:
+                levelTMP.text = " ";
+                break;
+        }
         
         popupRoot.SetActive(true);
 

@@ -27,35 +27,36 @@ public class CatalogUIManager : MonoBehaviour
     }
 
     void OnEnable() => Populate(null); // 기본: 전체
+    public void Reloading() => Populate(null);
 
 public void Populate(ItemCategory? filter)
-{
-    Debug.Log("populate");
-
-    // 1) Content 밑 자식 전부 제거 (안전하게 역순 삭제)
-    for (int i = content.childCount - 1; i >= 0; i--)
     {
-        Destroy(content.GetChild(i).gameObject);
+        Debug.Log("populate");
+
+        // 1) Content 밑 자식 전부 제거 (안전하게 역순 삭제)
+        for (int i = content.childCount - 1; i >= 0; i--)
+        {
+            Destroy(content.GetChild(i).gameObject);
+        }
+        spawned.Clear();
+
+        // 2) 새로 채우기
+        foreach (var item in database.items)
+        {
+            if (!item) continue;
+            if (filter.HasValue && item.category != filter.Value) continue;
+
+            var cell = Instantiate(cellPrefab, content);
+            cell.Setup(item, this);
+            spawned.Add(cell);
+        }
+
+        // 3) 레이아웃 강제 갱신 (빠른 클릭 시 UI 정리)
+        Canvas.ForceUpdateCanvases();
+
+        if (content is RectTransform rt)
+            UnityEngine.UI.LayoutRebuilder.ForceRebuildLayoutImmediate(rt);
     }
-    spawned.Clear();
-
-    // 2) 새로 채우기
-    foreach (var item in database.items)
-    {
-        if (!item) continue;
-        if (filter.HasValue && item.category != filter.Value) continue;
-
-        var cell = Instantiate(cellPrefab, content);
-        cell.Setup(item, this);
-        spawned.Add(cell);
-    }
-
-    // 3) 레이아웃 강제 갱신 (빠른 클릭 시 UI 정리)
-    Canvas.ForceUpdateCanvases();
-
-    if (content is RectTransform rt)
-        UnityEngine.UI.LayoutRebuilder.ForceRebuildLayoutImmediate(rt);
-}
 
 
 
