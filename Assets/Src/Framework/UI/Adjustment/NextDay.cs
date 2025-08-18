@@ -10,7 +10,7 @@ public class NextDay : MonoBehaviour
 
     private void Awake()
     {
-        nextDayButton.onClick.AddListener(ChangeNextDay);
+        //nextDayButton.onClick.AddListener(ChangeNextDay);
     }
 
     // void Update()

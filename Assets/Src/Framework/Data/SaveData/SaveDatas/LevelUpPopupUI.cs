@@ -40,6 +40,7 @@ public class LevelUpPopupUI : MonoBehaviour
     IEnumerator ShowRoutine(int level)
     {
         if (levelTMP) levelTMP.text = $"LV. {level}";
+        
         popupRoot.SetActive(true);
 
         yield return FadeTo(1f, fadeIn);           // 인

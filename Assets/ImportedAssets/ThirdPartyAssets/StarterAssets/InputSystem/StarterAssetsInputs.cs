@@ -42,10 +42,10 @@ namespace StarterAssets
 			JumpInput(value.isPressed);
 		}
 
-		// public void OnSprint(InputValue value)
-		// {
-		// 	SprintInput(value.isPressed);
-		// }
+		public void OnSprint(InputValue value)
+		{
+			SprintInput(value.isPressed);
+		}
 
 
 #else
