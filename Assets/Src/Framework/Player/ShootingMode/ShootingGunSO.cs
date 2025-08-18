@@ -9,4 +9,5 @@ public class ShootingGunSO : ScriptableObject
     public bool CanZoom = false;
     public float ZoonAmount = 10f;
     public float ZoomRotationSpeed = .3f;
+    public bool IsAuto = false;
 }

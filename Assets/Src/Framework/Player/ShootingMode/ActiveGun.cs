@@ -9,7 +9,6 @@ public class ActiveGun : MonoBehaviour
     [SerializeField] ShootingGunSO shootingGunSO;
     [SerializeField] private PlayerShooting playerShooting;
     [SerializeField] CinemachineVirtualCamera playerFollowCamera;
-    // [SerializeField] Camera GunCamera;
     [SerializeField] GameObject zoomVignette;
 
     FirstPersonController firstPersonController;
@@ -18,6 +17,8 @@ public class ActiveGun : MonoBehaviour
     float timeSinceLastShot = 0f;
     float defaultFOV;
     float defaultRotationSpeed;
+    private bool isShooting; // 마우스를 누르고 있는 중인지 여부 확인
+    private float nextFireTime; // 
 
     void Awake()
     {
@@ -50,6 +51,12 @@ public class ActiveGun : MonoBehaviour
     void Update()
     {
         HandleZoom();
+
+        if (isShooting && Time.time >= nextFireTime)
+        {
+            currentGun.Shoot(shootingGunSO);
+            nextFireTime = Time.time + shootingGunSO.FireRate;
+        }
     }
 
     void Shooting()
@@ -70,14 +77,12 @@ public class ActiveGun : MonoBehaviour
         if (playerShooting.Player.zoom.IsPressed())
         {
             playerFollowCamera.m_Lens.FieldOfView = shootingGunSO.ZoonAmount;
-            // GunCamera.FieldOfView = shootingGunSO.ZoomAmount;
             zoomVignette.SetActive(true);
             firstPersonController.ChangeRotationSpeed(shootingGunSO.ZoomRotationSpeed);
         }
         else
         {
             playerFollowCamera.m_Lens.FieldOfView = defaultFOV;
-            // GunCamera.FieldOfView = defaultFOV;
             zoomVignette.SetActive(false);
             firstPersonController.ChangeRotationSpeed(defaultRotationSpeed);
         }
@@ -91,12 +96,36 @@ public class ActiveGun : MonoBehaviour
         ShootingGun newGun = Instantiate(shootingGunSO.GunPrefab, transform).GetComponent<ShootingGun>();
         currentGun = newGun;
         this.shootingGunSO = shootingGunSO;
+
+        if (shootingGunSO.IsAuto)
+        {
+            InteractionController.Instance.OnClick -= Shooting;
+
+            var shootAction = playerShooting.Player.Shoot;
+            shootAction.started += ctx => StartShooting();
+            shootAction.canceled += ctx => StopShooting();
+        }
+        else
+        {
+            InteractionController.Instance.OnClick += Shooting;
+        }
+    }
+
+    void StartShooting()
+    {
+        isShooting = true;
+        nextFireTime = Time.time;
+        AudioManager.Instance.PlayGunSound(currentGun.GunIndex); // 첫 클릭에만 소리 나오도록
+    }
+
+    void StopShooting()
+    {
+        isShooting = false;
     }
 
     void OnDestroy()
     {
         playerShooting?.Disable();
-
         if (InteractionController.Instance != null)
         {
             InteractionController.Instance.OnClick -= Shooting;
