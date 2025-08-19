@@ -16,6 +16,7 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 
 public class SettlementManager : MonoBehaviour
 {
@@ -55,9 +56,10 @@ public class SettlementManager : MonoBehaviour
 
     // ───────── UI 바인딩 ─────────
     public event Action<Snapshot> OnChanged;
+    public UnityEvent OnComplainInvoked = new();
 
     // 읽기 전용 프로퍼티(필요 시 UI에서 직접 참조)
-    public int   SatisfiedCustomers    => satisfiedCustomers;
+    public int SatisfiedCustomers => satisfiedCustomers;
     public int   DissatisfiedCustomers => dissatisfiedCustomers;
     public int   ShopLevel             => shopLevel;
 
@@ -89,6 +91,8 @@ public class SettlementManager : MonoBehaviour
     {
         if (npc == null) return;
         complained.Add(npc);
+        OnComplainInvoked?.Invoke();
+
     }
 
     // ───────── 외부 API: 결제 완료(만족/불만족 분류) ─────────

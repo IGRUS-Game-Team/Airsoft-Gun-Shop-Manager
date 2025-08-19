@@ -7,6 +7,8 @@ using UnityEngine.UI;
 
 public class TimeUI : MonoBehaviour
 {
+    [System.Serializable] public class ComplainWithTimeEvent : UnityEvent<string> { }
+    public ComplainWithTimeEvent OnComplainWithTime = new();
     private NewsPaperController newsPaperController;
     //총 플레이타임을 초로 누적시켜서 계산
     [SerializeField] TextMeshProUGUI hourAndMinute;
@@ -24,7 +26,7 @@ public class TimeUI : MonoBehaviour
 
     [Header("하루 시작 시간 설정")]
     [SerializeField] private int dayStartHour = 8; // 오전 8시부터 시작
-    
+
     [Header("다음날로 넘어갈 때 사용되는 스크립트")]
     public UnityEvent OnDayChanged; // Inspector에서 설정 가능
 
@@ -33,11 +35,10 @@ public class TimeUI : MonoBehaviour
 
 
 
-    void Start()
+    private void Start()
     {
-        if (DeveloperMode) totalGameMinutes = startTime;
-        CheckAndExecute8AM();
-        
+        if (SettlementManager.Instance != null)
+            SettlementManager.Instance.OnComplainInvoked.AddListener(HandleComplainFromSettlement);
     }
 
     void Update()
@@ -52,7 +53,7 @@ public class TimeUI : MonoBehaviour
             timer -= 1f; // 1과 맞아 떨어지지 않는 순간을 대비하여
             UpdateTimeDisplay();
         }
-        
+
 
     }
 
@@ -85,7 +86,7 @@ public class TimeUI : MonoBehaviour
     {
         return totalGameMinutes; // 현실 1초 = 게임 1분일 경우
     }
-    
+
     private void CheckAndExecute8AM() //이벤트 시작 시간인 8시인지 확인하는 메서드
     {
         int hours = (totalGameMinutes / MINUTES_PER_HOUR) % HOURS_PER_DAY;
@@ -95,8 +96,20 @@ public class TimeUI : MonoBehaviour
         {
             Debug.Log("8시 정각 - CheckAndExecute8AM");
             SocialEventManager.Instance.ExecuteStrategy();
-            
+
         }
     }
 
+    private void HandleComplainFromSettlement()
+    {
+        string timeString = GetFormattedTime();
+        OnComplainWithTime.Invoke(timeString);
+    }
+
+    public string GetFormattedTime()
+    {
+        int hours = (totalGameMinutes / MINUTES_PER_HOUR) % HOURS_PER_DAY;
+        int minutes = totalGameMinutes % MINUTES_PER_HOUR;
+        return string.Format("{0:00}:{1:00}", hours, minutes);
+    }
 }
