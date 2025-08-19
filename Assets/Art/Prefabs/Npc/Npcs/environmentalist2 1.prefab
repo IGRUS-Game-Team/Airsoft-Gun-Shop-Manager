@@ -444,7 +444,6 @@ Transform:
   - {fileID: 7973872525269822717}
   - {fileID: 138440125787189251}
   - {fileID: 1053127245058830370}
-  - {fileID: 2756890659495256544}
   m_Father: {fileID: 5036461620481342066}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &793547888309039110
@@ -1288,13 +1287,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3626319631045538935}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.031, y: 0.099, z: 0.03}
+  m_LocalRotation: {x: -0.3535234, y: -0.4869265, z: -0.539359, w: 0.5890805}
+  m_LocalPosition: {x: -0.0010085787, y: 0.1170253, z: 0.043009005}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 4899724054461940431}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_Father: {fileID: 4607655629139897182}
+  m_LocalEulerAnglesHint: {x: -70.35, y: -34.885, z: -59.983}
 --- !u!1 &3686336631148705430
 GameObject:
   m_ObjectHideFlags: 0
@@ -2454,6 +2453,7 @@ Transform:
   - {fileID: 2511871287164465218}
   - {fileID: 4068690109559265556}
   - {fileID: 896906284714220654}
+  - {fileID: 2756890659495256544}
   m_Father: {fileID: 7364748376703796614}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &6340776562430922364
@@ -2829,7 +2829,7 @@ Animator:
   m_GameObject: {fileID: 7946477551492461494}
   m_Enabled: 1
   m_Avatar: {fileID: 9000000, guid: 55cc76c89776f674697f7a584f75b877, type: 3}
-  m_Controller: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 5bc0051df4c295146af5fbe904e0d12d, type: 2}
   m_CullingMode: 1
   m_UpdateMode: 0
   m_ApplyRootMotion: 1
@@ -2851,10 +2851,10 @@ NavMeshAgent:
   m_Enabled: 1
   m_AgentTypeID: 0
   m_Radius: 0.5
-  m_Speed: 3.5
-  m_Acceleration: 8
+  m_Speed: 1.5
+  m_Acceleration: 20
   avoidancePriority: 50
-  m_AngularSpeed: 120
+  m_AngularSpeed: 300
   m_StoppingDistance: 0
   m_AutoTraverseOffMeshLink: 1
   m_AutoBraking: 1
@@ -2875,11 +2875,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c26def0d8562fd148bbf12a717582f69, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  signPrefab: {fileID: 3373664083256254846, guid: 058cef287215691428fc5af77c7e9047, type: 3}
+  signSocket: {fileID: 2756890659495256544}
+  socketNameHint: HandSocket
+  signLocalPos: {x: 0, y: 0, z: 0}
+  signLocalEuler: {x: 0, y: 0, z: 0}
+  signLocalScale: {x: 1, y: 1, z: 1}
+  disableSignPhysics: 1
   walkAnim: Walking
-  picketAnim: Picket
-  stopDistance: 0.35
-  handSocket: {fileID: 2756890659495256544}
-  picketPrefab: {fileID: 8030420121516099720, guid: e84a6b5931425844890c15843f135605, type: 3}
+  protestAnim: Grab
+  leaveAnim: Walking
+  arriveDist: 0.35
+  exitDist: 1
 --- !u!1 &7976659580766517958
 GameObject:
   m_ObjectHideFlags: 0
