@@ -6622,6 +6622,64 @@ MonoBehaviour:
   slider: {fileID: 8780203754926811433}
   fillImage: {fileID: 8780203754315529704}
   fillDuration: 0.25
+  minValue: -100
+  maxValue: 100
+  colorStepSize: 10
+  stepColors:
+  - {r: 1, g: 0, b: 0, a: 1}
+  - {r: 1, g: 0.09215546, b: 0.0015686036, a: 1}
+  - {r: 1, g: 0.18431091, b: 0.0031372071, a: 1}
+  - {r: 1, g: 0.27646637, b: 0.004705811, a: 1}
+  - {r: 1, g: 0.36862183, b: 0.0062744142, a: 1}
+  - {r: 1, g: 0.46077728, b: 0.007843018, a: 1}
+  - {r: 1, g: 0.55293274, b: 0.009411622, a: 1}
+  - {r: 1, g: 0.6450882, b: 0.010980225, a: 1}
+  - {r: 1, g: 0.73724365, b: 0.0125488285, a: 1}
+  - {r: 1, g: 0.8293991, b: 0.014117433, a: 1}
+  - {r: 1, g: 0.92155457, b: 0.015686035, a: 1}
+  - {r: 0.90001374, g: 0.9294107, b: 0.014117863, a: 1}
+  - {r: 0.80001223, g: 0.93725395, b: 0.012549212, a: 1}
+  - {r: 0.70001066, g: 0.9450972, b: 0.01098056, a: 1}
+  - {r: 0.60000914, g: 0.95294046, b: 0.009411909, a: 1}
+  - {r: 0.5000076, g: 0.9607837, b: 0.007843258, a: 1}
+  - {r: 0.40000612, g: 0.968627, b: 0.006274606, a: 1}
+  - {r: 0.3000046, g: 0.97647023, b: 0.0047059553, a: 1}
+  - {r: 0.20000303, g: 0.9843135, b: 0.0031373026, a: 1}
+  - {r: 0.100001514, g: 0.99215674, b: 0.0015686508, a: 1}
+  - {r: 0, g: 1, b: 0, a: 1}
+  colorGradient:
+    serializedVersion: 2
+    key0: {r: 1, g: 0, b: 0, a: 1}
+    key1: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
+    key2: {r: 0, g: 1, b: 0, a: 0}
+    key3: {r: 0, g: 0, b: 0, a: 0}
+    key4: {r: 0, g: 0, b: 0, a: 0}
+    key5: {r: 0, g: 0, b: 0, a: 0}
+    key6: {r: 0, g: 0, b: 0, a: 0}
+    key7: {r: 0, g: 0, b: 0, a: 0}
+    ctime0: 0
+    ctime1: 32768
+    ctime2: 65535
+    ctime3: 0
+    ctime4: 0
+    ctime5: 0
+    ctime6: 0
+    ctime7: 0
+    atime0: 0
+    atime1: 65535
+    atime2: 0
+    atime3: 0
+    atime4: 0
+    atime5: 0
+    atime6: 0
+    atime7: 0
+    m_Mode: 0
+    m_ColorSpace: -1
+    m_NumColorKeys: 3
+    m_NumAlphaKeys: 2
+  tintedGraphics: []
+  tintedSprites: []
+  preserveAlpha: 1
 --- !u!1 &8780203755790875059
 GameObject:
   m_ObjectHideFlags: 0
@@ -6947,7 +7005,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0.5}
   m_AnchorMax: {x: 1, y: 0.5}
   m_AnchoredPosition: {x: 847.6433, y: 506.9458}
-  m_SizeDelta: {x: 327.8816, y: 64}
+  m_SizeDelta: {x: 327.8816, y: 72.5}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &8780203756139365077
 CanvasRenderer:

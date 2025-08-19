@@ -28,8 +28,8 @@ public class ReputationState : MonoBehaviour
     [SerializeField] private float currentRep = 0f;   // -100~100
     [SerializeField] private TextMeshProUGUI currentRepTMP;
     [SerializeField] private bool useInteger = true;   // 정수 표시 여부
-[SerializeField] private int  decimals   = 0;      // 소수 자릿수 (useInteger=false일 때 사용)
-[SerializeField] private bool showPlusSign = false; // 양수에 + 붙일지
+    [SerializeField] private int  decimals   = 0;      // 소수 자릿수 (useInteger=false일 때 사용)
+    [SerializeField] private bool showPlusSign = false; // 양수에 + 붙일지
 
     // 새 이벤트
     public FloatEvent OnChanged01 = new FloatEvent();  // 0=-100, 0.5=0, 1=+100

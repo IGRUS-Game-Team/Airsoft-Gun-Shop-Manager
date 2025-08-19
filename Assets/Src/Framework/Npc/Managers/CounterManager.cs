@@ -191,7 +191,7 @@ public class CounterManager : MonoBehaviour
 
     public bool HasCheckoutStarted(NpcController npc)
     {
-        return npcCheckoutTargetCount.ContainsKey(npc);
+        return npc != null && npcCheckoutTargetCount?.ContainsKey(npc) == true;
     }
 
     Transform TakeRandomFreeSlot()
