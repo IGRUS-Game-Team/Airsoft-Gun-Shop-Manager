@@ -38,13 +38,20 @@ public void Setup(ItemData item, CatalogUIManager owner)
 }
 
 
-    public void RefreshText()
-    {
-        // 커스텀 이름이 있으면 그걸로; 없으면 SO의 itemName 사용
-        txtName.text = ItemOverrideStore.Instance.GetDisplayName(data);
-        txtPrice.text = data.baseCost.ToString();
-    }
+public void RefreshText()
+{
+    if (ItemOverrideStore.Instance == null)
+        Debug.LogError("[ShopItemUnlockCELL] ItemOverrideStore.Instance 가 null!");
+    if (data == null)
+        Debug.LogError("[ShopItemUnlockCELL] data 가 null!");
+    if (txtName == null)
+        Debug.LogError("[ShopItemUnlockCELL] txtName 이 null!");
+    if (txtPrice == null)
+        Debug.LogError("[ShopItemUnlockCELL] txtPrice 이 null!");
 
+    txtName.text = ItemOverrideStore.Instance.GetDisplayName(data);
+    txtPrice.text = data.baseCost.ToString();
+}
     private void RefreshButtonVisual()
     {
         if (unlocked)

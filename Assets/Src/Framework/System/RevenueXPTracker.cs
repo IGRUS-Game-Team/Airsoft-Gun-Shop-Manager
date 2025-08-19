@@ -49,33 +49,39 @@ public class RevenueXPTracker : MonoBehaviour
     }
 
     // 매출 발생 → 경험치 증가(단조)
-    private void AddXPFromRevenue(float amount)
+private void AddXPFromRevenue(float amount)
+{
+    if (amount <= 0f) return;
+    Debug.Log($"[RevenueXPTracker] AddXPFromRevenue 호출됨: {amount}");
+
+    totalRevenueXP += amount;
+    Debug.Log($"[RevenueXPTracker] 총 XP = {totalRevenueXP}");
+
+    RecalcAndBroadcast();
+}
+
+private void RecalcAndBroadcast()
+{
+    float goal = Mathf.Max(1f, FinalGoal);
+    float t01  = Mathf.Clamp01(totalRevenueXP / goal);
+
+    int lvl = 0;
+    if (levelThresholds != null)
+        for (int i = 0; i < levelThresholds.Length; i++)
+            if (totalRevenueXP >= levelThresholds[i]) lvl = i + 1;
+
+    Debug.Log($"[RevenueXPTracker] 레벨 계산됨: {lvl}, 이전 레벨: {CurrentLevel}");
+
+    OnXPChanged.Invoke(totalRevenueXP);
+    OnProgress01.Invoke(t01);
+
+    if (lvl != CurrentLevel)
     {
-        if (amount <= 0f) return;
-        totalRevenueXP += amount;
-        RecalcAndBroadcast();
+        Debug.Log($"[RevenueXPTracker] 레벨 변경 감지! {CurrentLevel} → {lvl}");
+        CurrentLevel = lvl;
+        OnLevelChanged.Invoke(CurrentLevel);
     }
-
-    private void RecalcAndBroadcast()
-    {
-        float goal = Mathf.Max(1f, FinalGoal);
-        float t01  = Mathf.Clamp01(totalRevenueXP / goal);
-
-        // 레벨 계산
-        int lvl = 0;
-        if (levelThresholds != null)
-            for (int i = 0; i < levelThresholds.Length; i++)
-                if (totalRevenueXP >= levelThresholds[i]) lvl = i + 1;
-
-        OnXPChanged.Invoke(totalRevenueXP);
-        OnProgress01.Invoke(t01);
-
-        if (lvl != CurrentLevel)
-        {
-            CurrentLevel = lvl;
-            OnLevelChanged.Invoke(CurrentLevel);
-        }
-    }
+}
 
     private void BroadcastAll()
     {

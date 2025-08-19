@@ -1,3 +1,4 @@
+using TMPro;
 using UnityEngine;
 
 public class DoorTrigger : MonoBehaviour
@@ -43,6 +44,8 @@ public class DoorTrigger : MonoBehaviour
     [Range(0, 100)] [SerializeField] int minFinalChance = 5;
     [Range(0, 100)] [SerializeField] int maxFinalChance = 95;
 
+    [SerializeField] TextMeshProUGUI Customer;
+
     const string TagNpc = "Npc";
     int insideCount;
 
@@ -73,6 +76,7 @@ public class DoorTrigger : MonoBehaviour
 
         /* ── 입장 확정 ── */
         insideCount++;
+        Customer.text = "Customer : " + insideCount.ToString();
         SettlementManager.Instance?.RegisterCustomerEnter(npc);
         npc.SetDoor(this);
         npc.inStore = true;
@@ -87,6 +91,7 @@ public class DoorTrigger : MonoBehaviour
         if (npc != null && npc.inStore && npc.isLeaving)
         {
             insideCount = Mathf.Max(0, insideCount - 1);
+            Customer.text = "Customer : " + insideCount.ToString();
             npc.inStore = false;
         }
     }
