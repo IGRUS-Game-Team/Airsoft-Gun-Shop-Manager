@@ -32,7 +32,7 @@ public class NewsPaperObject : MonoBehaviour, IInteractable
     //받은 값 저장 -> 8시마다
     public void SaveCurrentEvent(string EeventName, string EeventStatus, string EitemName) 
     {
-        newsPaperController.SaveData(EeventName, EeventStatus, EitemName);//Eevent로 수정
+        newsPaperController.SaveData(EeventName, EeventStatus, EitemName);
         newsPaperController.SelectRandomSentence(); //랜덤 문장 선택 -> 느려야하는 SelectRandomSentence
        
 
