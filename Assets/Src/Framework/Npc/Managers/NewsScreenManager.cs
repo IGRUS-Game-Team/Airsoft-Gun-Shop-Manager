@@ -24,10 +24,6 @@ public class NewsScreenManager : MonoBehaviour
 
     //총기 규제 이벤트
     private static event Action gunProtestEvent; //총기 규제 시위시 발생하는 npc 이벤트
-    void Start()
-    {
-        //TvScreen.SetActive(false);
-    }
 
     void OnEnable()
     {

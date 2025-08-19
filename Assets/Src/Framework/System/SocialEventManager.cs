@@ -67,7 +67,7 @@ public class SocialEventManager : MonoBehaviour
 
         SelectRandomGun(); //사회이벤트 매니저에 랜덤 상품 저w장
         DeliverMarketPriceData();  // 먼저 시장 가격 업데이트
-        DeliverEventUIData();      // 그 다음 UI 업데이트
+        DeliverEventUIData();      // 그 다음 UI 업데이트 -> savedata
         
         // === (추가) 시위 신호 ===
         if (enableProtestSignal)
