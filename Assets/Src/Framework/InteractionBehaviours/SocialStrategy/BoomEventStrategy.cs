@@ -11,11 +11,13 @@ public class BoomEventStrategy : ISocialEventStrategy
 {
     private ItemDatabase itemDatabase;
     private List<int> cachedItemIds; // 아이템 id만
+
+   
     private List<string> EventNames = new List<string>() {
-        "[ Relaxation of gun regulations ]", //0
-        "[ Popularity of shooting game ]", //1
-        "[ Popularity of gun-action movies ]", //2
-        "[ Military festival opens ]" //3
+        "[ Relaxation of gun regulations ]", // 총기 규제 완화
+        "[ Popularity of shooting game ]", // 슈팅 게임 인기
+        "[ Popularity of gun-action movies ]", // 건액션 영화 인기
+        "[ Military festival opens ]" // 밀리터리 페스티벌
     }; //이벤트 이름 리스트 
 
 
