@@ -1,5 +1,50 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!1 &517458936307610753
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4421475890309313375}
+  - component: {fileID: 296155956801214264}
+  m_Layer: 0
+  m_Name: MarketPriceDataManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &4421475890309313375
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 517458936307610753}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2752836134298421583}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &296155956801214264
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 517458936307610753}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6fe6a84c1df2fe846974192cb21e6ad3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  itemDatabase: {fileID: 11400000, guid: 99a681d5d2baf7c469843baf34bca862, type: 2}
 --- !u!1 &932772379001168004
 GameObject:
   m_ObjectHideFlags: 0
@@ -421,7 +466,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   exitPoint: {fileID: 2561085439846907996}
   maxInStore: 5
-  baseEntryChancePercent: 100
+  baseEntryChancePercent: 70
   repAtLow: 0
   repAtHigh: 100
   bonusAtLowRep: -30
@@ -469,7 +514,8 @@ Transform:
   - {fileID: 798944044356543270}
   - {fileID: 8010017840091594079}
   - {fileID: 245869588804094908}
-  - {fileID: 2940027898771158113}
+  - {fileID: 4421475890309313375}
+  - {fileID: 7926215898563582545}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &6929514001218485653
@@ -643,6 +689,59 @@ MonoBehaviour:
   cashUI: {fileID: 0}
   cashRegisterEnterHandler: {fileID: 0}
   counterCashUI: {fileID: 0}
+--- !u!1 &8343688530397466731
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 7926215898563582545}
+  - component: {fileID: 4640700629301694477}
+  m_Layer: 0
+  m_Name: NewsScreenManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &7926215898563582545
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8343688530397466731}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2752836134298421583}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &4640700629301694477
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8343688530397466731}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 31394f0f749975a488eaddaba8a324dd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  TvScreen: {fileID: 0}
+  newsImage: {fileID: 0}
+  gunRegulationSprite: {fileID: 21300000, guid: c3926c1ba4f6c2b4585debc532ddebd4, type: 3}
+  shootingGameSprite: {fileID: 21300000, guid: f12f3da817e6f364893ab64a253aacfb, type: 3}
+  actionMovieSprite: {fileID: 21300000, guid: 8a7df117f7bea1d4288452e078959f33, type: 3}
+  militaryFestivalSprite: {fileID: 21300000, guid: 2c1d84879759cb2468be513fe2213366, type: 3}
+  shootingIncidentSprite: {fileID: 21300000, guid: fc9d2d2118f4dd14ea3fd6dc906b69d3, type: 3}
+  economicCrisisSprite: {fileID: 21300000, guid: a9c36238b9bfab744b568deb8a90e1ff, type: 3}
+  gunProtestSprite: {fileID: 21300000, guid: 66083f7e05c49d64cbb5c3a39cb16f9b, type: 3}
 --- !u!1 &8444636183546904808
 GameObject:
   m_ObjectHideFlags: 0
