@@ -1,8 +1,12 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
-using System.IO.Compression;
 using Cinemachine;
 using StarterAssets;
+using Unity.VisualScripting;
+
+/// <summary>
+/// 이지연 
+/// </summary>
 
 public class ActiveGun : MonoBehaviour
 {
@@ -12,14 +16,18 @@ public class ActiveGun : MonoBehaviour
     [SerializeField] GameObject zoomVignette;
     [SerializeField] ShootingZoneManager shootingZoneManager;
 
-    FirstPersonController firstPersonController;
+    FirstPersonController firstPersonController; // 사격 반동 조절
     ShootingGun currentGun;
 
-    float timeSinceLastShot = 0f;
+    float timeSinceLastShot = 0f; // 단발 사격 시간 계산
     float defaultFOV;
     float defaultRotationSpeed;
     private bool isShooting; // 마우스를 누르고 있는 중인지 여부 확인
-    private float nextFireTime; // 
+    private float nextFireTime; // 자동 사격 간격 확인
+
+    private System.Action onClickHandler; // 단발사격용(InteractionController.OnClick)의 핸들
+    private System.Action<InputAction.CallbackContext> onShootStartedHandler;  // 자동사격 시작
+    private System.Action<InputAction.CallbackContext> onShootCanceledHandler; // 자동사격 종료
 
     void Awake()
     {
@@ -27,11 +35,6 @@ public class ActiveGun : MonoBehaviour
         playerShooting = new PlayerShooting();
         defaultFOV = playerFollowCamera.m_Lens.FieldOfView;
         defaultRotationSpeed = firstPersonController.RotationSpeed;
-
-        if (InteractionController.Instance != null)
-        {
-            InteractionController.Instance.OnClick += Shooting;
-        }
     }
 
     void Start()
@@ -39,35 +42,45 @@ public class ActiveGun : MonoBehaviour
         currentGun = GetComponentInChildren<ShootingGun>();
     }
 
-    void OnEnable()
-    {
-        playerShooting.Enable();
-        playerShooting.Player.Range.performed += ctx =>
-        {
-            shootingZoneManager.ToggleZones(this);
-        };
-    }
-
-    void OnDisable()
-    {
-        playerShooting.Disable();
-    }
-
     void Update()
     {
         HandleZoom();
         if (shootingGunSO == null || currentGun == null) return;
-        if (isShooting && Time.time >= nextFireTime)
+
+        if (isShooting && Time.time >= nextFireTime) // 자동 사격
         {
             currentGun.Shoot(shootingGunSO);
             nextFireTime = Time.time + shootingGunSO.FireRate;
         }
     }
 
-    void Shooting()
+    void OnEnable()
+    {
+        playerShooting.Enable(); // 사격 Input 활성화
+        playerShooting.Player.Range.performed += OnRangePerformed; // Range 이벤트 구독
+    }
+
+    void OnDisable()
+    {
+        playerShooting.Player.Range.performed -= OnRangePerformed; // Range 이벤트 해제
+        UnsubscribeShootInput(); // 사격 관련 이벤트 확실히 해제
+        playerShooting.Disable(); // 사격 Input 비활성화
+    }
+
+    void OnDestroy()
+    {
+        playerShooting?.Disable();
+        UnsubscribeShootInput();
+    }
+
+    void OnRangePerformed(InputAction.CallbackContext ctx)
+    {
+        shootingZoneManager.ToggleZones(this);
+    }
+
+    void SingleShot() // 단발 사격
     {
         if (currentGun == null || shootingGunSO == null) return;
-
         timeSinceLastShot += Time.deltaTime;
 
         if (timeSinceLastShot >= shootingGunSO.FireRate)
@@ -77,7 +90,18 @@ public class ActiveGun : MonoBehaviour
         }
     }
 
-    void HandleZoom()
+    void StartShooting()
+    {
+        isShooting = true;
+        nextFireTime = Time.time;
+    }
+
+    void StopShooting()
+    {
+        isShooting = false;
+    }
+
+    void HandleZoom() // 우클릭 줌
     {
         if (shootingGunSO == null) return;
         if (!shootingGunSO.CanZoom) return;
@@ -100,54 +124,86 @@ public class ActiveGun : MonoBehaviour
     {
         Debug.Log($"Player picked up {shootingGunSO.name}");
 
-        if (currentGun) Destroy(currentGun.gameObject);
+        UnsubscribeShootInput(); // 이전 사격 이벤트 전부 해제 
 
-        currentGun = Instantiate(shootingGunSO.GunPrefab, transform).GetComponent<ShootingGun>();
-        this.shootingGunSO = shootingGunSO;
-
-        InteractionController.Instance.OnClick -= Shooting;
-        var shootAction = playerShooting.Player.Shoot;
-        shootAction.started -= ctx => StartShooting();
-        shootAction.canceled -= ctx => StopShooting();
-
-        if (shootingGunSO.IsAuto)
+        if (currentGun != null) // 이전 총 제거
         {
-            shootAction.started += ctx => StartShooting();
-            shootAction.canceled += ctx => StopShooting();
+            Destroy(currentGun.gameObject);
+            currentGun = null;
         }
-        else
+
+        this.shootingGunSO = shootingGunSO; // SO 교체
+
+        if (shootingGunSO != null && shootingGunSO.GunPrefab != null) // 새로운 총 생성
         {
-            InteractionController.Instance.OnClick += Shooting;
+            currentGun = Instantiate(shootingGunSO.GunPrefab, transform).GetComponent<ShootingGun>();
+
+            Debug.Log($"Switched to gun: {shootingGunSO.name}");
+
+            SubscribeShootInput();
         }
-    }
-
-    void StartShooting()
-    {
-        isShooting = true;
-        nextFireTime = Time.time;
-    }
-
-    void StopShooting()
-    {
-        isShooting = false;
+        else Debug.LogWarning("SwitchGun failed");
     }
 
     public void DropGun()
     {
+        UnsubscribeShootInput();
+
         if (currentGun != null)
         {
             Destroy(currentGun.gameObject);
             currentGun = null;
-            shootingGunSO = null;
+        }
+        shootingGunSO = null;
+    }
+
+    void SubscribeShootInput()
+    {
+        if (shootingGunSO == null) return;
+
+        if (shootingGunSO.IsAuto) // 자동사격
+        {
+            if (onShootStartedHandler == null)
+                onShootStartedHandler = (ctx) => StartShooting();
+
+            if (onShootCanceledHandler == null)
+                onShootCanceledHandler = (ctx) => StopShooting();
+
+            playerShooting.Player.Shoot.started += onShootStartedHandler;
+            playerShooting.Player.Shoot.canceled += onShootCanceledHandler;
+
+            if (InteractionController.Instance != null && onClickHandler != null)
+                InteractionController.Instance.OnClick -= onClickHandler;
+        }
+        else // 단발사격
+        {
+            if (onClickHandler == null)
+            {
+                onClickHandler = () => SingleShot();
+            }
+
+            if (InteractionController.Instance != null)
+            {
+                InteractionController.Instance.OnClick += onClickHandler;
+            }
+            
+            if (onShootStartedHandler != null)
+            {
+                playerShooting.Player.Shoot.started -= onShootStartedHandler;
+                playerShooting.Player.Shoot.canceled -= onShootCanceledHandler;
+            }
         }
     }
 
-    void OnDestroy()
+    void UnsubscribeShootInput()
     {
-        playerShooting?.Disable();
-        if (InteractionController.Instance != null)
+        if (onShootStartedHandler != null)
         {
-            InteractionController.Instance.OnClick -= Shooting;
+            playerShooting.Player.Shoot.started -= onShootStartedHandler;
+            playerShooting.Player.Shoot.canceled -= onShootCanceledHandler;
         }
+        
+        if (InteractionController.Instance != null && onClickHandler != null)
+            InteractionController.Instance.OnClick -= onClickHandler;
     }
 }

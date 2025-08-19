@@ -32,7 +32,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -0.047, y: 0.013, z: -0.018}
-  m_LocalScale: {x: 0.82523763, y: 0.8252375, z: 0.82523763}
+  m_LocalScale: {x: 0.9516641, y: 0.9516639, z: 0.9516641}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 2027078809556007617}
@@ -239,8 +239,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4893648399101458679}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0.28989208, z: -0, w: 0.9570594}
-  m_LocalPosition: {x: 1.6509469, y: 0.78320986, z: 1.9803301}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -0.013, y: 0.027, z: 0.679}
   m_LocalScale: {x: 0.056479998, y: 0.05648, z: 0.056479998}
   m_ConstrainProportionsScale: 1
   m_Children: []
@@ -329,7 +329,7 @@ ParticleSystem:
     startLifetime:
       serializedVersion: 2
       minMaxState: 3
-      scalar: 0.33
+      scalar: 0.5
       minScalar: 0.0001
       maxCurve:
         serializedVersion: 2
@@ -1175,7 +1175,7 @@ ParticleSystem:
       countCurve:
         serializedVersion: 2
         minMaxState: 0
-        scalar: 30
+        scalar: 50
         minScalar: 150
         maxCurve:
           serializedVersion: 2
@@ -1570,16 +1570,16 @@ ParticleSystem:
       maxColor: {r: 1, g: 1, b: 1, a: 1}
       maxGradient:
         serializedVersion: 2
-        key0: {r: 1, g: 0.7750001, b: 0, a: 1}
-        key1: {r: 1, g: 0.91509426, b: 0.91509426, a: 1}
-        key2: {r: 0.42745098, g: 0, b: 0, a: 1}
+        key0: {r: 0.6509433, g: 1, b: 0.9250491, a: 1}
+        key1: {r: 0.99191195, g: 1, b: 0.6194968, a: 1}
+        key2: {r: 1, g: 1, b: 1, a: 1}
         key3: {r: 0.42745098, g: 0, b: 0, a: 0}
         key4: {r: 1, g: 0, b: 0, a: 0}
         key5: {r: 1, g: 0, b: 0, a: 0}
         key6: {r: 0, g: 0, b: 0, a: 0}
         key7: {r: 0, g: 0, b: 0, a: 0}
         ctime0: 0
-        ctime1: 65535
+        ctime1: 32440
         ctime2: 65535
         ctime3: 65535
         ctime4: 65535
@@ -1596,7 +1596,7 @@ ParticleSystem:
         atime7: 0
         m_Mode: 0
         m_ColorSpace: 0
-        m_NumColorKeys: 2
+        m_NumColorKeys: 3
         m_NumAlphaKeys: 3
       minGradient:
         serializedVersion: 2
@@ -5073,8 +5073,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5990354256587778812}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0.28989208, z: -0, w: 0.9570594}
-  m_LocalPosition: {x: 1.6586546, y: 0.78196734, z: 1.9756954}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -0.003, y: 0.027, z: 0.442}
   m_LocalScale: {x: 0.22592008, y: 0.22592, z: 0.22592008}
   m_ConstrainProportionsScale: 1
   m_Children: []
@@ -6009,7 +6009,7 @@ ParticleSystem:
       countCurve:
         serializedVersion: 2
         minMaxState: 0
-        scalar: 50
+        scalar: 1
         minScalar: 150
         maxCurve:
           serializedVersion: 2
@@ -6404,17 +6404,17 @@ ParticleSystem:
       maxColor: {r: 1, g: 1, b: 1, a: 1}
       maxGradient:
         serializedVersion: 2
-        key0: {r: 0.94554913, g: 1, b: 0.34276712, a: 1}
-        key1: {r: 0.99752676, g: 1, b: 0.8836478, a: 1}
-        key2: {r: 0.8745815, g: 1, b: 0.8459119, a: 1}
-        key3: {r: 0.42745098, g: 0, b: 0, a: 0}
+        key0: {r: 0.5377357, g: 1, b: 0.96555674, a: 1}
+        key1: {r: 1, g: 1, b: 1, a: 1}
+        key2: {r: 1, g: 1, b: 1, a: 1}
+        key3: {r: 0.99752676, g: 1, b: 0.8836478, a: 0}
         key4: {r: 1, g: 0, b: 0, a: 0}
         key5: {r: 1, g: 0, b: 0, a: 0}
         key6: {r: 0, g: 0, b: 0, a: 0}
         key7: {r: 0, g: 0, b: 0, a: 0}
-        ctime0: 1928
-        ctime1: 65535
-        ctime2: 65535
+        ctime0: 2182
+        ctime1: 37532
+        ctime2: 64880
         ctime3: 65535
         ctime4: 65535
         ctime5: 65535
@@ -6430,7 +6430,7 @@ ParticleSystem:
         atime7: 0
         m_Mode: 0
         m_ColorSpace: 0
-        m_NumColorKeys: 2
+        m_NumColorKeys: 4
         m_NumAlphaKeys: 2
       minGradient:
         serializedVersion: 2
