@@ -1,15 +1,11 @@
 using TMPro;
 using UnityEngine;
+using UnityEngine.Events;
 
 /// <summary>
 /// 25/8/3 박정민
 /// 돈관리용 클래스입니다
 /// </summary>
-
-//TODO : 돈 표시하는 UI에 Text 만들고 연결하기
-//       그 후 주석 풀기
-using UnityEngine.Events;
-
 public class GameState : MonoBehaviour
 {
     public static GameState Instance { get; private set; }
@@ -18,9 +14,14 @@ public class GameState : MonoBehaviour
     [SerializeField] private float money = 0;
     [SerializeField] private TextMeshProUGUI moneyText;
 
-    // 잔액 변경(모든 돈 변화 공통)
+    // 기존: 잔액만 알림
     public UnityEvent<float> OnMoneyChanged = new();
-    // ★ 매출(경험치 포함) 전용 이벤트
+
+    // 새로 추가: 변화량 + 현재 잔액
+    [System.Serializable] public class MoneyDeltaEvent : UnityEvent<float, float> { }
+    public MoneyDeltaEvent OnMoneyDelta = new();
+
+    // 매출 전용 이벤트
     public UnityEvent<float> OnRevenueAdded = new();
 
     public float Money => money;
@@ -35,31 +36,34 @@ public class GameState : MonoBehaviour
     {
         UpdateMoneyUI();
         OnMoneyChanged.Invoke(money);
+        OnMoneyDelta.Invoke(0f, money); // 시작 시 delta=0
     }
 
     public void SetMoney(float value)
     {
+        float delta = value - money;
         money = value;
         UpdateMoneyUI();
         OnMoneyChanged.Invoke(money);
+        OnMoneyDelta.Invoke(delta, money);
     }
 
-    // 일반 입금(대출/환급 등 포함) → 경험치 미포함
     public void AddMoney(float amount)
     {
         money += amount;
         UpdateMoneyUI();
         OnMoneyChanged.Invoke(money);
+        OnMoneyDelta.Invoke(amount, money);
     }
 
-    // ★ 매출 전용: 잔액 증가 + 경험치 반영
     public void AddRevenue(float amount)
     {
-        if (amount <= 0f) return; // 음수 매출 방지
+        if (amount <= 0f) return;
         money += amount;
         UpdateMoneyUI();
         OnMoneyChanged.Invoke(money);
-        OnRevenueAdded.Invoke(amount); // 경험치로 처리됨
+        OnMoneyDelta.Invoke(amount, money);
+        OnRevenueAdded.Invoke(amount);
     }
 
     public bool SpendMoney(float amount)
@@ -68,6 +72,7 @@ public class GameState : MonoBehaviour
         money -= amount;
         UpdateMoneyUI();
         OnMoneyChanged.Invoke(money);
+        OnMoneyDelta.Invoke(-amount, money);
         return true;
     }
 
