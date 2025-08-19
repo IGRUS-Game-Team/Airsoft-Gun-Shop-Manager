@@ -279,9 +279,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d8765479ee46a24439b21fe87321f2e4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  money: 300000
+  money: 3000
   moneyText: {fileID: 0}
   OnMoneyChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  OnMoneyDelta:
     m_PersistentCalls:
       m_Calls: []
   OnRevenueAdded:

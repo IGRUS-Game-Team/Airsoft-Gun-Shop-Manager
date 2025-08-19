@@ -309,7 +309,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: -61.5}
-  m_SizeDelta: {x: 130, y: 40}
+  m_SizeDelta: {x: 130, y: 45.7}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &2927023972053982917
 CanvasRenderer:
@@ -978,8 +978,8 @@ MonoBehaviour:
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4294967295
-  m_fontColor: {r: 1, g: 1, b: 1, a: 1}
+    rgba: 4279238400
+  m_fontColor: {r: 0, g: 1, b: 0.0575552, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:
@@ -996,8 +996,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 12
-  m_fontSizeBase: 12
+  m_fontSize: 21.13
+  m_fontSizeBase: 21.13
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -1387,6 +1387,7 @@ MonoBehaviour:
   unitPriceText: {fileID: 2568101016111719744}
   amountText: {fileID: 3618039744572621549}
   totalText: {fileID: 6885574098344707421}
+  perAmountText: {fileID: 6633408408241499410}
   plusBtn: {fileID: 4554755073419028130}
   minusBtn: {fileID: 764379210869975458}
   addBtn: {fileID: 7591730119479801610}
@@ -1541,7 +1542,7 @@ GameObject:
   - component: {fileID: 2123713133778210191}
   - component: {fileID: 6633408408241499410}
   m_Layer: 5
-  m_Name: Text_DisplayType
+  m_Name: Text_perAmount
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1594,7 +1595,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: type
+  m_text: x4
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 4995422ffdb954b70a642f73eb1442ea, type: 2}
   m_sharedMaterial: {fileID: 2517202264660172603, guid: 4995422ffdb954b70a642f73eb1442ea, type: 2}

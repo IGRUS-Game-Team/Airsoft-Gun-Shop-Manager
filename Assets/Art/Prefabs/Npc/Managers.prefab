@@ -57,6 +57,9 @@ MonoBehaviour:
   grossProfitToday: 0
   purchaseCostToday: 0
   netProfitToday: 0
+  OnComplainInvoked:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &1401113380881662057
 GameObject:
   m_ObjectHideFlags: 0
@@ -365,6 +368,7 @@ MonoBehaviour:
   bonusAtHighRep: 20
   minFinalChance: 5
   maxFinalChance: 95
+  Customer: {fileID: 0}
 --- !u!1 &5770991120066519567
 GameObject:
   m_ObjectHideFlags: 0
