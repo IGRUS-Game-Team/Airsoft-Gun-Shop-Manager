@@ -57,57 +57,6 @@ MonoBehaviour:
   grossProfitToday: 0
   purchaseCostToday: 0
   netProfitToday: 0
---- !u!1 &1291153089214963386
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 2257834111883441517}
-  - component: {fileID: 4717362983874809273}
-  m_Layer: 0
-  m_Name: ProtestDirector
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &2257834111883441517
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1291153089214963386}
-  serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -46.979286, y: -2.807423, z: 22.153965}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 2752836134298421583}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &4717362983874809273
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1291153089214963386}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4ae49a8a451595246ad5c276bb767bf2, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  rallyCenter: {fileID: 0}
-  rallyRadius: 1.8
-  exitPoint: {fileID: 0}
-  protestorPrefab: {fileID: 7214586416580455288, guid: 3eb7b47f20938fd469d644ed8cf9e9b1, type: 3}
-  spawnCount: 6
-  spawnInterval: 0.2
-  protestDuration: 25
 --- !u!1 &1401113380881662057
 GameObject:
   m_ObjectHideFlags: 0
@@ -259,6 +208,67 @@ MonoBehaviour:
   marketWindow: {fileID: 0}
   eraseWindow: {fileID: 0}
   unlockLevel: 2
+--- !u!1 &2419877699787101783
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2940027898771158113}
+  - component: {fileID: 1147327041001136601}
+  m_Layer: 0
+  m_Name: ProtestDirector
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2940027898771158113
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2419877699787101783}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -46.979286, y: -2.807423, z: 22.153965}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2752836134298421583}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1147327041001136601
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2419877699787101783}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4ae49a8a451595246ad5c276bb767bf2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  spawnCenter: {fileID: 0}
+  spawnRadius: 4
+  rallyLineA: {fileID: 0}
+  rallyLineB: {fileID: 0}
+  slotSpacing: 1
+  slotJitter: 0.2
+  faceTarget: {fileID: 0}
+  exitPoint: {fileID: 0}
+  variants:
+  - prefab: {fileID: 7214586416580455288, guid: 3eb7b47f20938fd469d644ed8cf9e9b1, type: 3}
+    weight: 0
+  - prefab: {fileID: 7946477551492461494, guid: 23691e0c887386844863261c99d6b7bb, type: 3}
+    weight: 0
+  alternateVariants: 1
+  spawnCount: 6
+  spawnInterval: 0.2
+  protestDuration: 25
 --- !u!1 &3781021187163580599
 GameObject:
   m_ObjectHideFlags: 0
@@ -459,7 +469,7 @@ Transform:
   - {fileID: 798944044356543270}
   - {fileID: 8010017840091594079}
   - {fileID: 245869588804094908}
-  - {fileID: 2257834111883441517}
+  - {fileID: 2940027898771158113}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &6929514001218485653
