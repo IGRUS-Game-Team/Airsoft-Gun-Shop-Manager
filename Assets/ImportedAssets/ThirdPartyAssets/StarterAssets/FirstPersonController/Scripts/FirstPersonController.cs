@@ -137,6 +137,13 @@ namespace StarterAssets
 			CameraRotation();
 		}
 
+		// 8/16 추가
+		// 사격 모드 zoom 시 카메라 감도 낮추기
+		public void ChangeRotationSpeed(float amount)
+		{
+			RotationSpeed = amount;
+		}
+
 		private void GroundedCheck()
 		{
 			// set sphere position, with offset
