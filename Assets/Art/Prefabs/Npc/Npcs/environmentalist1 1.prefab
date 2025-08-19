@@ -34,39 +34,7 @@ Transform:
   - {fileID: 7273368324141249587}
   - {fileID: 843023789691545805}
   - {fileID: 343864025332082924}
-  - {fileID: 7090678959279149636}
   m_Father: {fileID: 5745968657156907708}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &289653746072145970
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 7090678959279149636}
-  m_Layer: 0
-  m_Name: HandSocket
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &7090678959279149636
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 289653746072145970}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.031, y: 0.099, z: 0.03}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 5307353851539757569}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &385983350201043250
 GameObject:
@@ -700,6 +668,37 @@ Transform:
   m_Children: []
   m_Father: {fileID: 5445388034640490874}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1745535811994177231
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 8210686521265780115}
+  m_Layer: 0
+  m_Name: HandSocket
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &8210686521265780115
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1745535811994177231}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0.3535234, y: -0.4869265, z: -0.539359, w: 0.5890805}
+  m_LocalPosition: {x: -0.0010085787, y: 0.1170253, z: 0.043009005}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 3866759494000604048}
+  m_LocalEulerAnglesHint: {x: -70.35, y: -34.885, z: -59.983}
 --- !u!1 &1764563096998659157
 GameObject:
   m_ObjectHideFlags: 0
@@ -2332,6 +2331,7 @@ Transform:
   - {fileID: 2919219334410725516}
   - {fileID: 3615888285967892954}
   - {fileID: 444344154932429984}
+  - {fileID: 8210686521265780115}
   m_Father: {fileID: 7812624422528916808}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &6748122410356135602
@@ -2512,7 +2512,7 @@ Animator:
   m_GameObject: {fileID: 7214586416580455288}
   m_Enabled: 1
   m_Avatar: {fileID: 9000000, guid: 9fe8b93080ffde144a6198a5d6756d26, type: 3}
-  m_Controller: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 5bc0051df4c295146af5fbe904e0d12d, type: 2}
   m_CullingMode: 1
   m_UpdateMode: 0
   m_ApplyRootMotion: 1
@@ -2534,10 +2534,10 @@ NavMeshAgent:
   m_Enabled: 1
   m_AgentTypeID: 0
   m_Radius: 0.5
-  m_Speed: 3.5
-  m_Acceleration: 8
+  m_Speed: 1.5
+  m_Acceleration: 20
   avoidancePriority: 50
-  m_AngularSpeed: 120
+  m_AngularSpeed: 300
   m_StoppingDistance: 0
   m_AutoTraverseOffMeshLink: 1
   m_AutoBraking: 1
@@ -2558,11 +2558,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c26def0d8562fd148bbf12a717582f69, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  signPrefab: {fileID: 8030420121516099720, guid: e84a6b5931425844890c15843f135605, type: 3}
+  signSocket: {fileID: 8210686521265780115}
+  socketNameHint: HandSocket
+  signLocalPos: {x: 0, y: 0, z: 0}
+  signLocalEuler: {x: 0, y: 0, z: 0}
+  signLocalScale: {x: 1, y: 1, z: 1}
+  disableSignPhysics: 1
   walkAnim: Walking
-  picketAnim: Picket
-  stopDistance: 0.35
-  handSocket: {fileID: 7090678959279149636}
-  picketPrefab: {fileID: 8030420121516099720, guid: e84a6b5931425844890c15843f135605, type: 3}
+  protestAnim: Grab
+  leaveAnim: Walking
+  arriveDist: 0.35
+  exitDist: 1
 --- !u!1 &7271653704397087240
 GameObject:
   m_ObjectHideFlags: 0
