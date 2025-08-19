@@ -8,9 +8,9 @@ public class RecessionEventStrategy : ISocialEventStrategy
 
     private List<string> EventNames = new List<string>()
     {
-        "총기 사건 발생",
-        "경제 불황",
-        "총기 반대 시위"
+        "[ Gun control following a shooting incident ]", // 총기 난사 사건에 따른 규제
+        "[ Economic recession ]", // 경제 악화
+        "[ Gun control protest ]"// 총기 규제 시위
     };
 
     //현재 이벤트 저장할 필드
@@ -26,13 +26,13 @@ public class RecessionEventStrategy : ISocialEventStrategy
     private void GenerateRandomEventData()
     {
         currentEventName = EventNames[UnityEngine.Random.Range(0, EventNames.Count)]; //이벤트이름 고르기
-        currentMarketModifier = UnityEngine.Random.Range(0.1f, 0.3f); // 10%~30% 상승
+        currentMarketModifier = UnityEngine.Random.Range(-0.3f,-0.1f); // 10%~30% 상승
 
         Debug.Log($"Boom 전략 : {currentEventName}, {currentMarketModifier}");
     }
 
     public string EventName => currentEventName;
-    public string StatusText => "수요 감소";
+    public string StatusText => "Decrease in demand";
     public float MarketModifier => currentMarketModifier;
 
 }

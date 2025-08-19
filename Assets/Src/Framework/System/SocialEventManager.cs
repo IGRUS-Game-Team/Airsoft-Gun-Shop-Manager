@@ -42,6 +42,7 @@ public class SocialEventManager : MonoBehaviour
     // 옵저버 패턴을 위한 이벤트들
     public static event Action<int, float> OnMarketPriceChanged;  // id, 시장변동률
     public static event Action<string, string, string> OnEventUIUpdate; // 이벤트이름, 상태, 아이템이름
+    public static event Action<string> OnNewsScreenUpdate; //뉴스 화면 업데이트
 //------------------------------------------------------------------------------------------
     private void Awake()
     {
@@ -59,7 +60,7 @@ public class SocialEventManager : MonoBehaviour
             Debug.Log("전략 설정 안됨");
             return;
         }
-        Debug.Log(" ExecuteStrategy 시작");
+        Debug.Log(" ExecuteStrategy 시작====================================");
 
 
         currentStrategy.GetEventStrategyData(); // 전략에서 랜덤 데이터 생성
@@ -91,13 +92,15 @@ public class SocialEventManager : MonoBehaviour
         {
             string eventName = currentStrategy.EventName ?? "알 수 없는 이벤트";
             string eventStatus = currentStrategy.StatusText ?? "사회 상태?";
-            string itemName = ItemNameResolver.Get(selectedItemData)?? "알 수 없는 상품";
+            string itemName = ItemNameResolver.Get(selectedItemData) ?? "알 수 없는 상품";
 
             // 옵저버로 UI에 전달
-            OnEventUIUpdate?.Invoke(eventName, eventStatus, itemName);
+            Debug.Log("전달");
+            OnEventUIUpdate?.Invoke(eventName, eventStatus, itemName);//신문에 전달
+            OnNewsScreenUpdate?.Invoke(eventName);//뉴스에 전달
+      
         }
     }
-
 
     //랜덤한 아이템 가져오기, 이름 아이디 저장
     private void SelectRandomGun()

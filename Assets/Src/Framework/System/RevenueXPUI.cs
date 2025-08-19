@@ -48,10 +48,24 @@ public class RevenueXPUI : MonoBehaviour
     private void OnXP(float xp)
     {
         if (!xpText) return;
-        float goal = Mathf.Max(1f, tracker.FinalGoal);
+
+        // 현재 레벨의 목표 가져오기
+        float goal = GetGoalForLevel(tracker.CurrentLevel);
+        
         xpText.text = $"${xp:0} / ${goal:0}";
     }
 
+    // 레벨별 목표 리턴
+    private float GetGoalForLevel(int level)
+    {
+        switch (level)
+        {
+            case 0: return 10000f;
+            case 1: return 25000f;
+            case 2: return 50000f;
+            default: return tracker.FinalGoal; // 그 이후는 일단 FinalGoal
+        }
+    }
     private void OnLevel(int lvl)
     {
         if (levelText) levelText.text = $"Level {lvl}";
