@@ -7,10 +7,16 @@ using UnityEngine;
 
 public class AudioManager : MonoBehaviour
 {
+    [SerializeField] ShootingGunSO shootingGunSO;
+
     [Header("박스 상호작용 사운드")]
     [SerializeField] AudioClip BoxPickUpSound;
     [SerializeField] AudioClip BoxDropSound;
     [SerializeField] AudioClip BoxThrowSound;
+
+    [Header("사격장 총기별 사운드")]
+    [SerializeField] AudioClip[] ShootingGunSounds;
+
 
     public static AudioManager Instance; // 싱글톤 선언
     public AudioSource audioSource;
@@ -40,5 +46,14 @@ public class AudioManager : MonoBehaviour
     {
         if (BoxThrowSound != null)
             audioSource.PlayOneShot(BoxThrowSound);
+    }
+
+    // 사격장 총기별 사운드 재생 함수
+    public void PlayGunSound(int gunIndex)
+    {
+        if (gunIndex >= 0 && gunIndex < ShootingGunSounds.Length)
+        {
+            audioSource.PlayOneShot(ShootingGunSounds[gunIndex]);
+        }
     }
 }
