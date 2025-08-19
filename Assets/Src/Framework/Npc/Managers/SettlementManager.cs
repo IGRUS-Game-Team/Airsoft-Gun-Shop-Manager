@@ -24,7 +24,6 @@ public class SettlementManager : MonoBehaviour
     // ───────── 기본 보상(Inspector) ─────────
     [Header("정상 결제 보상(Inspector)")]
     [SerializeField] int happyLevelGain = 1;       // 정상 결제 시 상점 레벨 증가치
-    [SerializeField] int happyReputationGain = 3;  // 정상 결제 시 평판 증가치
 
     // ───────── 영업시간 & 참조 ─────────
     [Header("영업 시간(게임 시각)")]
@@ -38,8 +37,11 @@ public class SettlementManager : MonoBehaviour
     [SerializeField] int satisfiedCustomers;     // 만족(불평 없이 정상 결제)
     [SerializeField] int dissatisfiedCustomers;  // 불만족(불평 이후 결제)
     [SerializeField] int shopLevel;              // 상점 레벨
-    [SerializeField] int reputation;             // 평판
     readonly HashSet<NpcController> complained = new(); // 불평 여부 추적
+
+    [Header("평판 변화량(Inspector)")]
+    [SerializeField] float happyReputationDelta  = +3f; // 정상 결제 시
+    [SerializeField] float unhappyReputationDelta = -3f; // 불평 고객(결제/미결제) 처리 시
 
     // ───────── 오늘 집계(총/이익/순이익) ─────────
     [Header("오늘 집계(런타임)")]
@@ -58,19 +60,28 @@ public class SettlementManager : MonoBehaviour
     public int   SatisfiedCustomers    => satisfiedCustomers;
     public int   DissatisfiedCustomers => dissatisfiedCustomers;
     public int   ShopLevel             => shopLevel;
-    public int   Reputation            => reputation;
 
     public int   TotalCustomersToday   => totalCustomersToday;
     public float GrossProfitToday      => grossProfitToday;
     public float PurchaseCostToday     => purchaseCostToday;
     public float CogsToday             => purchaseCostToday; // ▼ 호환용 별칭(기존 cogsToday 참조 대비)
     public float NetProfitToday        => netProfitToday;
+    public int Reputation => Mathf.RoundToInt(ReputationState.CurrentGlobal);
 
+    public int OpenHour => openHour;
+    public int CloseHour => closeHour;
+    
     void Awake()
     {
         if (Instance != null && Instance != this) { Destroy(gameObject); return; }
         Instance = this;
         DontDestroyOnLoad(gameObject);
+    }
+
+    void Start()
+    {
+        if (ReputationState.Instance != null)
+        ReputationState.Instance.OnChangedRaw.AddListener(OnRepChangedRelay);
     }
 
     // ───────── 외부 API: 불평 기록 ─────────
@@ -87,8 +98,21 @@ public class SettlementManager : MonoBehaviour
         if (npc == null) return;
 
         bool had = complained.Remove(npc);
-        if (had) { dissatisfiedCustomers++; }
-        else     { satisfiedCustomers++; shopLevel += happyLevelGain; reputation += happyReputationGain; }
+        if (had)
+        {
+            // 불평 후 결제한 케이스 = 불만족
+            dissatisfiedCustomers++;
+            if (unhappyReputationDelta != 0f)
+                ReputationState.Instance?.Add(unhappyReputationDelta);
+        }
+        else
+        {
+            satisfiedCustomers++;
+            shopLevel += happyLevelGain;
+
+            if (happyReputationDelta != 0f)
+                ReputationState.Instance?.Add(happyReputationDelta);
+        }
 
         OnChanged?.Invoke(GetSnapshot());
     }
@@ -150,27 +174,64 @@ public class SettlementManager : MonoBehaviour
         OnChanged?.Invoke(GetSnapshot());
     }
 
+    // 손님이 불평 기록이 있는 상태에서 결제 없이 나간 경우, 불만족 집계
+    public void OnCustomerLeftUnhappy(NpcController npc)
+    {
+        if (npc == null) return;
+
+        bool had = complained.Remove(npc);
+        if (had)
+        {
+            dissatisfiedCustomers++;
+            if (unhappyReputationDelta != 0f)
+                ReputationState.Instance?.Add(unhappyReputationDelta);
+            OnChanged?.Invoke(GetSnapshot());
+        }
+    }
+
+    void OnEnable()
+    {
+        // 평판 싱글톤이 바뀔 때마다 정산 스냅샷도 새로고침
+        if (ReputationState.Instance != null)
+            ReputationState.Instance.OnChangedRaw.AddListener(OnRepChangedRelay);
+    }
+
+    void OnDisable()
+    {
+        if (ReputationState.Instance != null)
+            ReputationState.Instance.OnChangedRaw.RemoveListener(OnRepChangedRelay);
+    }
+
+    private void OnRepChangedRelay(float _)
+    {
+        OnChanged?.Invoke(GetSnapshot());
+    }
+
     // ───────── 라운드/하루 리셋(만족/불만족/레벨/평판 세트) ─────────
     [Flags] public enum KeepFlags { None = 0, KeepLevel = 1, KeepReputation = 2, KeepBoth = KeepLevel | KeepReputation }
     public void ResetForNewDay(KeepFlags keep = KeepFlags.KeepBoth)
     {
-        satisfiedCustomers    = 0;
+        satisfiedCustomers = 0;
         dissatisfiedCustomers = 0;
-        if ((keep & KeepFlags.KeepLevel) == 0)      shopLevel   = 0;
-        if ((keep & KeepFlags.KeepReputation) == 0) reputation  = 0;
-        complained.Clear();
 
+        if ((keep & KeepFlags.KeepLevel) == 0)
+            shopLevel = 0;
+
+        // ★ 추가: 평판 리셋 (ReputationState로 위임)
+        if ((keep & KeepFlags.KeepReputation) == 0)
+            ReputationState.Instance?.SetRaw(0f);
+
+        complained.Clear();
         OnChanged?.Invoke(GetSnapshot());
     }
-
+    
     // ───────── Snapshot (UI에 한 번에 바인딩) ─────────
     public Snapshot GetSnapshot() => new Snapshot
     {
         satisfied      = satisfiedCustomers,
         dissatisfied   = dissatisfiedCustomers,
         shopLevel      = shopLevel,
-        reputation     = reputation,
-
+        reputation     = Mathf.RoundToInt(ReputationState.CurrentGlobal),
         totalCustomers = totalCustomersToday,
         grossProfit    = grossProfitToday,
         purchaseCost   = purchaseCostToday, // ▼ cogs 대신 purchaseCost로 명확히 표기
@@ -194,10 +255,8 @@ public class SettlementManager : MonoBehaviour
     public void AddSatisfied(int v)        { satisfiedCustomers    = Mathf.Max(0, satisfiedCustomers + v);    OnChanged?.Invoke(GetSnapshot()); }
     public void AddDissatisfied(int v)     { dissatisfiedCustomers = Mathf.Max(0, dissatisfiedCustomers + v); OnChanged?.Invoke(GetSnapshot()); }
     public void AddShopLevel(int v)        { shopLevel             = Mathf.Max(0, shopLevel + v);             OnChanged?.Invoke(GetSnapshot()); }
-    public void AddReputation(int v)       { reputation            = Mathf.Max(0, reputation + v);            OnChanged?.Invoke(GetSnapshot()); }
 
     public void SetSatisfied(int v)        { satisfiedCustomers    = Mathf.Max(0, v);                          OnChanged?.Invoke(GetSnapshot()); }
     public void SetDissatisfied(int v)     { dissatisfiedCustomers = Mathf.Max(0, v);                          OnChanged?.Invoke(GetSnapshot()); }
     public void SetShopLevel(int v)        { shopLevel             = Mathf.Max(0, v);                          OnChanged?.Invoke(GetSnapshot()); }
-    public void SetReputation(int v)       { reputation            = Mathf.Max(0, v);                          OnChanged?.Invoke(GetSnapshot()); }
 }

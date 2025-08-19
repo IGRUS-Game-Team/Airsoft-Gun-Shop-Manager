@@ -1,16 +1,48 @@
+using System.Collections.Generic;
 using UnityEngine;
 
-public class BoomEventStrategy : MonoBehaviour
+/// <summary>
+/// 장지원 8.12 
+/// 
+/// 호황 상태
+/// 전략에서 랜덤값을 정하여 SocialEventManager에게 전달한다
+/// </summary>
+public class BoomEventStrategy : ISocialEventStrategy
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    private ItemDatabase itemDatabase;
+    private List<int> cachedItemIds; // 아이템 id만
+
+   
+    private List<string> EventNames = new List<string>() {
+        "[ Relaxation of gun regulations ]", // 총기 규제 완화
+        "[ Popularity of shooting game ]", // 슈팅 게임 인기
+        "[ Popularity of gun-action movies ]", // 건액션 영화 인기
+        "[ Military festival opens ]" // 밀리터리 페스티벌
+    }; //이벤트 이름 리스트 
+
+
+    // 현재 이벤트 정보를 지정할 필드
+    private string currentEventName;
+    private float currentMarketModifier;
+    //private int currentDuration;
+
+    // -> 호출시 랜덤값 생성
+    public void GetEventStrategyData()
     {
-        
+        GenerateRandomEventData();
     }
 
-    // Update is called once per frame
-    void Update()
+    private void GenerateRandomEventData()
     {
-        
+        currentEventName = EventNames[UnityEngine.Random.Range(0, EventNames.Count)]; //이벤트이름 고르기
+        currentMarketModifier = UnityEngine.Random.Range(0.1f, 0.3f); // 10%~30% 상승
+        //currentDuration = UnityEngine.Random.Range(1, 4); // 1~3일
+
+        Debug.Log($"Boom 전략 : {currentEventName}, {currentMarketModifier}");
     }
+
+    public string EventName => currentEventName;        
+    public string StatusText => "Increase in demand";             
+    public float MarketModifier => currentMarketModifier; 
+    // public int Duration => currentDuration;             
 }

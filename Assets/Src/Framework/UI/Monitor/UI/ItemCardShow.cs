@@ -6,7 +6,7 @@ using UnityEngine.UI;
 
 public class ItemCardView : MonoBehaviour
 {
-    // [SerializeField] Image icon;
+    [SerializeField] Image icon;
     [SerializeField] TextMeshProUGUI nameText;
     [SerializeField] TextMeshProUGUI unitPriceText;
     [SerializeField] TextMeshProUGUI amountText;
@@ -21,19 +21,27 @@ public class ItemCardView : MonoBehaviour
     {        
         onAddToCart.AddListener(Test_OnSpacePressed);
     }
-    public void Setup(ItemData item)
-    {
-        data = item;
-        //  icon.sprite = data.icon;
-        nameText.text = data.itemName;
-        unitPriceText.text = $"${data.baseCost:F2}";
-        UpdateAmount(amount);
+public void Setup(ItemData item)
+{
+    data = item;
 
-        plusBtn.onClick.AddListener(() => ChangeAmount(1));
-        minusBtn.onClick.AddListener(() => ChangeAmount(-1));
-        //addBtn.onClick.AddListener(() => onAddToCart?.Invoke(this, new AddToCartEventArgs(data, amount)));
-        addBtn.onClick.AddListener(() => onAddToCart?.Invoke(data, amount));
+    // 아이콘이 있으면 사용, 없으면 null 처리(혹은 기본 스프라이트 사용)
+    if (icon != null)
+    {
+        if (data.icon != null)
+            icon.sprite = data.icon;
+        else
+            icon.sprite = null; // 또는 기본 아이콘 Sprite 변수로 교체 가능
     }
+
+    nameText.text = ItemNameResolver.Get(data);
+    unitPriceText.text = $"${data.baseCost:F2}";
+    UpdateAmount(amount);
+
+    plusBtn.onClick.AddListener(() => ChangeAmount(1));
+    minusBtn.onClick.AddListener(() => ChangeAmount(-1));
+    addBtn.onClick.AddListener(() => onAddToCart?.Invoke(data, amount));
+}
 
     void ChangeAmount(int delta)
     {

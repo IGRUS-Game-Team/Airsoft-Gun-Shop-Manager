@@ -25,6 +25,26 @@ public class ShopUIController : MonoBehaviour
         Populate(ItemCategory.MainWeapon);
     }
 
+    public void Populate()
+    {
+        Clear();
+
+        ItemCategory itemCategory = ItemCategory.MainWeapon;
+        foreach (var item in database.items)
+        {
+            if (item.category != itemCategory) continue;
+            if (!UnlockedItemsStore.IsUnlocked(item.itemId)) continue;
+            var card = Instantiate(itemCardPrefab, contentRoot);
+            card.Setup(item);
+
+            //card.onAddToCart.AddListener(cartManager.AddItem); //
+            card.onAddToCart.AddListener((data, amount) =>
+            {
+                cartManager.AddItem(data, amount);
+            });
+            spawnedCards.Add(card);
+        }
+    }
     public void Populate(ItemCategory itemCategory)
     {
         Clear();
@@ -32,9 +52,10 @@ public class ShopUIController : MonoBehaviour
         foreach (var item in database.items)
         {
             if (item.category != itemCategory) continue;
+            if (!UnlockedItemsStore.IsUnlocked(item.itemId)) continue;
             var card = Instantiate(itemCardPrefab, contentRoot);
             card.Setup(item);
-           
+
             //card.onAddToCart.AddListener(cartManager.AddItem); //
             card.onAddToCart.AddListener((data, amount) =>
             {

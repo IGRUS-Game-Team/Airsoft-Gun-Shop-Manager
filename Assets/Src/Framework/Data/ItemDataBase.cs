@@ -10,14 +10,14 @@ public class ItemDatabase : ScriptableObject
     [System.NonSerialized] private Dictionary<int, ItemData> _byId;
     [System.NonSerialized] private Dictionary<string, ItemData> _byName; // 소문자 키
 
-    void OnEnable()  => RebuildIndex();
+    void OnEnable() => RebuildIndex();
 #if UNITY_EDITOR
     void OnValidate() => RebuildIndex(); // 에디터에서 리스트 수정 시 자동 갱신
 #endif
 
     public void RebuildIndex()
     {
-        _byId   = new Dictionary<int, ItemData>();
+        _byId = new Dictionary<int, ItemData>();
         _byName = new Dictionary<string, ItemData>();
 
         foreach (var it in items)
@@ -66,7 +66,7 @@ public class ItemDatabase : ScriptableObject
         {
             if (!x) continue;
             if (NormalizeName(x.itemName) == key) return x;
-            if (NormalizeName(x.name)     == key) return x; // SO 파일명으로도 폴백
+            if (NormalizeName(x.name) == key) return x; // SO 파일명으로도 폴백
         }
         return null;
     }
@@ -82,4 +82,38 @@ public class ItemDatabase : ScriptableObject
 
         return it; // cat이 다르더라도 일단 반환(원하면 여기서 null로)
     }
+    
+
+    //랜덤 아이템 전달
+    public ItemData GetRandomItemData()
+    {
+        if (_byId == null || _byId.Count == 0) 
+        {
+            Debug.LogWarning("[ItemDatabase] 유효한 아이템이 없습니다.");
+            return null; 
+        }
+        
+        // Dictionary의 실제 키들을 배열로 변환
+        var keys = new List<int>(_byId.Keys);
+        
+        // 랜덤 인덱스로 키 선택
+        int randomIndex = Random.Range(0, keys.Count);
+        int randomId = keys[randomIndex];
+        
+        return _byId[randomId];
+
+    }
+    public bool TryGet(int itemId, out ItemData result)
+    {
+        result = null;
+        foreach (var item in items)
+        {
+            if (item != null && item.itemId == itemId)
+            {
+                result = item;
+                return true;
+            }
+        }
+        return false;
+}
 }

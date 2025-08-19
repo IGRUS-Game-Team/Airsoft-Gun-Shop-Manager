@@ -42,7 +42,7 @@ public class PriceSettingController : MonoBehaviour, IPriceChangeable
     //변수에 저장(so 받기)
     public void GetScriptableObject(ItemData itemData)
     {
-        displayName = itemData.name;
+        displayName = ItemNameResolver.Get(itemData);
         baseCost = itemData.baseCost;
         currentItemId = itemData.itemId;
 

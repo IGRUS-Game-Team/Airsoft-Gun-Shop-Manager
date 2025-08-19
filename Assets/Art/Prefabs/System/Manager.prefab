@@ -44,7 +44,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7049a555eb935b74c90a5076d47ff7f8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  cartManager: {fileID: 0}
 --- !u!1 &761213903060178311
 GameObject:
   m_ObjectHideFlags: 0
@@ -186,8 +185,56 @@ Transform:
   - {fileID: 3591974996512848879}
   - {fileID: 2286108506174796280}
   - {fileID: 6423442812234916833}
+  - {fileID: 8686301005386198645}
+  - {fileID: 6215675313508400123}
+  - {fileID: 5977767616851901581}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &4480917739677299015
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 6215675313508400123}
+  - component: {fileID: 4172794453567216641}
+  m_Layer: 0
+  m_Name: MarketPriceDataManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &6215675313508400123
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4480917739677299015}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 9166925525532697562}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &4172794453567216641
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4480917739677299015}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6fe6a84c1df2fe846974192cb21e6ad3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  itemDatabase: {fileID: 11400000, guid: 99a681d5d2baf7c469843baf34bca862, type: 2}
 --- !u!1 &4957803642263356624
 GameObject:
   m_ObjectHideFlags: 0
@@ -233,7 +280,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   priceCardWithSetting: {fileID: 0}
-  priceObserver: {fileID: 2814845541927651040}
+  x: 0
+  y: 0
+  z: 0
 --- !u!1 &5818334321806768356
 GameObject:
   m_ObjectHideFlags: 0
@@ -323,6 +372,112 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5144e8f91912c0d4fb7fb5b9ec868e85, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  itemDatabase: {fileID: 11400000, guid: 99a681d5d2baf7c469843baf34bca862, type: 2}
+--- !u!1 &7761070788928817447
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 5977767616851901581}
+  - component: {fileID: 1573429190676383855}
+  m_Layer: 0
+  m_Name: NewsScreenManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &5977767616851901581
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7761070788928817447}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -101.89495, y: -231.56679, z: 932.83386}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 9166925525532697562}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1573429190676383855
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7761070788928817447}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 31394f0f749975a488eaddaba8a324dd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  TvScreen: {fileID: 0}
+  newsImage: {fileID: 0}
+  gunRegulationSprite: {fileID: 21300000, guid: c3926c1ba4f6c2b4585debc532ddebd4, type: 3}
+  shootingGameSprite: {fileID: 21300000, guid: f12f3da817e6f364893ab64a253aacfb, type: 3}
+  actionMovieSprite: {fileID: 21300000, guid: 8a7df117f7bea1d4288452e078959f33, type: 3}
+  militaryFestivalSprite: {fileID: 21300000, guid: 2c1d84879759cb2468be513fe2213366, type: 3}
+  shootingIncidentSprite: {fileID: 21300000, guid: fc9d2d2118f4dd14ea3fd6dc906b69d3, type: 3}
+  economicCrisisSprite: {fileID: 21300000, guid: a9c36238b9bfab744b568deb8a90e1ff, type: 3}
+  gunProtestSprite: {fileID: 21300000, guid: 66083f7e05c49d64cbb5c3a39cb16f9b, type: 3}
+--- !u!1 &8499417535868715933
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 8686301005386198645}
+  - component: {fileID: 7226556393929996159}
+  m_Layer: 0
+  m_Name: SocialEventManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &8686301005386198645
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8499417535868715933}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 9166925525532697562}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &7226556393929996159
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8499417535868715933}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 09ba9dde2ced6e741ab7e7bbed624300, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  itemDatabase: {fileID: 11400000, guid: 99a681d5d2baf7c469843baf34bca862, type: 2}
+  strategyChances: 320000001e00000014000000
+  enableProtestSignal: 1
+  protestAutoStopAfter: 25
+  protestKeywords:
+  - "\uCD1D\uAE30\uC0AC\uAC74"
+  - "\uC5EC\uB860 \uC545\uD654"
+  - Protest
 --- !u!1001 &696240906046841780
 PrefabInstance:
   m_ObjectHideFlags: 0

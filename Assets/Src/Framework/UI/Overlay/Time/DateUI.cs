@@ -20,6 +20,7 @@ public class DateUI : MonoBehaviour
 
     public void UpdateDate()
     {
+        //SocialEventManager.Instance.ExecuteStrategy();
         date++;
         
         // 리스트에서 현재 월의 최대 날짜 확인
@@ -41,4 +42,5 @@ public class DateUI : MonoBehaviour
     {
         monthAndDate.text = string.Format("{0:00}/{1:00}", month, date);
     }
+    
 }
