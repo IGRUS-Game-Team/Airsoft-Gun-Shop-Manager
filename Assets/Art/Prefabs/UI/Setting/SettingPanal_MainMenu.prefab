@@ -3880,10 +3880,10 @@ MonoBehaviour:
   m_FillRect: {fileID: 8325105866036726354}
   m_HandleRect: {fileID: 5153199282060483483}
   m_Direction: 0
-  m_MinValue: 0
+  m_MinValue: 0.001
   m_MaxValue: 1
   m_WholeNumbers: 0
-  m_Value: 0
+  m_Value: 0.001
   m_OnValueChanged:
     m_PersistentCalls:
       m_Calls: []
@@ -12526,6 +12526,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 9214636923972784991}
+  - component: {fileID: 282923565186458501}
   - component: {fileID: 1134862024884562665}
   - component: {fileID: 5652052794060656872}
   - component: {fileID: 3499882837299528280}
@@ -12556,6 +12557,22 @@ RectTransform:
   m_AnchoredPosition: {x: 289.5, y: 163}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &282923565186458501
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6240378525129634009}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9b122d932a89a2145996ec3ded583de7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  audioMixer: {fileID: 24100000, guid: 5f182e13a726d78438e3fa85a68efd86, type: 2}
+  musicMasterSlider: {fileID: 9098197395464445849}
+  musicBGMSlider: {fileID: 4419433628602206577}
+  musicSFXSlider: {fileID: 5931604788524334163}
 --- !u!114 &1134862024884562665
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -13705,10 +13722,10 @@ MonoBehaviour:
   m_FillRect: {fileID: 4968012439790126884}
   m_HandleRect: {fileID: 6441528269522292151}
   m_Direction: 0
-  m_MinValue: 0
+  m_MinValue: 0.001
   m_MaxValue: 1
   m_WholeNumbers: 0
-  m_Value: 0
+  m_Value: 0.001
   m_OnValueChanged:
     m_PersistentCalls:
       m_Calls: []
@@ -15259,10 +15276,10 @@ MonoBehaviour:
   m_FillRect: {fileID: 4788836991542846139}
   m_HandleRect: {fileID: 3087881362441187343}
   m_Direction: 0
-  m_MinValue: 0
+  m_MinValue: 0.001
   m_MaxValue: 1
   m_WholeNumbers: 0
-  m_Value: 0
+  m_Value: 0.001
   m_OnValueChanged:
     m_PersistentCalls:
       m_Calls: []
