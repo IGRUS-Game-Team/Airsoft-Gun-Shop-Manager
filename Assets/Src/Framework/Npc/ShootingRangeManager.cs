@@ -29,17 +29,21 @@ public class ShootingRangeManager : MonoBehaviour
         RemoveNulls();
         _available.Clear();
 
-        foreach (var l in lanes)
+        // 비어있는 레인 수집
+        for (int i = 0; i < lanes.Count; i++)
         {
+            var l = lanes[i];
             if (!l) continue;
-            if (!l.isActiveAndEnabled) continue;                         // ★ 비활성 레인 제외
-            if (l.IsOccupied) continue;
-            if (l.standPoint != null && !l.standPoint.gameObject.activeInHierarchy) continue; // ★ 스탠드포인트 꺼져도 제외
-            _available.Add(l);
+            if (!l.IsOccupied) _available.Add(l);
         }
 
-        if (_available.Count == 0) { lane = null; return false; }
+        if (_available.Count == 0)
+        {
+            lane = null;
+            return false;
+        }
 
+        // 무작위 선택
         int pick = Random.Range(0, _available.Count);
         lane = _available[pick];
         return true;
