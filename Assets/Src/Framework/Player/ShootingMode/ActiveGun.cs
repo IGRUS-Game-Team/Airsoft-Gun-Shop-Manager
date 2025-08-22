@@ -24,7 +24,7 @@ public class ActiveGun : MonoBehaviour
     private System.Action onClickHandler; // 단발사격(InteractionController용)
     private System.Action<InputAction.CallbackContext> onShootStartedHandler;  // 자동사격 시작
     private System.Action<InputAction.CallbackContext> onShootCanceledHandler; // 자동사격 종료
-    private System.Action<InputAction.CallbackContext> onShootPerformedOnceHandler; // ★ 단발 fallback
+    private System.Action<InputAction.CallbackContext> onShootPerformedOnceHandler; // 단발 fallback
 
     void Awake()
     {
@@ -38,7 +38,7 @@ public class ActiveGun : MonoBehaviour
     {
         currentGun = GetComponentInChildren<ShootingGun>();
 
-        // ★ 시작 시 이미 총/데이터가 있으면 즉시 입력 바인딩
+        // 시작 시 이미 총/데이터가 있으면 즉시 입력 바인딩
         if (shootingGunSO != null && currentGun != null)
             SubscribeShootInput();
     }
@@ -138,7 +138,7 @@ public class ActiveGun : MonoBehaviour
         {
             currentGun = Instantiate(shootingGunSO.GunPrefab, transform).GetComponent<ShootingGun>();
             Debug.Log($"Switched to gun: {shootingGunSO.name}");
-            SubscribeShootInput(); // ★ 새 총 적용과 동시에 입력 바인딩
+            SubscribeShootInput(); // 새 총 적용과 동시에 입력 바인딩
         }
         else Debug.LogWarning("SwitchGun failed");
     }
@@ -217,7 +217,7 @@ public class ActiveGun : MonoBehaviour
 
         if (onShootPerformedOnceHandler != null)
         {
-            playerShooting.Player.Shoot.performed -= onShootPerformedOnceHandler; // ★ fallback 해제
+            playerShooting.Player.Shoot.performed -= onShootPerformedOnceHandler; // fallback 해제
             onShootPerformedOnceHandler = null;
         }
 
