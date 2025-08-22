@@ -97,22 +97,22 @@ public class SettingsUI_Common : MonoBehaviour
     }
     
     public void OnClickClose()
-{
-    var d = SettingsManager.Instance.Data;
+    {
+        var d = SettingsManager.Instance.Data;
 
-    d.masterDb = AudioApplier.Linear01ToDb(masterSlider.value);
-    d.bgmDb    = AudioApplier.Linear01ToDb(bgmSlider.value);
-    d.sfxDb    = AudioApplier.Linear01ToDb(sfxSlider.value);
+        d.masterDb = AudioApplier.Linear01ToDb(masterSlider.value);
+        d.bgmDb    = AudioApplier.Linear01ToDb(bgmSlider.value);
+        d.sfxDb    = AudioApplier.Linear01ToDb(sfxSlider.value);
 
-    d.mouseSensitivity = mouseSensitivity.value;
-    d.invertY = invertY.isOn;
+        d.mouseSensitivity = mouseSensitivity.value;
+        d.invertY = invertY.isOn;
 
-    d.subtitles     = subtitles.isOn;
-    d.subtitleScale = subtitleScale.value;
-    d.uiScale       = uiScale.value;
+        d.subtitles     = subtitles.isOn;
+        d.subtitleScale = subtitleScale.value;
+        d.uiScale       = uiScale.value;
 
-    SettingsManager.Instance.audioApplier.Apply(d);
-    SettingsManager.Instance.inputApplier.Apply(d);
-    SettingsManager.Instance.Save();
-}
+        SettingsManager.Instance.audioApplier.Apply(d);
+        SettingsManager.Instance.inputApplier.Apply(d);
+        SettingsManager.Instance.Save();
+    }
 }
