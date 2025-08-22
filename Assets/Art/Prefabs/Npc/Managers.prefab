@@ -89,7 +89,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 23b64d3f16cfb814cb603645739f856a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  shootingRangeIncome: 20
   happyLevelGain: 1
   openHour: 8
   closeHour: 8
@@ -103,9 +102,6 @@ MonoBehaviour:
   grossProfitToday: 0
   purchaseCostToday: 0
   netProfitToday: 0
-  OnComplainInvoked:
-    m_PersistentCalls:
-      m_Calls: []
 --- !u!1 &1401113380881662057
 GameObject:
   m_ObjectHideFlags: 0
@@ -477,8 +473,6 @@ MonoBehaviour:
   bonusAtHighRep: 20
   minFinalChance: 5
   maxFinalChance: 95
-  percentToShelves: 80
-  fallbackToOtherIfFull: 1
   Customer: {fileID: 0}
 --- !u!1 &5770991120066519567
 GameObject:
@@ -522,60 +516,8 @@ Transform:
   - {fileID: 245869588804094908}
   - {fileID: 4421475890309313375}
   - {fileID: 7926215898563582545}
-  - {fileID: 2940027898771158113}
-  - {fileID: 4120214770709951109}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &6759687137017171350
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 4120214770709951109}
-  - component: {fileID: 3048306697063905576}
-  m_Layer: 0
-  m_Name: ShootingRangeManager
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &4120214770709951109
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6759687137017171350}
-  serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -58.348213, y: -11.924394, z: -36.06058}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 2752836134298421583}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &3048306697063905576
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6759687137017171350}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c23163193ba030d4d8d0b8c209223879, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  lanes:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
 --- !u!1 &6929514001218485653
 GameObject:
   m_ObjectHideFlags: 0
@@ -638,7 +580,7 @@ MonoBehaviour:
   m_OverrideVoxelSize: 0
   m_VoxelSize: 0.1
   m_MinRegionArea: 2
-  m_NavMeshData: {fileID: 23800000, guid: 5e9f562c9caa1944c8fba95f9aa68c0d, type: 2}
+  m_NavMeshData: {fileID: 23800000, guid: 3cacd15444e15014b8d0eab46eabd271, type: 2}
   m_BuildHeightMesh: 0
 --- !u!1 &6944756901588880700
 GameObject:
@@ -894,6 +836,17 @@ MonoBehaviour:
   spawnPoints:
   - {fileID: 0}
   npcPrefabs:
+  - {fileID: 1157323347645730359, guid: d747cd251cdee6b4899f3979275a5631, type: 3}
+  - {fileID: 1157323347645730359, guid: fbe2684825c405e44b93bdcb7116323c, type: 3}
+  - {fileID: 1157323347645730359, guid: 10ed872badd0c7944845488a31d46539, type: 3}
+  - {fileID: 1157323347645730359, guid: 0ced4ebb5bff74642908d0d9389475b0, type: 3}
+  - {fileID: 1157323347645730359, guid: c64572f1599074a4495e6c50f4cd80c8, type: 3}
+  - {fileID: 1157323347645730359, guid: 17200092da3d03d47a3929abcf4f8e26, type: 3}
+  - {fileID: 1157323347645730359, guid: 70cfbfd090965fd42b4231a112215a7a, type: 3}
+  - {fileID: 1157323347645730359, guid: 77a93cc248703274e9a0bdb1243d4fe9, type: 3}
+  - {fileID: 1157323347645730359, guid: ad58dcf7473620f4987a9d5b3b08f5b8, type: 3}
+  - {fileID: 1157323347645730359, guid: c1da3aa8dd0c51249b392e5efeb7b2b9, type: 3}
+  - {fileID: 1157323347645730359, guid: bcfa60c33f63c12408f634d99d96fab0, type: 3}
   - {fileID: 1157323347645730359, guid: a48a551dc87f8a045b330d93029172f4, type: 3}
-  minDelay: 5
-  maxDelay: 5
+  minDelay: 30
+  maxDelay: 30
