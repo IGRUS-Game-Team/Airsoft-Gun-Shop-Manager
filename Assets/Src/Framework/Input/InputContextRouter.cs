@@ -52,12 +52,13 @@ public class InputContextRouter : MonoBehaviour
         clickRequested = false;
 
         // [추가] 총 들고 있으면 상호작용 막기
-        var activeGun = FindFirstObjectByType<ActiveGun>();
-        if (activeGun != null && activeGun.enabled && activeGun.gameObject.activeInHierarchy)
-        {
-            // 총 모드면 InputContextRouter는 상호작용 안함
-            return;
-        }
+        // var activeGun = FindFirstObjectByType<ActiveGun>();
+        // Debug.Log("[ActiveGun] " + activeGun != null && activeGun.enabled && activeGun.gameObject.activeInHierarchy);
+        // if (activeGun != null && activeGun.enabled && activeGun.gameObject.activeInHierarchy)
+        // {
+        //     // 총 모드면 InputContextRouter는 상호작용 안함
+        //     return;
+        // }
 
         if (UIUtility.IsPointerOverUI()) return;
 

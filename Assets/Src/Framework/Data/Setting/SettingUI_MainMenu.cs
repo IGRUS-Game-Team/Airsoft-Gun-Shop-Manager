@@ -113,12 +113,24 @@ public class SettingsUI_MainMenu : MonoBehaviour
         confirmTimerText.text = "이전 설정으로 복원했습니다.";
     }
 
-    public void OnClickClose()
+public void OnClickClose()
+{
+    var d = SettingsManager.Instance.Data;
+
+    // 해상도/품질은 드롭다운 이벤트에서 이미 저장됨.
+    // 혹시 반영 안 된 경우를 대비해서 다시 동기화
+    int idx = resolutionDropdown.value;
+    if (idx >= 0 && idx < resolutions.Length)
     {
-        // 스냅샷 필요 없으면 생략 가능. 여기서는 유지.
-        SettingsManager.Instance.Save();
-        gameObject.SetActive(false);
+        var r = resolutions[idx];
+        d.width = r.width; d.height = r.height; d.refreshRate = (int)r.refreshRateRatio.value;
     }
+    d.fullscreenMode = ToMode(fullscreenDropdown.value);
+    d.qualityLevel = qualityDropdown.value;
+
+    SettingsManager.Instance.Save();
+    gameObject.SetActive(false);
+}
 
     public void OnClickCancel()
     {
