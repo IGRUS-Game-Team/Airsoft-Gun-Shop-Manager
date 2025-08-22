@@ -30,20 +30,28 @@ public class NewsPaperController : MonoBehaviour
 
 
 
-    //오브젝트에서 이 메서드를 통하여 ui에 데이터를 세이브해준다
+    //오브젝트에서 이 메서드를 통하여 ui에 데이터를 세이브해준다 -> 옵젝 클릭하면 저장됨 -> 빨라야함 
     public void SaveData(string EeventName, string EeventStatus, string EitemName)
     {
+        Debug.Log("NewsPaperController SaveData 시작  currentTitle = " +EeventName);
+
         currentTitle = EeventName;
         currentEventState = EeventStatus;
         currentItemName = EitemName;
     }
 
-    //랜덤 정하기 -> 이걸 특정 즉 8시마다 진행해야함 -> time스크립트에 이걸 이어주면 될 것 같다 이 스크립트르 참조해서
+    //랜덤 정하기 -> 이걸 특정 즉 8시마다 진행해야함 -> selectrandomsentence가 savedata보다 느려야한다
     public void SelectRandomSentence()
     {
-        selectedSentence = randomSentence[Random.Range(0, randomSentence.Count)]; //랜덤 문자열 선택
+        Debug.Log("SelectRandomSentence currentTitle: "+currentTitle);//<<얘가 null 나온다
+        if (currentTitle == "Day")
+        {
+            selectedSentence = randomSentenceDay[Random.Range(0, randomSentenceDay.Count)];
+            return;
+        }
+        selectedSentence = randomSentence[Random.Range(0, randomSentence.Count)]; 
         Debug.Log($"{selectedSentence}");
-        //이게 updatedisplay보다 먼저 나와야함
+        
     } 
 
 
@@ -52,7 +60,7 @@ public class NewsPaperController : MonoBehaviour
     {
         if (currentTitle == "Day") //평상시일때
         {
-            sentence.text = randomSentenceDay[Random.Range(0, randomSentenceDay.Count)];
+            sentence.text = selectedSentence;// 
             return;
         }
         sentence.text = selectedSentence //문자열 변환

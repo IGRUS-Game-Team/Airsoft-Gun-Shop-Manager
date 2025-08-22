@@ -29,7 +29,7 @@ public class SettingsUI_Common : MonoBehaviour
 
         mouseSensitivity.SetValueWithoutNotify(d.mouseSensitivity);
         invertY.SetIsOnWithoutNotify(d.invertY);
-       // vibration.SetIsOnWithoutNotify(d.gamepadVibration);
+        // vibration.SetIsOnWithoutNotify(d.gamepadVibration);
 
         subtitles.SetIsOnWithoutNotify(d.subtitles);
         subtitleScale.SetValueWithoutNotify(d.subtitleScale);
@@ -94,5 +94,25 @@ public class SettingsUI_Common : MonoBehaviour
         // 단순 역함수: -80~0 dB → 0~1 근사
         if (db <= -80f) return 0f;
         return Mathf.Clamp01(Mathf.Pow(10f, db / 20f));
+    }
+    
+    public void OnClickClose()
+    {
+        var d = SettingsManager.Instance.Data;
+
+        d.masterDb = AudioApplier.Linear01ToDb(masterSlider.value);
+        d.bgmDb    = AudioApplier.Linear01ToDb(bgmSlider.value);
+        d.sfxDb    = AudioApplier.Linear01ToDb(sfxSlider.value);
+
+        d.mouseSensitivity = mouseSensitivity.value;
+        d.invertY = invertY.isOn;
+
+        d.subtitles     = subtitles.isOn;
+        d.subtitleScale = subtitleScale.value;
+        d.uiScale       = uiScale.value;
+
+        SettingsManager.Instance.audioApplier.Apply(d);
+        SettingsManager.Instance.inputApplier.Apply(d);
+        SettingsManager.Instance.Save();
     }
 }

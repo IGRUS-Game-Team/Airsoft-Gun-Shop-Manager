@@ -16,10 +16,13 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 
 public class SettlementManager : MonoBehaviour
 {
     public static SettlementManager Instance { get; private set; }
+    [Header("사격장 수입(Inspector)")]
+    [SerializeField] float shootingRangeIncome = 20f;  // 사격장 1회 이용 수입
 
     // ───────── 기본 보상(Inspector) ─────────
     [Header("정상 결제 보상(Inspector)")]
@@ -55,9 +58,10 @@ public class SettlementManager : MonoBehaviour
 
     // ───────── UI 바인딩 ─────────
     public event Action<Snapshot> OnChanged;
+    public UnityEvent OnComplainInvoked = new();
 
     // 읽기 전용 프로퍼티(필요 시 UI에서 직접 참조)
-    public int   SatisfiedCustomers    => satisfiedCustomers;
+    public int SatisfiedCustomers => satisfiedCustomers;
     public int   DissatisfiedCustomers => dissatisfiedCustomers;
     public int   ShopLevel             => shopLevel;
 
@@ -89,6 +93,8 @@ public class SettlementManager : MonoBehaviour
     {
         if (npc == null) return;
         complained.Add(npc);
+        OnComplainInvoked?.Invoke();
+
     }
 
     // ───────── 외부 API: 결제 완료(만족/불만족 분류) ─────────
@@ -162,13 +168,19 @@ public class SettlementManager : MonoBehaviour
         OnChanged?.Invoke(GetSnapshot());
     }
 
+    // ───────── 외부 API: 사격장 1회 이용 수입 반영 ─────────
+    public void RegisterShootingRangeUse()
+    {
+        RegisterSaleAmount(shootingRangeIncome);
+    }
+
     // ───────── 하루 리셋(정산 UI 닫고 다음날 시작) ─────────
     public void ResetToday()
     {
         totalCustomersToday = 0;
-        grossProfitToday    = 0f;
-        purchaseCostToday   = 0f;
-        netProfitToday      = 0f;
+        grossProfitToday = 0f;
+        purchaseCostToday = 0f;
+        netProfitToday = 0f;
         countedNpcIdsToday.Clear();
 
         OnChanged?.Invoke(GetSnapshot());

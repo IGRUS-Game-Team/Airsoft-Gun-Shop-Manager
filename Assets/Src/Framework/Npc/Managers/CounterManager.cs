@@ -191,7 +191,7 @@ public class CounterManager : MonoBehaviour
 
     public bool HasCheckoutStarted(NpcController npc)
     {
-        return npcCheckoutTargetCount.ContainsKey(npc);
+        return npc != null && npcCheckoutTargetCount?.ContainsKey(npc) == true;
     }
 
     Transform TakeRandomFreeSlot()
@@ -307,38 +307,55 @@ public class CounterManager : MonoBehaviour
 
 
     // 기존 카드 로직은 그대로 냅두고 새롭게 현금 로직만 여기 추가하면 됨.
-    public void StartCashPayment(NpcController npc)
+public void StartCashPayment(NpcController npc)
+{
+    Debug.Log("현금계산 시작");
+    counterCashUI.SetActive(true);
+    currentNpcForPayment = npc;
+
+    npcPaymentAmount = (countorMonitorController != null)
+        ? countorMonitorController.GetCurrentTotalAmount()
+        : 0f;
+
+    float payAmount = npcPaymentAmount;
+
+    // 손님이 낼 금액 계산
+    npcSendMe = GetCustomerPayment(payAmount);
+
+    // UI 세팅
+    if (cashUI != null)
+        cashUI.SetValues(received: npcSendMe, total: npcPaymentAmount);
+
+    UnsubscribeCashRegisterEvents();
+    SubscribeCashRegisterEvents();
+    cashSessionActive = true;
+
+    cashRegisterEnterHandler.OpenBasket();
+}
+private float GetCustomerPayment(float amount)
+{
+    // 지폐 단위 (여기선 10 단위 기준으로 처리)
+    float rounded = Mathf.Ceil(amount / 10f) * 10f;
+
+    int roll = Random.Range(0, 100);
+
+    if (roll < 60)
     {
-        Debug.Log("현금계산 시작");
-        counterCashUI.SetActive(true);
-        currentNpcForPayment = npc;
-
-        // 1) 이번 손님 총 결제금액 계산(모니터에서 가져오거나, 보유한 API 사용)
-        //    상황에 맞게 치환하세요.
-        npcPaymentAmount = (countorMonitorController != null)
-            ? countorMonitorController.GetCurrentTotalAmount()   
-            : 0f;
-        
-        float value = npcPaymentAmount + npcPaymentAmount / Random.Range(10, 15);
-        value = Mathf.Round(value * 100f) / 100f; // 숫자 자체 반올림
-        npcSendMe = value;
-        Debug.Log( countorMonitorController.GetCurrentTotalAmount());
-        
-        // 2) 캐시 UI 초기화(손님이 낸 돈은 일단 0, 총액은 npcPaymentAmount)
-        if (cashUI != null)
-        {
-            cashUI.SetValues(received: npcSendMe, total: npcPaymentAmount);
-        }
-        Debug.Log(countorMonitorController.GetCurrentTotalAmount());
-        // 3) 이벤트 구독 + 세션 on
-        UnsubscribeCashRegisterEvents(); // 혹시 남아있으면 정리
-        SubscribeCashRegisterEvents();
-        cashSessionActive = true;
-
-        // (선택) 서랍 열기/프리팹 노출 등은 여기서 처리
-        cashRegisterEnterHandler.OpenBasket();
-        // registerMoneyRoot.SetActive(true);
+        // 60% 확률 → 가장 가까운 10단위
+        return rounded;
     }
+    else if (roll < 90)
+    {
+        // 30% 확률 → 한 단계 더 큰 단위 (예: 150, 200)
+        return rounded + 10 * Random.Range(1, 3); // +10~20
+    }
+    else
+    {
+        // 10% 확률 → 크게 낸다 (예: 200, 500)
+        return rounded + Random.Range(50, 201); // +50~200
+    }
+}
+
 
     private void SubscribeCashRegisterEvents()
     {

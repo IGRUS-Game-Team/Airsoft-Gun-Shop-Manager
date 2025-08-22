@@ -11,6 +11,7 @@ public class ItemCardView : MonoBehaviour
     [SerializeField] TextMeshProUGUI unitPriceText;
     [SerializeField] TextMeshProUGUI amountText;
     [SerializeField] TextMeshProUGUI totalText;
+    [SerializeField] TextMeshProUGUI perAmountText;
     [SerializeField] Button plusBtn, minusBtn, addBtn;
 
     private ItemData data;
@@ -36,6 +37,7 @@ public void Setup(ItemData item)
 
     nameText.text = ItemNameResolver.Get(data);
     unitPriceText.text = $"${data.baseCost:F2}";
+    perAmountText.text = $"x{data.perBoxCount}";
     UpdateAmount(amount);
 
     plusBtn.onClick.AddListener(() => ChangeAmount(1));

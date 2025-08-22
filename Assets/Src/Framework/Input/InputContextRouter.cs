@@ -1,8 +1,4 @@
 using UnityEngine;
-
-/// <summary>
-/// 클릭 시 레이캐스트로 오브젝트를 찾고, IInteractable이 붙어 있으면 Interact()를 실행합니다.
-/// </summary>
 using System.Collections;
 
 public class InputContextRouter : MonoBehaviour
@@ -55,6 +51,15 @@ public class InputContextRouter : MonoBehaviour
         if (!clickRequested) return;
         clickRequested = false;
 
+        // [추가] 총 들고 있으면 상호작용 막기
+        // var activeGun = FindFirstObjectByType<ActiveGun>();
+        // Debug.Log("[ActiveGun] " + activeGun != null && activeGun.enabled && activeGun.gameObject.activeInHierarchy);
+        // if (activeGun != null && activeGun.enabled && activeGun.gameObject.activeInHierarchy)
+        // {
+        //     // 총 모드면 InputContextRouter는 상호작용 안함
+        //     return;
+        // }
+
         if (UIUtility.IsPointerOverUI()) return;
 
         if (RaycastDetector.Instance == null)
@@ -63,7 +68,7 @@ public class InputContextRouter : MonoBehaviour
         }       
         var hit = (RaycastDetector.Instance != null) ? RaycastDetector.Instance.HitObject : null;
 
-        // 1) 들고 있는 오브젝트를 조준 중이거나, 아무 것도 안 맞았을 때 → held 우선
+        // 1) 들고 있는 오브젝트 우선
         if (hold != null && hold.heldObject != null)
         {
             bool aimedAtHeld = hit != null && (hit.transform.root == hold.heldObject.transform.root);

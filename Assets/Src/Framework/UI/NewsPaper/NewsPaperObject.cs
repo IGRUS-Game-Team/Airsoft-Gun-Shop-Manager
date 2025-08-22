@@ -29,25 +29,26 @@ public class NewsPaperObject : MonoBehaviour, IInteractable
     }
 
 
-    //받은 값 저장
+    //받은 값 저장 -> 8시마다
     public void SaveCurrentEvent(string EeventName, string EeventStatus, string EitemName) 
     {
-        newsPaperController.SelectRandomSentence(); //랜덤 문장 선택
+        newsPaperController.SaveData(EeventName, EeventStatus, EitemName);
+        newsPaperController.SelectRandomSentence(); //랜덤 문장 선택 -> 느려야하는 SelectRandomSentence
+       
 
         currentTitleOB = EeventName;
         currentEventStateOB = EeventStatus;
         currentItemNameOB = EitemName;
         Debug.Log($"{currentTitleOB}/{currentEventStateOB}/{currentItemNameOB}");
-
-
     }
+    
+    //이미 이걸 클릭하기 이전에 받은 값 저장이 이루어져있어야 한다.
     public void Interact() //클릭할 때마다 호출
     {
-        newsPaperController.SaveData(currentTitleOB, currentEventStateOB, currentItemNameOB);
 
         // //클릭 시 ui 활성화
         ClickObjectUIManager.Instance.OpenUI(newsPaperUIObject);
-        
+
         newsPaperController.UpdateDisplay();
     }
 }
