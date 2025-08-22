@@ -9,6 +9,7 @@ public class DoorTrigger : MonoBehaviour
     [Header("매장 최대 인원")]
     [SerializeField] int maxInStore = 10;
 
+
     // 바꿔야 하는 상황
     // 1. 평판이 0 ~ 중간임에도 너무 한산하다 -> 기본 확률 높이기
     // 2. 평판이 나쁜데도 계속 붐빈다 -> 기본 확률 낮추기
@@ -17,26 +18,31 @@ public class DoorTrigger : MonoBehaviour
     // 5. 평판이 낮을 때도 너무 잘 들어온다 -> bonusAtLowRep을 더 음수로
     // 6. 평판이 높아도 사람이 별로 안 늘어난다 -> bonusAtLowRep을 더 양수로
 
+    [Header("기본 입장 확률 (%)")]
+    [Tooltip("평판 보정 빼고, 기본 확률")]
 
-    [Header("입장 기본 확률 (%) + 평판 보정")]
-    [Range(0, 100)] [SerializeField] int baseEntryChancePercent = 70;
+    [Range(0, 100)]
+    [SerializeField] int baseEntryChancePercent = 70;
 
+    // 평판이 낮을수록 깎고, 높을수록 올리는 정비례 그래프의 기울기와 끝값 조
     [Header("평판 보정(선형)")]
-    [SerializeField] int repAtLow  = 0;
-    [SerializeField] int repAtHigh = 100;
-    [Range(-100, 100)] [SerializeField] int bonusAtLowRep  = -30;
-    [Range(-100, 100)] [SerializeField] int bonusAtHighRep = +20;
+    [Tooltip("이 구간 안에서 평판을 0 ~ 1 슬라이더로 환산")]
+
+    [SerializeField] int repAtLow  = 0;    // 낮은 평판 기준(예: 0)
+    [SerializeField] int repAtHigh = 100;  // 높은 평판 기준(예: 100)
+
+    [Tooltip("평판이 최저일 때 얼마나 깎을지")]
+    [Range(-100, 100)]
+    [SerializeField] int bonusAtLowRep = -30;
+
+    [Tooltip("평판이 최고일 때 얼마나 올릴지")]
+    [Range(-100, 100)]
+    [SerializeField] int bonusAtHighRep = +20;
 
     [Header("최종 확률 클램프")]
+    [Tooltip("최종 확률이 너무 0%/100%로 고정되지 않게 안전 범위 설정(원하면 0/100으로 바꿔도 됨)")]
     [Range(0, 100)] [SerializeField] int minFinalChance = 5;
     [Range(0, 100)] [SerializeField] int maxFinalChance = 95;
-
-    [Header("입장 목적지 분배(%)")]
-    [Tooltip("선반으로 보낼 확률(사격장은 100-이 값)")]
-    [Range(0, 100)] [SerializeField] int percentToShelves = 80;
-
-    [Tooltip("선택한 목적지가 꽉 찼으면 다른 쪽으로 보낼지?")]
-    [SerializeField] bool fallbackToOtherIfFull = true;
 
     [SerializeField] TextMeshProUGUI Customer;
 
@@ -45,6 +51,7 @@ public class DoorTrigger : MonoBehaviour
 
     void OnTriggerEnter(Collider other)
     {
+        Debug.Log(other.name);
         if (!other.CompareTag(TagNpc)) return;
 
         var npc = other.GetComponent<NpcController>();
@@ -58,37 +65,22 @@ public class DoorTrigger : MonoBehaviour
         if (insideCount >= maxInStore)
         { npc.StartLeaving(exitPoint); return; }
 
-        /* ── 입장 허가 주사위 ── */
+        /* ── 평판 보정 포함 최종 확률 계산 + 주사위 ── */
         int effectiveChance = ComputeEffectiveChance();
         if (!RollEntry(effectiveChance))
         { npc.StartLeaving(exitPoint); return; }
 
-        /* ── 목적지 선택 ── */
-        bool chooseShelf = Random.Range(0, 100) < percentToShelves;
+        /* ── 선반 빈 칸 예약 ── */
+        if (!ShelfManager.Instance.TryGetAvailableSlot(out ShelfSlot slot))
+        { npc.StartLeaving(exitPoint); return; }
 
-        bool sent = false;
-
-        if (chooseShelf)
-        {
-            sent = TrySendToShelf(npc);
-            if (!sent && fallbackToOtherIfFull)
-                sent = TrySendToRange(npc);
-        }
-        else
-        {
-            sent = TrySendToRange(npc);
-            if (!sent && fallbackToOtherIfFull)
-                sent = TrySendToShelf(npc);
-        }
-
-        if (!sent) { npc.StartLeaving(exitPoint); return; }
-
-        // ── 입장 확정 ──
+        /* ── 입장 확정 ── */
         insideCount++;
-        if (Customer) Customer.text = "Customer : " + insideCount.ToString();
+        Customer.text = "Customer : " + insideCount.ToString();
         SettlementManager.Instance?.RegisterCustomerEnter(npc);
         npc.SetDoor(this);
         npc.inStore = true;
+        npc.AllowEntry(slot.transform, exitPoint);
     }
 
     void OnTriggerExit(Collider other)
@@ -99,54 +91,35 @@ public class DoorTrigger : MonoBehaviour
         if (npc != null && npc.inStore && npc.isLeaving)
         {
             insideCount = Mathf.Max(0, insideCount - 1);
-            if (Customer) Customer.text = "Customer : " + insideCount.ToString();
+            Customer.text = "Customer : " + insideCount.ToString();
             npc.inStore = false;
         }
     }
 
-    // ─────────────────────────────────────────────
-    // 목적지 분기 헬퍼
-    // ─────────────────────────────────────────────
-    bool TrySendToShelf(NpcController npc)
-    {
-        if (ShelfManager.Instance != null &&
-            ShelfManager.Instance.TryGetAvailableSlot(out ShelfSlot slot))
-        {
-            npc.AllowEntry(slot.transform, exitPoint);
-            return true;
-        }
-        return false;
-    }
-
-    bool TrySendToRange(NpcController npc)
-    {
-        if (ShootingRangeManager.Instance != null &&
-            ShootingRangeManager.Instance.TryGetAvailableLane(out ShootingLane lane))
-        {
-            npc.AllowRange(lane, exitPoint);
-            return true;
-        }
-        return false;
-    }
-
-    // ─────────────────────────────────────────────
-    // 확률 계산
-    // ─────────────────────────────────────────────
+    // 평판 기반 최종 확률 계산
     int ComputeEffectiveChance()
     {
         int rep = SettlementManager.Instance != null ? SettlementManager.Instance.Reputation : 0;
 
+        // repAtLow~repAtHigh 구간으로 정규화 (범위 뒤집혀 있어도 안전)
         float minRep = Mathf.Min(repAtLow, repAtHigh);
         float maxRep = Mathf.Max(repAtLow, repAtHigh);
         float t = (Mathf.Approximately(minRep, maxRep)) ? 1f : Mathf.InverseLerp(minRep, maxRep, rep);
 
+        // 낮은 평판 보정 → 높은 평판 보정으로 선형 보간
         float bonus = Mathf.Lerp(bonusAtLowRep, bonusAtHighRep, t);
+
+        // 기본 확률 + 보정
         float chance = baseEntryChancePercent + bonus;
+
+        // 최종 확률 클램프
         chance = Mathf.Clamp(chance, minFinalChance, maxFinalChance);
+        Debug.Log("보정 확률 값: " + chance);
 
         return Mathf.RoundToInt(chance);
     }
 
+    // 0~99 주사위 < chancePercent
     bool RollEntry(int chancePercent)
     {
         chancePercent = Mathf.Clamp(chancePercent, 0, 100);
