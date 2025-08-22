@@ -44,6 +44,8 @@ public class ShootingLane : MonoBehaviour
 
     public bool TryReserve(NpcController npc)
     {
+        if (!isActiveAndEnabled) return false;                           // ★ 비활성 레인 거절
+        if (standPoint != null && !standPoint.gameObject.activeInHierarchy) return false;
         if (IsOccupied) return false;
         occupant = npc;
         return true;
