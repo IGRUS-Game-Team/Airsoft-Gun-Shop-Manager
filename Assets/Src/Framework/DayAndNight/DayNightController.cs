@@ -64,7 +64,7 @@ public class DayNightController : MonoBehaviour
     void DebugTimeInfo(float normalizedTime)
     {
         string currentTime = timeUI.GetFormattedTime();
-        Debug.Log($"현재 시간: {currentTime}, 정규화된 시간: {normalizedTime:F3}");
+        //Debug.Log($"현재 시간: {currentTime}, 정규화된 시간: {normalizedTime:F3}");
     }
     
     // 유틸리티 메서드들
