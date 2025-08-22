@@ -12,6 +12,9 @@ GameObject:
   - component: {fileID: 5441968574024784912}
   - component: {fileID: 6716447430564256983}
   - component: {fileID: 3941483380044012058}
+  - component: {fileID: -2094585729397434860}
+  - component: {fileID: -5678582897984898769}
+  - component: {fileID: 8239220733719912153}
   m_Layer: 0
   m_Name: Ammo Box 7
   m_TagString: Untagged
@@ -109,3 +112,45 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: 30
   m_Mesh: {fileID: 4375667146016736931, guid: f9d90878c8db1594f8807c1feceed700, type: 3}
+--- !u!114 &-2094585729397434860
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7704015689140418988}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9345664f47681ba41ad9508fc726bb0d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  itemData: {fileID: 0}
+--- !u!114 &-5678582897984898769
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7704015689140418988}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ad87d0d48e8cb7745afe825d1149743c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  itemObject: {fileID: 0}
+  itemData: {fileID: 0}
+  amount: 0
+--- !u!114 &8239220733719912153
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7704015689140418988}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0ccb6c0d3408f134b929a7b03ee477cd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  selected: 0
+  sharedOutlineMaterial: {fileID: 0}
