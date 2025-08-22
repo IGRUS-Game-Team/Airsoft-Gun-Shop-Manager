@@ -145,7 +145,7 @@ public partial class @PlayerShooting: IInputActionCollection2, IDisposable
                 {
                     ""name"": """",
                     ""id"": ""ac913a22-6017-4fc6-a6f5-e837b0dc534b"",
-                    ""path"": ""<Keyboard>/l"",
+                    ""path"": ""<Mouse>/leftButton"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
