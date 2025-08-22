@@ -65,12 +65,23 @@ public class SettingsUI_InGame : MonoBehaviour
         SettingsManager.Instance.Save();
     }
 
-    public void OnClickClose()
-    {
-        SettingsManager.Instance.Save();
-        gameObject.SetActive(false);
-        Time.timeScale = 1f; // 일시정지 해제 등
-    }
+public void OnClickClose()
+{
+    // UI → Data 반영
+    var d = SettingsManager.Instance.Data;
+    d.vSync = vSync.isOn;
+    if (int.TryParse(targetFps.text, out var fps))
+        d.targetFps = Mathf.Clamp(fps, 30, 1000);
+    d.fov = fovSlider.value;
+    d.motionBlur = motionBlurToggle.isOn;
+
+    SettingsManager.Instance.graphicsApplier.ApplySafe(d);
+    SettingsManager.Instance.Save();
+
+    gameObject.SetActive(false);
+    Time.timeScale = 1f; // 일시정지 해제
+}
+
 
     public void OnClickCancel()
     {
