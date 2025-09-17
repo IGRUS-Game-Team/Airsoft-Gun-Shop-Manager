@@ -1,5 +1,60 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!1 &338056600959939300
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 7823688080647488657}
+  - component: {fileID: 2047869322226338167}
+  m_Layer: 0
+  m_Name: PlacementManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &7823688080647488657
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 338056600959939300}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2752836134298421583}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2047869322226338167
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 338056600959939300}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0a4d9099b1486d54da1bff5bf0edbdc6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  storeArea: {fileID: 0}
+  groundMask:
+    serializedVersion: 2
+    m_Bits: 2048
+  blockerMask:
+    serializedVersion: 2
+    m_Bits: 12288
+  rotateSnap: 15
+  followHeightOffset: 0
+  groundCheckDown: 0.2
+  cornerProbeInset: 0.01
 --- !u!1 &517458936307610753
 GameObject:
   m_ObjectHideFlags: 0
@@ -256,7 +311,13 @@ MonoBehaviour:
   middleWall: {fileID: 0}
   marketWindow: {fileID: 0}
   eraseWindow: {fileID: 0}
-  unlockLevel: 2
+  marketUnlockLevel: 2
+  shootingRange: {fileID: 0}
+  rangeUnlockLevel: 3
+  rangeDoor: {fileID: 0}
+  marketPrice: 30000
+  rangePrice: 50000
+  marketAreaCollider: {fileID: 0}
 --- !u!1 &2419877699787101783
 GameObject:
   m_ObjectHideFlags: 0
@@ -309,6 +370,11 @@ MonoBehaviour:
   slotJitter: 0.2
   faceTarget: {fileID: 0}
   exitPoint: {fileID: 0}
+  bouncerPrefab: {fileID: 4293158611158367777, guid: 6490f68fc9c5ebc40b90db380d793658, type: 3}
+  bouncerSpawn: {fileID: 0}
+  bouncerCallCooldown: 15
+  bouncerEscortSpeed: 2.6
+  bouncerOrderRadius: 8
   variants:
   - prefab: {fileID: 7214586416580455288, guid: 3eb7b47f20938fd469d644ed8cf9e9b1, type: 3}
     weight: 0
@@ -470,7 +536,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   exitPoint: {fileID: 2561085439846907996}
   maxInStore: 5
-  baseEntryChancePercent: 70
+  baseEntryChancePercent: 100
   repAtLow: 0
   repAtHigh: 100
   bonusAtLowRep: -30
@@ -524,6 +590,7 @@ Transform:
   - {fileID: 7926215898563582545}
   - {fileID: 2940027898771158113}
   - {fileID: 4120214770709951109}
+  - {fileID: 7823688080647488657}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &6759687137017171350
@@ -627,7 +694,7 @@ MonoBehaviour:
   m_Center: {x: 0, y: 2, z: 0}
   m_LayerMask:
     serializedVersion: 2
-    m_Bits: 128
+    m_Bits: 2176
   m_UseGeometry: 0
   m_DefaultArea: 0
   m_GenerateLinks: 0

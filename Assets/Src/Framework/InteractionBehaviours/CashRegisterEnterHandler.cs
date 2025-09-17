@@ -3,7 +3,7 @@ using UnityEngine;
 public class CashRegisterEnterHandler : MonoBehaviour
 {
     [SerializeField] private Transform cashBasket; // 현금 바구니 오브젝트
-    [SerializeField] private Vector3 openOffset = new Vector3(0.8f, 0f, 0f);
+    [SerializeField] private Vector3 openOffset = new Vector3(0f, 0f, 0.27f);
     [SerializeField] private float moveSpeed = 2f;
     [SerializeField] private CashRegisterUI cashUI;
 

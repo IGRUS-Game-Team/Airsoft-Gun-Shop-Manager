@@ -109,24 +109,28 @@ public class DoorTrigger : MonoBehaviour
     // ─────────────────────────────────────────────
     bool TrySendToShelf(NpcController npc)
     {
+        bool result = false;
         if (ShelfManager.Instance != null &&
             ShelfManager.Instance.TryGetAvailableSlot(out ShelfSlot slot))
         {
             npc.AllowEntry(slot.transform, exitPoint);
-            return true;
+            result = true;
         }
-        return false;
+        Debug.Log("TrySendToShelf result = " + result);
+        return result;
     }
 
     bool TrySendToRange(NpcController npc)
     {
+        bool result = false;
         if (ShootingRangeManager.Instance != null &&
             ShootingRangeManager.Instance.TryGetAvailableLane(out ShootingLane lane))
         {
             npc.AllowRange(lane, exitPoint);
-            return true;
+            result = true;
         }
-        return false;
+        Debug.Log("TrySendToRange result = " + result);
+        return result;
     }
 
     // ─────────────────────────────────────────────
