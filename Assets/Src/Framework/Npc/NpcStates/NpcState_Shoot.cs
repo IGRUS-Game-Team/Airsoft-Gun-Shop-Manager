@@ -131,7 +131,8 @@ public class NpcState_Shoot : IState
     // ─ 내부 헬퍼 ───────────────────────────────────────
     private void TrySpawnAndAttachWeapon()
     {
-        var lane = npc.TargetLane; var socket = npc.HandTransform;
+        var lane = npc.TargetLane;
+        var socket = npc.HandTransform;
         if (!lane || !socket) return;
 
         CleanupHeldWeapon();
@@ -144,8 +145,12 @@ public class NpcState_Shoot : IState
         npc.heldItem = go;
         npc.hasItemInHand = true;
         weaponTf = go.transform;
-    }
 
+        // ★ 무기 프리팹에서 IK 타겟 가져오기
+        var ikTargets = go.GetComponent<WeaponIKTargets>();
+        if (ikTargets != null)
+            npc.IKSystem.ApplyWeaponTargets(ikTargets);
+    }
     private void ApplyOffset()
     {
         if (weaponTf == null || npc.TargetLane == null) return;

@@ -22,28 +22,42 @@ public class ProtestDirector : MonoBehaviour
     [Header("퇴장 포인트(맵 밖)")]
     [SerializeField] Transform exitPoint;
 
+    // ▼ 바운서(용역) 관련
+    [Header("바운서 소환 설정")]
+    [SerializeField] GameObject bouncerPrefab;
+    [SerializeField] Transform bouncerSpawn;               // 없으면 spawnCenter 사용
+    [SerializeField, Min(0f)] float bouncerCallCooldown = 15f;
+    [SerializeField, Min(0f)] float bouncerEscortSpeed = 2.6f;
+    [SerializeField, Min(0f)] float bouncerOrderRadius = 8f; // 이 반경 안의 시위대에게 퇴장명령
+
+    float _nextCallReadyTime;
+    bool _protestOn;
+
     // ▼▼ 여기만 바뀐 핵심: 프리팹 여러 개 + 가중치
     [Serializable]
     public class ProtestorVariant
     {
         public GameObject prefab;
-        [Min(0f)] public float weight = 1f; // 확률 가중치 (0도 가능하지만 0이면 거의 안 뽑힘)
+        [Min(0f)] public float weight = 1f; // 확률 가중치
     }
 
     [Header("스폰 프리팹들")]
-    [SerializeField] List<ProtestorVariant> variants = new(); // 인스펙터에 여러 개 추가
-    [SerializeField] bool alternateVariants = false;          // true면 1번-2번-1번-2번… 교대 스폰
+    [SerializeField] List<ProtestorVariant> variants = new();
+    [SerializeField] bool alternateVariants = false;
     int altIndex = 0;
 
     [Header("스폰 설정")]
     [SerializeField, Min(1)] int spawnCount = 6;
-    [SerializeField, Min(0f)] float spawnInterval = 0.2f; // 0이면 한 프레임에 전원
+    [SerializeField, Min(0f)] float spawnInterval = 0.2f;
 
     [Header("랠리 머무르는 시간(초) — 0이면 무한")]
     [SerializeField, Min(0f)] float protestDuration = 25f;
 
     readonly List<Protestor> spawned = new();
     Coroutine spawnCoro;
+
+    public bool IsProtestOn => _protestOn;
+    public float CooldownRemaining => Mathf.Max(0f, _nextCallReadyTime - Time.time);
 
     void OnEnable()
     {
@@ -79,6 +93,8 @@ public class ProtestDirector : MonoBehaviour
         {
             spawnCoro = StartCoroutine(SpawnGradual(slots));
         }
+
+        _protestOn = true;
     }
 
     [ContextMenu("Stop Protest")]
@@ -87,6 +103,7 @@ public class ProtestDirector : MonoBehaviour
         StopAll();
         foreach (var p in spawned) if (p) p.Dismiss();
         spawned.Clear();
+        _protestOn = false;
     }
 
     void StopAll()
@@ -124,12 +141,67 @@ public class ProtestDirector : MonoBehaviour
         spawned.Add(p);
     }
 
+    // ───────── 바운서(용역) 호출 API ─────────
+    public void CallBouncer()
+    {
+        if (!_protestOn)
+        {
+            Debug.Log("[ProtestDirector] 현재 시위가 없음");
+            return;
+        }
+        if (Time.time < _nextCallReadyTime)
+        {
+            Debug.Log("[ProtestDirector] 쿨다운 진행중");
+            return;
+        }
+        if (!bouncerPrefab)
+        {
+            Debug.LogWarning("[ProtestDirector] bouncerPrefab 미설정");
+            return;
+        }
+
+        _nextCallReadyTime = Time.time + bouncerCallCooldown;
+
+        var spawnPos = (bouncerSpawn ? bouncerSpawn.position : spawnCenter.position);
+        var pos = SampleOnNavmesh(spawnPos, 2f);
+        var go  = Instantiate(bouncerPrefab, pos, Quaternion.identity);
+
+        var b = go.GetComponent<BouncerEscort>();
+        if (!b) { Debug.LogWarning("[ProtestDirector] 바운서 프리팹에 BouncerEscort 컴포넌트 필요"); Destroy(go); return; }
+
+        b.Setup(
+    director: this,
+    rallyCenter: GetRallyCenter(),
+    exitT: exitPoint,
+    orderRadius: bouncerOrderRadius,
+    escortSpeed: bouncerEscortSpeed,
+    faceLookTarget: faceTarget,   // ★ 시위대가 바라보는 기준
+    standAhead: 2.0f,             // 군중 앞 몇 m 지점에 설지 (원하면 조절)
+    lateralOffset: 0f             // 살짝 옆으로 서고 싶으면 ±값
+);
+
+    }
+
+    public void OrderDismissAll()
+    {
+        foreach (var p in spawned)
+            if (p) p.Dismiss();
+    }
+
+    public IReadOnlyList<Protestor> GetSpawned() => spawned;
+
+    public Vector3 GetRallyCenter()
+    {
+        if (!rallyLineA || !rallyLineB) return spawnCenter ? spawnCenter.position : transform.position;
+        var a = rallyLineA.position; var b = rallyLineB.position;
+        return new Vector3((a.x + b.x) * 0.5f, a.y, (a.z + b.z) * 0.5f);
+    }
+
     // ── 프리팹 선택 로직 ──
     GameObject PickPrefab()
     {
         if (variants == null || variants.Count == 0) return null;
 
-        // 교대 모드
         if (alternateVariants)
         {
             var v = variants[altIndex % variants.Count];
@@ -137,7 +209,6 @@ public class ProtestDirector : MonoBehaviour
             return v.prefab;
         }
 
-        // 가중 랜덤 모드
         float total = 0f;
         foreach (var v in variants) total += Mathf.Max(0.0001f, v.weight);
         float r = UnityEngine.Random.Range(0f, total);

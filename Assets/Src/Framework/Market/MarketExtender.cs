@@ -23,6 +23,9 @@ public class MarketExtender : MonoBehaviour
     [SerializeField] float marketPrice = 30000f;
     [SerializeField] float rangePrice  = 50000f;
 
+    [Header("Market Area 범위 조정")]
+    [SerializeField] private BoxCollider marketAreaCollider;
+
     // 구매 상태 저장 키
     const string KeyMarketPurchased = "StoreExpansionPurchased";
     const string KeyRangePurchased  = "ShootingRangePurchased";
@@ -98,6 +101,13 @@ public class MarketExtender : MonoBehaviour
         // ─ Shooting Range 본체 + 문
         if (shootingRange) shootingRange.SetActive(rangeUnlocked);
         if (rangeDoor) rangeDoor.SetActive(!rangeUnlocked);
+
+        // ─ Market Area Collider 조정
+        if (marketAreaCollider && marketUnlocked)
+        {
+            marketAreaCollider.center = new Vector3(-0.5f, 0f, 0f);
+            marketAreaCollider.size = new Vector3(2f, 1f, 1f);
+        }
     }
 
     // ========== 구매 호출 (UI 버튼 OnClick에서 연결) ==========

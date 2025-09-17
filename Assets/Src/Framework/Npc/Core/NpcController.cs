@@ -32,6 +32,10 @@ public class NpcController : MonoBehaviour
 
     [SerializeField] private Transform handSocket;
 
+    [Header("IK 시스템")]
+    [SerializeField] private NpcIKSystem ikSystem;
+    public NpcIKSystem IKSystem => ikSystem;
+
     private Transform doorPoint;
     public Transform HandTransform => handSocket;
     public System.Action<float> onScheduleNextShot;
@@ -42,6 +46,10 @@ public class NpcController : MonoBehaviour
         Agent = GetComponent<NavMeshAgent>();
         Animator = GetComponentInChildren<Animator>();
         stateMachine = new StateMachine();
+        if (ikSystem == null)
+        {
+            ikSystem = GetComponentInChildren<NpcIKSystem>();
+        }
     }
 
     private void Start()
