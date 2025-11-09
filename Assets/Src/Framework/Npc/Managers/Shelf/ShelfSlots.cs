@@ -134,4 +134,16 @@ public class ShelfSlot : MonoBehaviour
 
         return offerPrice > 0f;
     }
+
+    // 플레이어가 직접 가져간 상품을 리스트에서 제거할 때 사용
+    public bool RemoveItem(GameObject go)
+    {
+        if (go == null) return false;
+
+        int idx = items.IndexOf(go);
+        if (idx < 0) return false;   // 리스트에 없으면 아무 것도 안 함
+
+        items.RemoveAt(idx);
+        return true;
+    }
 }

@@ -62,6 +62,8 @@ MeshRenderer:
   m_RayTracingAccelStructBuildFlagsOverride: 0
   m_RayTracingAccelStructBuildFlags: 1
   m_SmallMeshCulling: 1
+  m_ForceMeshLod: -1
+  m_MeshLodSelectionBias: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -83,6 +85,7 @@ MeshRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
+  m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
@@ -130,8 +133,6 @@ GameObject:
   - component: {fileID: 5881947768277536065}
   - component: {fileID: 3482931455743299277}
   - component: {fileID: 8244393591970569411}
-  - component: {fileID: 1404980911192727925}
-  - component: {fileID: 7119902305905835634}
   m_Layer: 8
   m_Name: PlayerCapsule
   m_TagString: Player
@@ -245,6 +246,7 @@ MonoBehaviour:
   jump: 0
   sprint: 0
   dayEnd: 0
+  range: 0
   analogMovement: 0
   cursorLocked: 1
   cursorInputForLook: 1
@@ -429,55 +431,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   throwForce: 10
---- !u!114 &1404980911192727925
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4282492155600643594}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f21231ab81851934793e80b2116abd77, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  preview: {fileID: 7119902305905835634}
---- !u!114 &7119902305905835634
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4282492155600643594}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6860a2f96fefce649b5d9c69770c468d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  holdController: {fileID: 2799180030413340524}
-  holdPoint: {fileID: 3194395245542308415}
-  previewGreen: {fileID: 0}
-  previewRed: {fileID: 0}
-  placeRange: 3
-  contentRootOverride: {fileID: 0}
-  boxLayerMask:
-    serializedVersion: 2
-    m_Bits: 0
-  boxLikeTags:
-  - Box
-  - Crate
-  - Package
-  boxNameHints:
-  - Box
-  - Crate
-  - Lid
-  - Cap
-  - Case
-  - Package
-  useBoxColliderFirst: 1
-  sizeScale: 1
-  alignToSurface: 1
-  liftByHeightRatio: 0.5
 --- !u!1 &4459114452649729900
 GameObject:
   m_ObjectHideFlags: 0

@@ -17,6 +17,17 @@ public class PlayerObjectThrowBoxController : MonoBehaviour
         var held = PlayerObjectHoldController.Instance.heldObject;
         if (held == null) return;
 
+        // 선반에서 들고 온 작은 박스라면 originalParent 가 null 일 수 있음
+        if (held.originalParent != null)
+        {
+            held.transform.SetParent(held.originalParent);
+        }
+        else
+        {
+            // 부모 정보가 없으면 그냥 월드 루트에 남겨둔다
+            held.transform.SetParent(null);
+        }
+
         // 부모 복원
         held.transform.SetParent(held.originalParent);
 

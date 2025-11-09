@@ -20,6 +20,7 @@ public class InteractionController : MonoBehaviour
     public event Action OnExitUI;
     public event Action OnDayEnd;
     public event Action OnCashRegister;
+    public event Action OnOpenHeldBox;
     private void Awake()
     {
         if (Instance != null && Instance != this)
@@ -38,6 +39,7 @@ public class InteractionController : MonoBehaviour
         inputActions.Player.ExitUI.performed += ctx => OnExitUI?.Invoke();
         inputActions.Player.DayEnd.performed += ctx => OnDayEnd?.Invoke();
         inputActions.Player.CashRegister.performed += ctx => OnCashRegister?.Invoke();
+        inputActions.Player.OpenHeldBox.performed += ctx => OnOpenHeldBox?.Invoke();
     }
 
     private void OnDestroy()
@@ -48,5 +50,6 @@ public class InteractionController : MonoBehaviour
         inputActions.Player.ExitUI.performed -= ctx => OnExitUI?.Invoke();
         inputActions.Player.DayEnd.performed -= ctx => OnDayEnd?.Invoke();
         inputActions.Player.CashRegister.performed -= ctx => OnCashRegister?.Invoke();
+        inputActions.Player.OpenHeldBox.performed -= ctx => OnOpenHeldBox?.Invoke();
     }
 }

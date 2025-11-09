@@ -79,6 +79,18 @@ public class InputContextRouter : MonoBehaviour
             }
         }
 
+        // 1.5) 맨손일 때: 선반을 맞췄더라도, 그 위에 SmallBox가 있으면 그걸 먼저 처리
+        if (hit != null && (hold == null || hold.heldObject == null))
+        {
+            // hit 오브젝트(대부분 ShelfSlot) 아래에 SmallBoxInteraction이 있는지 찾기
+            var small = hit.GetComponentInChildren<SmallBoxInteraction>();
+            if (small != null)
+            {
+                small.Interact();
+                return;
+            }
+        }
+
         // 2) 평소처럼 레이캐스트 대상 처리
         if (hit == null) return;
         var intr = hit.GetComponentInParent<IInteractable>();

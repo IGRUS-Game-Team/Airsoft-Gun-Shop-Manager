@@ -90,7 +90,10 @@ public class BoxContentVisualManager : MonoBehaviour
 
     private void Clear()
     {
-        foreach (var go in spawned) if (go) Destroy(go);
+        foreach (var go in spawned)
+        {
+            if (go) Destroy(go);
+        }
         spawned = System.Array.Empty<GameObject>();
     }
 
@@ -117,8 +120,20 @@ public class BoxContentVisualManager : MonoBehaviour
         var go = Instantiate(prefab, contentRoot);
         go.transform.localPosition = localPos;
         go.transform.localRotation = Quaternion.identity; // 필요하면 랜덤 틸트로 바꿔도 됨
-        go.transform.localScale    = Vector3.one * 0.9f;
+        go.transform.localScale = Vector3.one * 0.9f;
 
+        var anim = go.GetComponent<Animator>();
+        if (anim != null) anim.enabled = false;
+
+        // 박스 안에 들어 있는 박스들은 물리 끄기
+        var rb = go.GetComponent<Rigidbody>();
+        if (rb != null)
+        {
+            rb.isKinematic = true;   // 물리 시뮬레이션 안 받게
+            rb.useGravity = false;  // 중력 끄기
+            rb.detectCollisions = false;  // 충돌 연산도 필요 없음
+        }
+    
         // 박스 안에서 클릭 레이 방해 안 하도록
         var col = go.GetComponent<Collider>();
         if (col) col.enabled = false;
