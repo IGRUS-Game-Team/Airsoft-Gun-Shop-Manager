@@ -23,6 +23,8 @@ public class GunInteraction : MonoBehaviour, IPickable
 
     public void Interact()
     {
+        if (holdController != null && holdController.heldObject != null)
+        return;
         // 상호작용(클릭)하면 그냥 집기
         PickUp();
     }
@@ -48,17 +50,7 @@ public class GunInteraction : MonoBehaviour, IPickable
 
     public void SetDown()
     {
-        if (!holdData.isHeld) return;
 
-        transform.SetParent(null, true);
-        holdData.originalParent = null; // 참고로 같이 정리
-
-        if (col != null) col.enabled = true;
-        holdData.EnablePhysics();
-
-        holdData.isHeld = false;
-        if (holdController != null && holdController.heldObject == holdData)
-            holdController.heldObject = null;
     }
 
     public void ThrowObject()

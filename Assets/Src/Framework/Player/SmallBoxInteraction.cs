@@ -127,11 +127,14 @@ public class SmallBoxInteraction : MonoBehaviour, IPickable
         holdData.isHeld = false;
         if (holdController != null && holdController.heldObject == holdData)
             holdController.heldObject = null;
+
+        Debug.Log("상자 내려 놓음");
     }
 
     public void ThrowObject()
     {
         // 개별 박스를 던지는 기능이 필요하면 나중에 여기에 구현
+        Debug.Log("상자 집어 던짐");
     }
 
     // 선반에서 집어 들 때, 선반과의 관계를 끊어준다
