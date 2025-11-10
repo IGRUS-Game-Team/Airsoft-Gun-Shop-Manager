@@ -22,7 +22,9 @@ public class BlockIsHolding : MonoBehaviour
     private void Awake()
     {
         rb = GetComponent<Rigidbody>();
-        originalParent = transform.parent;
+
+        if (originalParent == null)
+            originalParent = transform.parent;
     }
 
     /// <summary>
@@ -32,6 +34,8 @@ public class BlockIsHolding : MonoBehaviour
     {
         if (rb == null) return;
 
+        rb.velocity = Vector3.zero;
+        rb.angularVelocity = Vector3.zero;
         rb.isKinematic = true;
         rb.detectCollisions = false;
         rb.useGravity = false;
@@ -47,5 +51,6 @@ public class BlockIsHolding : MonoBehaviour
         rb.isKinematic = false;
         rb.detectCollisions = true;
         rb.useGravity = true;
+        rb.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
     }
 }

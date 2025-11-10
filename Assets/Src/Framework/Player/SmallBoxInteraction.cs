@@ -85,27 +85,12 @@ public class SmallBoxInteraction : MonoBehaviour, IPickable
         // 4) 총 프리팹을 "상자가 있던 자리"에 생성
         GameObject gun = Instantiate(gunPrefab, pos, rot, parent);
 
-        // // 만약 parent가 holdPoint 라면, local 기준으로 딱 붙이고 싶으면 이렇게:
-        // gun.transform.localPosition = Vector3.zero;
-        // gun.transform.localRotation = Quaternion.identity;
-
-        // 필요하면 여기서 총의 리지드바디/콜라이더 끄기 (손에 고정용)
-        var rb = gun.GetComponent<Rigidbody>();
-        if (rb != null)
+        // 총을 바로 플레이어 손에 쥐어 주기
+        var gunInteraction = gun.GetComponent<GunInteraction>();
+        if (gunInteraction != null)
         {
-            rb.isKinematic = true;
-            rb.useGravity = false;
-            rb.detectCollisions = false;
+            gunInteraction.PickUp();   // 위에서 만든 PickUp() 호출
         }
-
-        var col = gun.GetComponent<Collider>();
-        if (col != null)
-        {
-            col.enabled = false;
-        }
-
-        // 나중에 "총 들고 있는 상태 관리"를 할 시스템이 있으면
-        // 거기에 gun을 넘겨주는 코드를 여기에 추가하면 됨.
     }
 
     // ===== IPickable 구현 =====
