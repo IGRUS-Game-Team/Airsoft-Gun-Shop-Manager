@@ -4,68 +4,125 @@ using UnityEngine;
 public class DoorTrigger : MonoBehaviour
 {
     [Header("NPC 퇴장 위치")]
-    [SerializeField] Transform exitPoint;
+    [SerializeField] private Transform exitPoint;
 
     [Header("매장 최대 인원")]
-    [SerializeField] int maxInStore = 10;
+    [SerializeField] private int maxInStore = 10;
 
-    // 바꿔야 하는 상황
-    // 1. 평판이 0 ~ 중간임에도 너무 한산하다 -> 기본 확률 높이기
-    // 2. 평판이 나쁜데도 계속 붐빈다 -> 기본 확률 낮추기
-    // 3. 게임에서 평판이 100보다 넘게 크는 구조다 -> repAtHigh를 더 높이기
-    // 4. 초반부터 평판 변화가 잘 느껴졌으면 좋겠다 -> repAtHigh를 더 낮추기
-    // 5. 평판이 낮을 때도 너무 잘 들어온다 -> bonusAtLowRep을 더 음수로
-    // 6. 평판이 높아도 사람이 별로 안 늘어난다 -> bonusAtLowRep을 더 양수로
-
+    [Header("매장 상태 (OPEN / CLOSED)")]
+    [SerializeField] private bool isOpen = true;
+    public bool IsOpen => isOpen;
 
     [Header("입장 기본 확률 (%) + 평판 보정")]
-    [Range(0, 100)] [SerializeField] int baseEntryChancePercent = 70;
+    [Range(0, 100)] [SerializeField] private int baseEntryChancePercent = 70;
 
     [Header("평판 보정(선형)")]
-    [SerializeField] int repAtLow  = 0;
-    [SerializeField] int repAtHigh = 100;
-    [Range(-100, 100)] [SerializeField] int bonusAtLowRep  = -30;
-    [Range(-100, 100)] [SerializeField] int bonusAtHighRep = +20;
+    [SerializeField] private int repAtLow = 0;
+    [SerializeField] private int repAtHigh = 100;
+    [Range(-100, 100)] [SerializeField] private int bonusAtLowRep = -30;
+    [Range(-100, 100)] [SerializeField] private int bonusAtHighRep = +20;
 
     [Header("최종 확률 클램프")]
-    [Range(0, 100)] [SerializeField] int minFinalChance = 5;
-    [Range(0, 100)] [SerializeField] int maxFinalChance = 95;
+    [Range(0, 100)] [SerializeField] private int minFinalChance = 5;
+    [Range(0, 100)] [SerializeField] private int maxFinalChance = 95;
 
     [Header("입장 목적지 분배(%)")]
-    [Tooltip("선반으로 보낼 확률(사격장은 100-이 값)")]
-    [Range(0, 100)] [SerializeField] int percentToShelves = 80;
+    [Tooltip("선반으로 보낼 확률(사격장은 100 - 이 값)")]
+    [Range(0, 100)] [SerializeField] private int percentToShelves = 80;
 
     [Tooltip("선택한 목적지가 꽉 찼으면 다른 쪽으로 보낼지?")]
-    [SerializeField] bool fallbackToOtherIfFull = true;
+    [SerializeField] private bool fallbackToOtherIfFull = true;
 
-    [SerializeField] TextMeshProUGUI Customer;
+    [Header("현재 매장 인원 텍스트 (선택)")]
+    [SerializeField] private TextMeshProUGUI customerText;
 
-    const string TagNpc = "Npc";
-    int insideCount;
+    private const string TagNpc = "Npc";
+    private int insideCount;
 
-    void OnTriggerEnter(Collider other)
+    // =========================================================
+    // Unity Events
+    // =========================================================
+    private void OnTriggerEnter(Collider other)
+    {
+        if (!IsValidNpc(other, out var npc)) return;
+
+        // 한 번만 처리
+        if (npc.DoorProcessed) return;
+        npc.DoorProcessed = true;
+
+        // 1) 매장 입장 가능 여부 체크 (열려 있음? 인원? 확률?)
+        if (!CanEnterStore(npc))
+        {
+            SendOut(npc);
+            return;
+        }
+
+        // 2) 선반 / 사격장 등 목적지 할당
+        if (!TryAssignDestination(npc))
+        {
+            SendOut(npc);
+            return;
+        }
+
+        // 3) 실제 입장 처리
+        RegisterEnter(npc);
+    }
+
+    private void OnTriggerExit(Collider other)
     {
         if (!other.CompareTag(TagNpc)) return;
 
         var npc = other.GetComponent<NpcController>();
-        if (npc == null || npc.isLeaving) return;
+        if (npc != null && npc.inStore && npc.isLeaving)
+        {
+            insideCount = Mathf.Max(0, insideCount - 1);
+            UpdateCustomerUI();
+            npc.inStore = false;
+        }
+    }
 
-        // 중복 처리 방지
-        if (npc.DoorProcessed) return;
-        npc.DoorProcessed = true;
+    // =========================================================
+    // Public API (문 열고 닫기)
+    // =========================================================
+    public void OpenStore()  => isOpen = true;
+    public void CloseStore() => isOpen = false;
+    public void ToggleOpen() => isOpen = !isOpen;
 
-        /* ── 인원 제한 ── */
-        if (insideCount >= maxInStore)
-        { npc.StartLeaving(exitPoint); return; }
+    // =========================================================
+    // Private helpers
+    // =========================================================
 
-        /* ── 입장 허가 주사위 ── */
+    /// <summary>콜라이더가 유효한 NPC인지 확인하고 NpcController를 꺼내온다.</summary>
+    private bool IsValidNpc(Collider other, out NpcController npc)
+    {
+        npc = null;
+        if (!other.CompareTag(TagNpc)) return false;
+
+        npc = other.GetComponent<NpcController>();
+        if (npc == null) return false;
+        if (npc.isLeaving) return false;
+
+        return true;
+    }
+
+    /// <summary>매장이 열려 있고, 인원/확률 조건을 만족하면 true.</summary>
+    private bool CanEnterStore(NpcController npc)
+    {
+        // 매장 닫혀있으면 입장 불가
+        if (!isOpen) return false;
+
+        // 인원 제한
+        if (insideCount >= maxInStore) return false;
+
+        // 입장 확률
         int effectiveChance = ComputeEffectiveChance();
-        if (!RollEntry(effectiveChance))
-        { npc.StartLeaving(exitPoint); return; }
+        return RollEntry(effectiveChance);
+    }
 
-        /* ── 목적지 선택 ── */
+    /// <summary>NPC를 어느 목적지로 보낼지 결정하고 실제로 보낸다.</summary>
+    private bool TryAssignDestination(NpcController npc)
+    {
         bool chooseShelf = Random.Range(0, 100) < percentToShelves;
-
         bool sent = false;
 
         if (chooseShelf)
@@ -81,77 +138,87 @@ public class DoorTrigger : MonoBehaviour
                 sent = TrySendToShelf(npc);
         }
 
-        if (!sent) { npc.StartLeaving(exitPoint); return; }
+        return sent;
+    }
 
-        // ── 입장 확정 ──
+    /// <summary>입장을 확정하고 카운트 / UI / 정산에 반영.</summary>
+    private void RegisterEnter(NpcController npc)
+    {
         insideCount++;
-        if (Customer) Customer.text = "Customer : " + insideCount.ToString();
+        UpdateCustomerUI();
+
         SettlementManager.Instance?.RegisterCustomerEnter(npc);
         npc.SetDoor(this);
         npc.inStore = true;
     }
 
-    void OnTriggerExit(Collider other)
+    /// <summary>NPC를 출구 방향으로 돌려보낸다.</summary>
+    private void SendOut(NpcController npc)
     {
-        if (!other.CompareTag(TagNpc)) return;
+        npc.StartLeaving(exitPoint);
+    }
 
-        var npc = other.GetComponent<NpcController>();
-        if (npc != null && npc.inStore && npc.isLeaving)
-        {
-            insideCount = Mathf.Max(0, insideCount - 1);
-            if (Customer) Customer.text = "Customer : " + insideCount.ToString();
-            npc.inStore = false;
-        }
+    private void UpdateCustomerUI()
+    {
+        if (customerText != null)
+            customerText.text = "Customer : " + insideCount.ToString();
     }
 
     // ─────────────────────────────────────────────
-    // 목적지 분기 헬퍼
+    // 목적지 분기
     // ─────────────────────────────────────────────
-    bool TrySendToShelf(NpcController npc)
+    private bool TrySendToShelf(NpcController npc)
     {
-        bool result = false;
         if (ShelfManager.Instance != null &&
             ShelfManager.Instance.TryGetAvailableSlot(out ShelfSlot slot))
         {
             npc.AllowEntry(slot.transform, exitPoint);
-            result = true;
+            Debug.Log("TrySendToShelf result = true");
+            return true;
         }
-        Debug.Log("TrySendToShelf result = " + result);
-        return result;
+
+        Debug.Log("TrySendToShelf result = false");
+        return false;
     }
 
-    bool TrySendToRange(NpcController npc)
+    private bool TrySendToRange(NpcController npc)
     {
-        bool result = false;
         if (ShootingRangeManager.Instance != null &&
             ShootingRangeManager.Instance.TryGetAvailableLane(out ShootingLane lane))
         {
             npc.AllowRange(lane, exitPoint);
-            result = true;
+            Debug.Log("TrySendToRange result = true");
+            return true;
         }
-        Debug.Log("TrySendToRange result = " + result);
-        return result;
+
+        Debug.Log("TrySendToRange result = false");
+        return false;
     }
 
     // ─────────────────────────────────────────────
     // 확률 계산
     // ─────────────────────────────────────────────
-    int ComputeEffectiveChance()
+    private int ComputeEffectiveChance()
     {
-        int rep = SettlementManager.Instance != null ? SettlementManager.Instance.Reputation : 0;
+        int rep = SettlementManager.Instance != null
+            ? SettlementManager.Instance.Reputation
+            : 0;
 
         float minRep = Mathf.Min(repAtLow, repAtHigh);
         float maxRep = Mathf.Max(repAtLow, repAtHigh);
-        float t = (Mathf.Approximately(minRep, maxRep)) ? 1f : Mathf.InverseLerp(minRep, maxRep, rep);
 
-        float bonus = Mathf.Lerp(bonusAtLowRep, bonusAtHighRep, t);
+        float t = (Mathf.Approximately(minRep, maxRep))
+            ? 1f
+            : Mathf.InverseLerp(minRep, maxRep, rep);
+
+        float bonus  = Mathf.Lerp(bonusAtLowRep, bonusAtHighRep, t);
         float chance = baseEntryChancePercent + bonus;
-        chance = Mathf.Clamp(chance, minFinalChance, maxFinalChance);
+        chance       = Mathf.Clamp(chance, minFinalChance, maxFinalChance);
 
         return Mathf.RoundToInt(chance);
     }
 
-    bool RollEntry(int chancePercent)
+    private bool RollEntry(int chancePercent)
     {
         chancePercent = Mathf.Clamp(chancePercent, 0, 100);
         int dice = Random.Range(0, 100);

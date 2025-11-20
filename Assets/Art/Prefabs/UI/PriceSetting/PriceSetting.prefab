@@ -1092,7 +1092,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 7982216211841276643}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 626412397211356928, guid: a47101ea77504674dbce66aacad9321d, type: 3}
+        m_TargetAssemblyTypeName: PriceCardController, Assembly-CSharp
+        m_MethodName: ClosePriceUI
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!1 &6190288570971354039
 GameObject:
   m_ObjectHideFlags: 0

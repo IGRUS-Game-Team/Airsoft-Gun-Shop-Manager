@@ -98,7 +98,6 @@ public class SocialEventManager : MonoBehaviour
             Debug.Log("전달");
             OnEventUIUpdate?.Invoke(eventName, eventStatus, itemName);//신문에 전달
             OnNewsScreenUpdate?.Invoke(eventName);//뉴스에 전달
-      
         }
     }
 

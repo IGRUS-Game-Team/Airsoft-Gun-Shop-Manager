@@ -1,53 +1,50 @@
 using System.Collections.Generic;
 using UnityEngine;
+
 /// <summary>
 /// 가격표 생성
-/// so 데이터 받아서 가격표에게 넘기기 
+/// SO 데이터 받아서 가격표에게 넘기기 
 /// </summary>
 public class PriceCardFactory : MonoBehaviour
 {
     public static PriceCardFactory Instance { get; private set; }
+
     [Header("가격표 프리팹 & 위치 슬롯")]
     [SerializeField] GameObject priceCardWithSetting;
-    [SerializeField] float x = 0;
-    [SerializeField] float y = 0;
-    [SerializeField] float z = 0;
     
-    // 현재 생성된 가격표 추적 (딕셔너리로 변경)
+    // 현재 생성된 가격표 추적 (딕셔너리로 유지)
     private Dictionary<Vector3, GameObject> priceCardDictionary = new Dictionary<Vector3, GameObject>();
 
 
     void Awake()
     {
-        // 만약 다른 PriceCardFactory 인스턴스가 이미 존재한다면
         if (Instance != null && Instance != this)
         {
-            // 이 오브젝트는 파괴하고 로직을 중단
             Destroy(this.gameObject);
             return;
         }
         Instance = this;
     }
+
     void OnEnable()
     {
-        // 람다식이 아닌, 메소드 이름을 직접 등록합니다.
+        // 시그니처 변경: Quaternion rotation 추가됨
         ShelfSlot.OnProductPlacedToFactory += SendItemData;
     }
 
     void OnDisable()
     {
-        // 등록했던 메소드 이름으로 정확하게 해지합니다.
         ShelfSlot.OnProductPlacedToFactory -= SendItemData;
     }
 
-    //so 데이터 가격표에게 전달하기
-    void SendItemData(ItemData itemData, Vector3 priceCardPosition, Transform parentTransform)
+    // 슬롯에서 위치 + 회전 + 부모까지 받아옴
+    void SendItemData(ItemData itemData, Vector3 priceCardPosition, Quaternion rotation, Transform parentTransform)
     {
-        CreatePriceCard(itemData, priceCardPosition, parentTransform);
+        CreatePriceCard(itemData, priceCardPosition, rotation, parentTransform);
     }
 
-    //가격표 생성하기
-    private void CreatePriceCard(ItemData itemData,Vector3 position, Transform parent)
+    // 가격표 생성하기
+    private void CreatePriceCard(ItemData itemData, Vector3 position, Quaternion rotation, Transform parent)
     {
         if (priceCardWithSetting == null)
         {
@@ -62,13 +59,9 @@ public class PriceCardFactory : MonoBehaviour
             priceCardDictionary.Remove(position);
         }
 
-
-        // 새 가격표 생성
-        Quaternion rotation = Quaternion.Euler(x, y, z);
+        // 새 가격표 생성 – 슬롯에서 넘겨준 회전 그대로 사용
         GameObject newPriceCard = Instantiate(priceCardWithSetting, position, rotation, parent);
         priceCardDictionary.Add(position, newPriceCard);
-
-
 
         // 가격표 및 세팅창 item데이터 전송
         PriceCardController priceCardController = newPriceCard.GetComponent<PriceCardController>();
@@ -77,16 +70,14 @@ public class PriceCardFactory : MonoBehaviour
         {
             priceCardController.UpdateName(itemData);
             priceCardController.UpdatePrice(itemData);
-            PriceObserver.Instance.Subscribe(itemData.itemId, priceCardController);//옵저버 구독
+            PriceObserver.Instance.Subscribe(itemData.itemId, priceCardController); // 옵저버 구독
         }
 
         PriceSettingController priceSettingController = newPriceCard.GetComponentInChildren<PriceSettingController>(true);
         if (priceSettingController)
         {
             priceSettingController.GetScriptableObject(itemData);
-            PriceObserver.Instance.Subscribe(itemData.itemId, priceSettingController);//옵저버 구독
+            PriceObserver.Instance.Subscribe(itemData.itemId, priceSettingController); // 옵저버 구독
         }
-        
-        
     }
 }

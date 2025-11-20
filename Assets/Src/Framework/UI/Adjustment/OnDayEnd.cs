@@ -1,131 +1,192 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
-using StarterAssets;
 
-/// <summary>
-/// OnDayEnd.cs 08/03 이지연
-/// OnDayEnd 오브젝트에 붙은 스크립트로, 액션맵 통해 enter 감지하면 Text가 0.4초마다 나타나는 기능입니다. 
-/// </summary>
-
-
+/// 하루 마감(정산) UI 컨트롤러
+/// - Enter/KeypadEnter 로 열기(마감시간 이후)
+/// - InteractionController.OnDayEnd 이벤트로도 열기
+/// - 자정(00:00) 자동 마감 유지
+/// - 다음날로 넘어가면 모든 가드/코루틴/텍스트 확실히 리셋
 public class OnDayEnd : MonoBehaviour
 {
+    [Header("Refs")]
     [SerializeField] GameObject AdjustmentCanvas;
     [SerializeField] GameObject BackgroundImage;
-    [SerializeField] Transform TextGroup;
-    [SerializeField] AudioClip AdjustmentAppearSound;
-    [SerializeField] AudioClip UIAppearSound;
+    [SerializeField] Transform  TextGroup;
+    [SerializeField] AudioClip  AdjustmentAppearSound;
+    [SerializeField] AudioClip  UIAppearSound;
     [SerializeField] AudioSource audioSource;
-    //[SerializeField] StarterAssets.StarterAssetsInputs playerInput; // 액션맵
-    [SerializeField] TimeUI timeUI;
+    [SerializeField] TimeUI     timeUI;
 
-    private bool isAdjustmentCanvasActive = false; // 시간이 지났을 때만 정산 UI가 활성화되어야 하므로 false가 기본값
-    private bool isEnterPressed = false;
+    [Header("Input Fallback")]
+    [Tooltip("InteractionController 이벤트가 없어도 Enter 키로 열 수 있게 함")]
+    [SerializeField] bool useEnterFallback = true;
+
+    // 내부 상태
+    bool isAdjustmentCanvasActive = false;
+    bool isEnterRequested         = false;
+    bool subscribed               = false;
+    bool hasShownToday            = false;   // 오늘 하루에 정산창을 한 번이라도 띄웠는지
+    Coroutine showTextCo          = null;    // 텍스트 순차 표시 코루틴 핸들
+
     public static bool isDayEndUIActive = false;
-    private bool hasAutoEndTriggered = false; // 자동 종료
-    private void Start()
+
+    void OnEnable()
     {
-        InteractionController.Instance.OnDayEnd += HandleExitKeyPressed;
-        isDayEndUIActive = false;
+        TrySubscribe();
+        if (timeUI != null)
+            timeUI.OnDayChanged.AddListener(ResetFlagsForNewDay); // 다음날 되면 플래그 리셋
     }
 
-    private void OnDisable()
+    void Start()
     {
+        TrySubscribe();
+        isDayEndUIActive = false;
+
+        if (!timeUI) Debug.LogWarning("[OnDayEnd] TimeUI 미지정");
+        if (!AdjustmentCanvas || !BackgroundImage || !TextGroup || !audioSource)
+            Debug.LogWarning("[OnDayEnd] UI/오디오 레퍼런스 중 누락 있음");
+    }
+
+    void OnDisable()
+    {
+        Unsubscribe();
+        if (timeUI != null)
+            timeUI.OnDayChanged.RemoveListener(ResetFlagsForNewDay);
+    }
+
+    void TrySubscribe()
+    {
+        if (subscribed) return;
         if (InteractionController.Instance != null)
-            InteractionController.Instance.OnDayEnd -= HandleExitKeyPressed;
+        {
+            InteractionController.Instance.OnDayEnd += OnExternalDayEndRequest;
+            subscribed = true;
+        }
     }
 
-    private void HandleExitKeyPressed()
+    void Unsubscribe()
     {
-        isEnterPressed = true;
-    }
-
-    private void OpenSetting()
-    {
-        isDayEndUIActive = true;
-        Cursor.lockState = CursorLockMode.None;
-        Cursor.visible = true;
-    }
-
-    private void CloseSetting() //정산 ui 꺼질때 이 메서드 넣어주세요
-    {
-        isDayEndUIActive = false;
-        Cursor.lockState = CursorLockMode.Locked;
-        Cursor.visible = false; //커서 안보임
+        if (subscribed && InteractionController.Instance != null)
+            InteractionController.Instance.OnDayEnd -= OnExternalDayEndRequest;
+        subscribed = false;
     }
 
     void Update()
     {
-        var sm = SettlementManager.Instance;
-        int open  = sm != null ? sm.OpenHour  : 8;
-        int close = sm != null ? sm.CloseHour : 20;
+        if (!subscribed) TrySubscribe();
 
-        int hours = (timeUI.totalGameMinutes / 60) % 24;
-        bool isAfterClose = hours >= close; // ← 하드코드 20 대신
+        // 다른 UI(설정 등) 열려 있으면 리턴 → Enter가 거기서 소비될 수 있음
+        if (InGameSettingManager.Instance != null &&
+            InGameSettingManager.Instance.GetIsSettingOpen())
+            return;
 
-       if (isEnterPressed && !isAdjustmentCanvasActive && isAfterClose)
+        if (useEnterFallback &&
+            (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter)))
+            isEnterRequested = true;
+
+        int minutes = timeUI ? timeUI.totalGameMinutes : 480;
+        int hours   = (minutes / 60) % 24;
+
+        var sm    = SettlementManager.Instance;
+        int close = sm ? sm.CloseHour : 20;
+        bool afterClose = hours >= close;
+
+        // 수동 마감
+        if (isEnterRequested && !hasShownToday)
         {
-            OnEnterDayEnd();
-            isEnterPressed = false;
-        }   
-    
-        else if (isEnterPressed && !isAdjustmentCanvasActive && !isAfterClose)
-        {
-            isEnterPressed = false;
-            Debug.Log("아직 마감 시간이 되지 않았습니다.");
+            if (afterClose) OpenDayEndUI();
+            else Debug.Log($"[OnDayEnd] 아직 마감 전 (현재 {hours:D2}시, 마감 {close}시)");
+            isEnterRequested = false;
         }
 
-        else if (timeUI.totalGameMinutes == 1440 && !hasAutoEndTriggered && !timeUI.isTimePaused) // 00:00 가 됐을 때 정산UI 띄우기
+        // 자정 자동 마감 (00:00)
+        if (timeUI && !hasShownToday && !timeUI.isTimePaused)
         {
-            hasAutoEndTriggered = true; // 자동 종료 (Updeate 내에서 OnEnterDayEnd가 한 번만 호출되도록)
-            OnEnterDayEnd();
+            int h = (timeUI.totalGameMinutes / 60) % 24;
+            int m = timeUI.totalGameMinutes % 60;
+            if (h == 0 && m == 0) OpenDayEndUI();
         }
     }
 
-    public void OnEnterDayEnd()
-    {
-        OpenSetting();
-        audioSource.PlayOneShot(AdjustmentAppearSound);
+    void OnExternalDayEndRequest() => isEnterRequested = true;
 
-        AdjustmentCanvas.SetActive(true); 
-        BackgroundImage.SetActive(true); 
-        StartCoroutine(ShowDelayText());
+    void OpenDayEndUI()
+    {
+        if (hasShownToday) return;
+        hasShownToday = true;
+
+        // 텍스트 초기화(모두 끔)
+        if (TextGroup)
+            foreach (Transform t in TextGroup) t.gameObject.SetActive(false);
+
+        isDayEndUIActive         = true;
         isAdjustmentCanvasActive = true;
-        timeUI.isTimePaused = true; // 시간 멈추기
+
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible   = true;
+
+        if (AdjustmentAppearSound) audioSource.PlayOneShot(AdjustmentAppearSound);
+        if (AdjustmentCanvas)  AdjustmentCanvas.SetActive(true);
+        if (BackgroundImage)   BackgroundImage.SetActive(true);
+
+        showTextCo = StartCoroutine(ShowDelayText());
+
+        if (timeUI) timeUI.isTimePaused = true;
+
+        int close = SettlementManager.Instance ? SettlementManager.Instance.CloseHour : 20;
+        Debug.Log($"[OnDayEnd] 정산 UI 오픈 (마감 {close}시)");
     }
 
     public void StartNextDay()
     {
-        CloseSetting(); //추가함 -박정민-
-        AdjustmentCanvas.SetActive(false);
-        BackgroundImage.SetActive(false);
-        isAdjustmentCanvasActive = false;
-        hasAutoEndTriggered = false;
+        // UI 끄기
+        if (AdjustmentCanvas)  AdjustmentCanvas.SetActive(false);
+        if (BackgroundImage)   BackgroundImage.SetActive(false);
 
-        SettlementManager.Instance?.ResetToday(); // 하루 집계 초기화 추가함 -이준서-
+        // 하루 집계 리셋
+        SettlementManager.Instance?.ResetToday();
 
-        NextDayTime();
-    }
+        // 시간 재개 + 오픈 시간으로 점프
+        int open = SettlementManager.Instance ? SettlementManager.Instance.OpenHour : 8;
+        if (timeUI)
+        {
+            timeUI.isTimePaused     = false;
+            timeUI.totalGameMinutes = open * 60;
+            timeUI.ForceUpdate();
+        }
 
-    public void NextDayTime()
-    {
-        var sm = SettlementManager.Instance;
-        int open = sm != null ? sm.OpenHour : 8;
-        timeUI.totalGameMinutes = open * 60;
-        timeUI.isTimePaused = false;
-        timeUI.ForceUpdate();
+        // 커서 원복
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible   = false;
+
+        // 내부 플래그/코루틴 정리
+        ResetFlagsForNewDay();
+
+        Debug.Log("[OnDayEnd] 다음날 시작 - 상태 리셋 완료");
     }
 
     IEnumerator ShowDelayText()
     {
-        foreach (Transform text in TextGroup) // TextGroup 내에 있는 Text들 0.4초 간격으로 띄우기
+        foreach (Transform t in TextGroup)
         {
-            yield return new WaitForSeconds(.4f);
-            audioSource.PlayOneShot(UIAppearSound);
-
-            text.gameObject.SetActive(true);
+            yield return new WaitForSeconds(0.4f);
+            if (UIAppearSound) audioSource.PlayOneShot(UIAppearSound);
+            t.gameObject.SetActive(true);
         }
+        showTextCo = null;
+    }
+
+    /// 다음날 시작 시 공통 리셋(버튼/자정/외부 이벤트 모두 이 함수 호출)
+    void ResetFlagsForNewDay()
+    {
+        isDayEndUIActive         = false;
+        isAdjustmentCanvasActive = false;
+        hasShownToday            = false;
+        isEnterRequested         = false;
+
+        if (showTextCo != null) { StopCoroutine(showTextCo); showTextCo = null; }
+
+        if (TextGroup)
+            foreach (Transform t in TextGroup) t.gameObject.SetActive(false);
     }
 }

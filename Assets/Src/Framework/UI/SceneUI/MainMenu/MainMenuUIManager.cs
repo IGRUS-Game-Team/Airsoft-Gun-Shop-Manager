@@ -10,7 +10,7 @@ public class MainMenuUIManager : MonoBehaviour
     public void OnClickNewGame()
     {
         Debug.Log("새 게임 시작");
-        SceneManager.LoadScene("RealFinal");
+        SceneManager.LoadScene("RealFinal 1");
     }
 
     public void OnClickLoadSave()

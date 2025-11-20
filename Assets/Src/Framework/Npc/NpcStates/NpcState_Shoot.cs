@@ -13,6 +13,7 @@ public class NpcState_Shoot : IState
     private float savedAnimatorSpeed = 1f;
     private int   lastLoopIndex; // normalizedTime의 정수부
     private float prevLoopFrac = -1f;
+    private bool feeCharged;
 
     private Transform weaponTf;
     private RuntimeAnimatorController originalController;
@@ -53,6 +54,12 @@ public class NpcState_Shoot : IState
 
         weaponTf = npc.heldItem ? npc.heldItem.transform : null;
         ApplyOffset(); // 손 오프셋 즉시 반영
+
+        if (!feeCharged)
+        {
+            SettlementManager.Instance?.RegisterShootingRangeUse();
+            feeCharged = true;
+        }
     }
 
     public void Tick()
@@ -62,9 +69,6 @@ public class NpcState_Shoot : IState
         var lane = npc.TargetLane;
         var anim = npc.Animator;
         if (!anim) return;
-
-        // ★ 사격장 1회 이용 수입 반영 (Inspector 금액 사용)
-        SettlementManager.Instance?.RegisterShootingRangeUse();
 
         const int layer = 0; // ← Shoot가 레이어1(상체)면 1로 바꿔!
         var info = anim.IsInTransition(layer)

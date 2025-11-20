@@ -8,11 +8,20 @@ using UnityEngine;
 public class ShelfSlot : MonoBehaviour
 {
     public ShelfGroup ParentGroup { get; internal set; }
-    public static event Action<ItemData, Vector3, Transform> OnProductPlacedToFactory; //so 가격표를 전달
-    //Transform은 부모가 된 카드슬롯의 위치
+
+    // 이제 회전(Quaternion) 하나만 추가
+    // ItemData, priceCardPosition, priceCardRotation, parentTransform
+    public static event Action<ItemData, Vector3, Quaternion, Transform> OnProductPlacedToFactory;
+
     [Header("shelf slot 오브젝트")]
     [SerializeField] private Transform priceCardParent;
+
+    // 위치 보정(예전 그대로 사용)
     [SerializeField] private Vector3 controll = new(0, 0.3f, 0.18f);
+
+    // 새로 추가: 가격표 회전값(Euler)
+    [SerializeField] private Vector3 priceCardEuler = Vector3.zero;
+
     /* ---------- 설정 ---------- */
     public const int Capacity = 2;
 
@@ -35,22 +44,34 @@ public class ShelfSlot : MonoBehaviour
     /* ---------- 외부에서 위치 얻기 ---------- */
     public Transform GetSnapPoint(int idx) => points[idx];
 
-    /* ---------- 외부에서 아이템 추가 ---------- */ //수정 so값 넘기기
+    /* ---------- 외부에서 아이템 추가 ---------- */ //so값 넘기기
     public void RegisterNewItem(GameObject go)
     {
         Debug.Log("레지스터뉴아이템");
         items.Add(go);
+
         var itemDataManager = go.GetComponent<ItemDataManager>();
-        ItemData itemDatas = itemDataManager.GetItemData();
-
-        Vector3 priceCardPosition = transform.position + controll;
-
-        // 3. 이벤트 호출 수정: 부모 Transform(priceCardParent)을 함께 전달
-        if (priceCardParent != null)
+        if (itemDataManager == null)
         {
-            OnProductPlacedToFactory?.Invoke(itemDatas, priceCardPosition, priceCardParent);
+            Debug.LogWarning($"[ShelfSlot] {go.name} 에 ItemDataManager 없음 – 가격표 생략");
+            return;
         }
 
+        ItemData itemDatas = itemDataManager.GetItemData();
+        if (itemDatas == null)
+        {
+            Debug.LogWarning($"[ShelfSlot] {go.name} 의 ItemData 가 null – 가격표 생략");
+            return;
+        }
+
+        Vector3 priceCardPosition = transform.position + controll;
+        Quaternion priceCardRotation = Quaternion.Euler(priceCardEuler);
+
+        // 이벤트 호출: 위치 + 회전 + 부모 전달
+        if (priceCardParent != null)
+        {
+            OnProductPlacedToFactory?.Invoke(itemDatas, priceCardPosition, priceCardRotation, priceCardParent);
+        }
     }
 
     /* ---------- NPC 가 꺼낼 때 ---------- */

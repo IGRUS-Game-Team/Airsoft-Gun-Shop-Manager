@@ -112,4 +112,14 @@ public class TimeUI : MonoBehaviour
         int minutes = totalGameMinutes % MINUTES_PER_HOUR;
         return string.Format("{0:00}:{1:00}", hours, minutes);
     }
+
+    public void ResetForNewDay()
+    {
+        // 하루 시작 시간으로 되돌리기 (예: dayStartHour = 8 이면 08:00)
+        totalGameMinutes = dayStartHour * MINUTES_PER_HOUR;
+        timer = 0f;
+
+        // 화면에 보이는 시계 글자도 바로 갱신
+        UpdateTimeDisplay();
+    }
 }

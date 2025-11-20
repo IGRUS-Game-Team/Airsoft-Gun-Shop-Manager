@@ -1,18 +1,3 @@
-// 2025-08-14 이준서
-// SettlementManager (최종 정산 전담 매니저)
-// ─ 목적 ──────────────────────────────────────────────────────────────
-// - 최종 정산 UI에 필요한 값만 "집계/수정" 담당(카운터/결제 로직과 분리)
-// - 만족/불만족, 상점 레벨/평판 + "총 고객 수 / 이익 / 순이익"까지 한 곳에서 관리
-//
-// ─ 연결(훅) 가이드 ───────────────────────────────────────────────────
-// [입장 시점] DoorTrigger 등에서   : SettlementManager.Instance.RegisterCustomerEnter(npc);
-// [매입 완료] PurchaseProcessor     : SettlementManager.Instance.RegisterPurchaseCost(totalCost);
-// [결제 완료] (카드/현금 성공 핸들러) : 
-//              var sale = countorMonitorController.GetCurrentTotalAmount();
-//              SettlementManager.Instance.RegisterSaleAmount(sale);
-// [만족/불만족] NpcController.OnPaymentCompleted() 에서 그대로 유지:
-//              SettlementManager.Instance.OnPaymentCompleted(this);
-
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -21,60 +6,61 @@ using UnityEngine.Events;
 public class SettlementManager : MonoBehaviour
 {
     public static SettlementManager Instance { get; private set; }
+
     [Header("사격장 수입(Inspector)")]
-    [SerializeField] float shootingRangeIncome = 20f;  // 사격장 1회 이용 수입
+    [SerializeField] float shootingRangeIncome = 20f;
 
-    // ───────── 기본 보상(Inspector) ─────────
     [Header("정상 결제 보상(Inspector)")]
-    [SerializeField] int happyLevelGain = 1;       // 정상 결제 시 상점 레벨 증가치
+    [SerializeField] int happyLevelGain = 1;
 
-    // ───────── 영업시간 & 참조 ─────────
     [Header("영업 시간(게임 시각)")]
-    [SerializeField] int openHour  = 8;   // 08:00 포함
-    [SerializeField] int closeHour = 20;  // 20:00 제외
+    [SerializeField] int openHour  = 8;
+    [SerializeField] int closeHour = 20;
 
     [Header("Refs")]
-    [SerializeField] TimeUI timeUI;       // 게임 시각: timeUI.totalGameMinutes
+    [SerializeField] TimeUI timeUI;
 
-    // ───────── 만족/불만족/레벨/평판 ─────────
-    [SerializeField] int satisfiedCustomers;     // 만족(불평 없이 정상 결제)
-    [SerializeField] int dissatisfiedCustomers;  // 불만족(불평 이후 결제)
-    [SerializeField] int shopLevel;              // 상점 레벨
-    readonly HashSet<NpcController> complained = new(); // 불평 여부 추적
+    [SerializeField] int   satisfiedCustomers;
+    [SerializeField] int   dissatisfiedCustomers;
+    [SerializeField] int   shopLevel;
+    readonly HashSet<NpcController> complained = new();
 
     [Header("평판 변화량(Inspector)")]
-    [SerializeField] float happyReputationDelta  = +3f; // 정상 결제 시
-    [SerializeField] float unhappyReputationDelta = -3f; // 불평 고객(결제/미결제) 처리 시
+    [SerializeField] float happyReputationDelta   = +3f;
+    [SerializeField] float unhappyReputationDelta = -3f;
 
-    // ───────── 오늘 집계(총/이익/순이익) ─────────
     [Header("오늘 집계(런타임)")]
-    [SerializeField] int   totalCustomersToday;   // 08~20 입장 고객
-    [SerializeField] float grossProfitToday;      // 이익(매출 합) = 결제 완료 시 모니터 합계 누적
-    [SerializeField] float purchaseCostToday;     // 매입가 합 = PurchaseProcessor.totalCost 누적
-    [SerializeField] float netProfitToday;        // 순이익 = Gross - Purchase
+    [SerializeField] int   totalCustomersToday;
+    [SerializeField] float grossProfitToday;
+    [SerializeField] float purchaseCostToday;
+    [SerializeField] float netProfitToday;
+
+    // ✅ 중복 결제 방지용: 오늘 처리된 영수증 ID들
+    readonly HashSet<string> processedReceiptIds = new();
 
     // 총 고객 수 중복 방지
     readonly HashSet<int> countedNpcIdsToday = new();
 
-    // ───────── UI 바인딩 ─────────
+    // 디버그(원인 추적에 유용)
+    [Header("Debug")]
+    public bool debugSalesLog = false;
+
+    // UI 바인딩
     public event Action<Snapshot> OnChanged;
     public UnityEvent OnComplainInvoked = new();
 
-    // 읽기 전용 프로퍼티(필요 시 UI에서 직접 참조)
-    public int SatisfiedCustomers => satisfiedCustomers;
-    public int   DissatisfiedCustomers => dissatisfiedCustomers;
-    public int   ShopLevel             => shopLevel;
+    public int  SatisfiedCustomers   => satisfiedCustomers;
+    public int  DissatisfiedCustomers=> dissatisfiedCustomers;
+    public int  ShopLevel            => shopLevel;
+    public int  TotalCustomersToday  => totalCustomersToday;
+    public float GrossProfitToday    => grossProfitToday;
+    public float PurchaseCostToday   => purchaseCostToday;
+    public float CogsToday           => purchaseCostToday;
+    public float NetProfitToday      => netProfitToday;
+    public int Reputation            => Mathf.RoundToInt(ReputationState.CurrentGlobal);
+    public int OpenHour              => openHour;
+    public int CloseHour             => closeHour;
 
-    public int   TotalCustomersToday   => totalCustomersToday;
-    public float GrossProfitToday      => grossProfitToday;
-    public float PurchaseCostToday     => purchaseCostToday;
-    public float CogsToday             => purchaseCostToday; // ▼ 호환용 별칭(기존 cogsToday 참조 대비)
-    public float NetProfitToday        => netProfitToday;
-    public int Reputation => Mathf.RoundToInt(ReputationState.CurrentGlobal);
-
-    public int OpenHour => openHour;
-    public int CloseHour => closeHour;
-    
     void Awake()
     {
         if (Instance != null && Instance != this) { Destroy(gameObject); return; }
@@ -85,20 +71,17 @@ public class SettlementManager : MonoBehaviour
     void Start()
     {
         if (ReputationState.Instance != null)
-        ReputationState.Instance.OnChangedRaw.AddListener(OnRepChangedRelay);
+            ReputationState.Instance.OnChangedRaw.AddListener(OnRepChangedRelay);
     }
 
-    // ───────── 외부 API: 불평 기록 ─────────
+    // ───────── 외부 API ─────────
     public void MarkNpcComplained(NpcController npc)
     {
         if (npc == null) return;
         complained.Add(npc);
         OnComplainInvoked?.Invoke();
-
     }
 
-    // ───────── 외부 API: 결제 완료(만족/불만족 분류) ─────────
-    // ※ 매출 집계는 성공 핸들러에서 RegisterSaleAmount(...)로 이미 처리함
     public void OnPaymentCompleted(NpcController npc)
     {
         if (npc == null) return;
@@ -106,7 +89,6 @@ public class SettlementManager : MonoBehaviour
         bool had = complained.Remove(npc);
         if (had)
         {
-            // 불평 후 결제한 케이스 = 불만족
             dissatisfiedCustomers++;
             if (unhappyReputationDelta != 0f)
                 ReputationState.Instance?.Add(unhappyReputationDelta);
@@ -123,70 +105,80 @@ public class SettlementManager : MonoBehaviour
         OnChanged?.Invoke(GetSnapshot());
     }
 
-    // ───────── 외부 API: 총 고객 수(입장 시) ─────────
     public void RegisterCustomerEnter(NpcController npc)
     {
         if (npc == null || timeUI == null) return;
 
         int hours = (timeUI.totalGameMinutes / 60) % 24;
-        if (hours < openHour || hours >= closeHour) return; // 영업시간 외 → 카운트 X
+        if (hours < openHour || hours >= closeHour) return;
 
         int id = npc.GetInstanceID();
-        if (countedNpcIdsToday.Contains(id)) return;
+        if (!countedNpcIdsToday.Add(id)) return;
 
-        countedNpcIdsToday.Add(id);
         totalCustomersToday++;
         OnChanged?.Invoke(GetSnapshot());
     }
 
-    // ───────── 외부 API: 매입 비용 반영 (PurchaseProcessor) ─────────
     public void RegisterPurchaseCost(float totalCost)
     {
         totalCost = Mathf.Max(0f, totalCost);
         purchaseCostToday += totalCost;
-        netProfitToday     = grossProfitToday - purchaseCostToday;
-
+        netProfitToday = grossProfitToday - purchaseCostToday;
         OnChanged?.Invoke(GetSnapshot());
     }
-    
+
     public void ExcessChangeCost(float totalCost)
     {
         totalCost = Mathf.Max(0f, totalCost);
         purchaseCostToday += totalCost;
-        netProfitToday     = grossProfitToday - purchaseCostToday;
-
+        netProfitToday = grossProfitToday - purchaseCostToday;
         OnChanged?.Invoke(GetSnapshot());
     }
 
-    // ───────── 외부 API: 판매 금액 반영 (카드/현금 성공 핸들러) ─────────
-    public void RegisterSaleAmount(float saleAmount)
+    /// <summary>
+    /// ✅ 결제 금액 반영 (같은 영수증 ID는 한 번만 반영)
+    /// </summary>
+    public void RegisterSaleAmount(float saleAmount, string receiptId = null)
     {
+        if (!string.IsNullOrEmpty(receiptId))
+        {
+            // 이미 처리한 영수증이면 무시
+            if (!processedReceiptIds.Add(receiptId))
+            {
+                if (debugSalesLog) Debug.Log($"[Sale] Skip duplicate receipt {receiptId}");
+                return;
+            }
+        }
+
         saleAmount = Mathf.Max(0f, saleAmount);
+        if (debugSalesLog) Debug.Log($"[Sale] +{saleAmount:0.00} (id={receiptId})");
+
         grossProfitToday += saleAmount;
         netProfitToday = grossProfitToday - purchaseCostToday;
 
         OnChanged?.Invoke(GetSnapshot());
     }
 
-    // ───────── 외부 API: 사격장 1회 이용 수입 반영 ─────────
-    public void RegisterShootingRangeUse()
+    public void RegisterShootingRangeUse(string sessionId = null)
     {
-        RegisterSaleAmount(shootingRangeIncome);
+        // 사격장도 세션/라운드별로 한 번만 반영하고 싶다면 ID 넘겨주세요
+        RegisterSaleAmount(shootingRangeIncome, sessionId);
+
+        GameState.Instance?.AddRevenue(shootingRangeIncome);
     }
 
-    // ───────── 하루 리셋(정산 UI 닫고 다음날 시작) ─────────
     public void ResetToday()
     {
         totalCustomersToday = 0;
-        grossProfitToday = 0f;
-        purchaseCostToday = 0f;
-        netProfitToday = 0f;
+        grossProfitToday    = 0f;
+        purchaseCostToday   = 0f;
+        netProfitToday      = 0f;
         countedNpcIdsToday.Clear();
+        processedReceiptIds.Clear(); // ✅ 영수증 가드 초기화
 
         OnChanged?.Invoke(GetSnapshot());
     }
 
-    // 손님이 불평 기록이 있는 상태에서 결제 없이 나간 경우, 불만족 집계
     public void OnCustomerLeftUnhappy(NpcController npc)
     {
         if (npc == null) return;
@@ -203,7 +195,6 @@ public class SettlementManager : MonoBehaviour
 
     void OnEnable()
     {
-        // 평판 싱글톤이 바뀔 때마다 정산 스냅샷도 새로고침
         if (ReputationState.Instance != null)
             ReputationState.Instance.OnChangedRaw.AddListener(OnRepChangedRelay);
     }
@@ -214,12 +205,8 @@ public class SettlementManager : MonoBehaviour
             ReputationState.Instance.OnChangedRaw.RemoveListener(OnRepChangedRelay);
     }
 
-    private void OnRepChangedRelay(float _)
-    {
-        OnChanged?.Invoke(GetSnapshot());
-    }
+    private void OnRepChangedRelay(float _) => OnChanged?.Invoke(GetSnapshot());
 
-    // ───────── 라운드/하루 리셋(만족/불만족/레벨/평판 세트) ─────────
     [Flags] public enum KeepFlags { None = 0, KeepLevel = 1, KeepReputation = 2, KeepBoth = KeepLevel | KeepReputation }
     public void ResetForNewDay(KeepFlags keep = KeepFlags.KeepBoth)
     {
@@ -229,15 +216,13 @@ public class SettlementManager : MonoBehaviour
         if ((keep & KeepFlags.KeepLevel) == 0)
             shopLevel = 0;
 
-        // ★ 추가: 평판 리셋 (ReputationState로 위임)
         if ((keep & KeepFlags.KeepReputation) == 0)
             ReputationState.Instance?.SetRaw(0f);
 
         complained.Clear();
         OnChanged?.Invoke(GetSnapshot());
     }
-    
-    // ───────── Snapshot (UI에 한 번에 바인딩) ─────────
+
     public Snapshot GetSnapshot() => new Snapshot
     {
         satisfied      = satisfiedCustomers,
@@ -246,7 +231,7 @@ public class SettlementManager : MonoBehaviour
         reputation     = Mathf.RoundToInt(ReputationState.CurrentGlobal),
         totalCustomers = totalCustomersToday,
         grossProfit    = grossProfitToday,
-        purchaseCost   = purchaseCostToday, // ▼ cogs 대신 purchaseCost로 명확히 표기
+        purchaseCost   = purchaseCostToday,
         netProfit      = netProfitToday
     };
 
@@ -256,19 +241,17 @@ public class SettlementManager : MonoBehaviour
         public int   dissatisfied;
         public int   shopLevel;
         public int   reputation;
-
         public int   totalCustomers;
         public float grossProfit;
-        public float purchaseCost; // (구)cogs
+        public float purchaseCost;
         public float netProfit;
     }
 
-    // ───────── 값 수동 보정/설정(테스트용) ─────────
-    public void AddSatisfied(int v)        { satisfiedCustomers    = Mathf.Max(0, satisfiedCustomers + v);    OnChanged?.Invoke(GetSnapshot()); }
-    public void AddDissatisfied(int v)     { dissatisfiedCustomers = Mathf.Max(0, dissatisfiedCustomers + v); OnChanged?.Invoke(GetSnapshot()); }
-    public void AddShopLevel(int v)        { shopLevel             = Mathf.Max(0, shopLevel + v);             OnChanged?.Invoke(GetSnapshot()); }
-
-    public void SetSatisfied(int v)        { satisfiedCustomers    = Mathf.Max(0, v);                          OnChanged?.Invoke(GetSnapshot()); }
-    public void SetDissatisfied(int v)     { dissatisfiedCustomers = Mathf.Max(0, v);                          OnChanged?.Invoke(GetSnapshot()); }
-    public void SetShopLevel(int v)        { shopLevel             = Mathf.Max(0, v);                          OnChanged?.Invoke(GetSnapshot()); }
+    // 테스트용 수동 조정
+    public void AddSatisfied(int v)    { satisfiedCustomers    = Mathf.Max(0, satisfiedCustomers + v);    OnChanged?.Invoke(GetSnapshot()); }
+    public void AddDissatisfied(int v) { dissatisfiedCustomers = Mathf.Max(0, dissatisfiedCustomers + v); OnChanged?.Invoke(GetSnapshot()); }
+    public void AddShopLevel(int v)    { shopLevel             = Mathf.Max(0, shopLevel + v);             OnChanged?.Invoke(GetSnapshot()); }
+    public void SetSatisfied(int v)    { satisfiedCustomers    = Mathf.Max(0, v);                          OnChanged?.Invoke(GetSnapshot()); }
+    public void SetDissatisfied(int v) { dissatisfiedCustomers = Mathf.Max(0, v);                          OnChanged?.Invoke(GetSnapshot()); }
+    public void SetShopLevel(int v)    { shopLevel             = Mathf.Max(0, v);                          OnChanged?.Invoke(GetSnapshot()); }
 }

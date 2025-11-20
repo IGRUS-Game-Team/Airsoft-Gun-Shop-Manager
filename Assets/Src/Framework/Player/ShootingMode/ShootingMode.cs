@@ -4,7 +4,6 @@ public class ShootingMode : MonoBehaviour
 {
     [SerializeField] ShootingGunSO shootingGunSO;
     public bool isZoneActive = false;
- 
     const string PLAYER_STRING = "Player";
 
     void OnTriggerEnter(Collider other)

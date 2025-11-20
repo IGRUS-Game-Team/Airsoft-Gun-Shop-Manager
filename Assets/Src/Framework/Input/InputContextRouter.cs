@@ -51,14 +51,13 @@ public class InputContextRouter : MonoBehaviour
         if (!clickRequested) return;
         clickRequested = false;
 
-        // [추가] 총 들고 있으면 상호작용 막기
-        // var activeGun = FindFirstObjectByType<ActiveGun>();
-        // Debug.Log("[ActiveGun] " + activeGun != null && activeGun.enabled && activeGun.gameObject.activeInHierarchy);
-        // if (activeGun != null && activeGun.enabled && activeGun.gameObject.activeInHierarchy)
-        // {
-        //     // 총 모드면 InputContextRouter는 상호작용 안함
-        //     return;
-        // }
+        // 가격 수정 UI가 떠 있으면, 월드 상호작용 전부 무시
+        if (PriceCardController.IsAnyPriceUIOpen)
+        {
+            // 필요하면 로그
+            // Debug.Log("[Router] Click ignored: Price UI open");
+            return;
+        }
 
         if (UIUtility.IsPointerOverUI()) return;
 
@@ -79,15 +78,19 @@ public class InputContextRouter : MonoBehaviour
             }
         }
 
-        // 1.5) 맨손일 때: 선반을 맞췄더라도, 그 위에 SmallBox가 있으면 그걸 먼저 처리
+        // 1.5) 맨손일 때: "선반(ShelfSlot)" 을 맞췄을 때만, 그 위 SmallBox를 우선 처리
         if (hit != null && (hold == null || hold.heldObject == null))
         {
-            // hit 오브젝트(대부분 ShelfSlot) 아래에 SmallBoxInteraction이 있는지 찾기
-            var small = hit.GetComponentInChildren<SmallBoxInteraction>();
-            if (small != null)
+            // ★ hit 에 ShelfSlot 이 붙어 있을 때만 SmallBoxInteraction을 찾는다
+            var shelf = hit.GetComponentInParent<ShelfSlot>();
+            if (shelf != null)
             {
-                small.Interact();
-                return;
+                var small = shelf.GetComponentInChildren<SmallBoxInteraction>();
+                if (small != null)
+                {
+                    small.Interact();
+                    return;
+                }
             }
         }
 
