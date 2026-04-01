@@ -1,32 +1,38 @@
 using UnityEngine;
 
-/// <summary>
-/// 이지연 사격 모드 on/off 관리하는 스크립트
-/// </summary>
-
 public class ShootingZoneManager : MonoBehaviour
 {
+    public static ShootingZoneManager Instance { get; private set; }
+
     [SerializeField] ShootingMode[] shootingZones;
-    [SerializeField] GameObject targetImage;
 
-    bool isActive = false;
+    private ActiveGun currentActiveGun;
 
-    public void ToggleZones(ActiveGun activeGun)
+    public bool IsInShootingMode { get; private set; }
+    public bool CurrentGunCanZoom => currentActiveGun != null && currentActiveGun.CanZoom;
+
+    void Awake()
     {
-        isActive = !isActive; // on이면 off로, off면 on으로
-        targetImage.SetActive(isActive);
+        if (Instance == null) Instance = this;
+        else Destroy(gameObject);
+    }
 
+    void Start()
+    {
         foreach (var zone in shootingZones)
-        {
-            zone.isZoneActive = isActive; // 각 존 켜고 끄기
-        }
+            zone.isZoneActive = true;
+    }
 
-        if (!isActive && activeGun != null)
-        {
-            activeGun.DropGun(); // 모드 OFF 시 무기 버리기
-        }
+    public void EnterShootingMode(ActiveGun gun)
+    {
+        IsInShootingMode = true;
+        currentActiveGun = gun;
+    }
 
-        if (!isActive && activeGun != null) activeGun.DropGun();
-        Debug.Log("사격 모드" + (isActive ? "활성화" : "비활성화"));
+    public void ExitShootingMode()
+    {
+        IsInShootingMode = false;
+        if (currentActiveGun != null) currentActiveGun.DropGun();
+        currentActiveGun = null;
     }
 }

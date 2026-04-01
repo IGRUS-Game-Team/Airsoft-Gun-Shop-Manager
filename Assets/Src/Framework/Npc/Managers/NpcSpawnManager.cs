@@ -35,6 +35,21 @@ public class NpcSpawnManager : MonoBehaviour
         nextSpawnTime = Time.time + Random.Range(minDelay, maxDelay);
     }
 
+    /* ---------- 전체 NPC 제거 ---------- */
+
+    /// <summary>활성 NPC를 모두 파괴하고 풀을 비운다 (다음날 초기화용).</summary>
+    public void DespawnAll()
+    {
+        foreach (var npc in npcPool)
+        {
+            if (npc != null) Destroy(npc.gameObject);
+        }
+        npcPool.Clear();
+
+        // 다음 스폰까지 약간의 여유를 두어 즉시 재소환 방지
+        nextSpawnTime = Time.time + Random.Range(minDelay, maxDelay);
+    }
+
     /* ---------- NPC 소환 로직 ---------- */
 
     private void SpawnNpc()

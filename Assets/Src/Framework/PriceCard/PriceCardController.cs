@@ -144,6 +144,7 @@ public class PriceCardController : MonoBehaviour, IInteractable, IPriceChangeabl
 
         Debug.Log("잘 닫아짐");
         IsAnyPriceUIOpen = false;
+        TutorialEvents.RaisePriceSet();
     }
     
 }

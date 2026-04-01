@@ -20,6 +20,9 @@ public class Protestor : MonoBehaviour
     [SerializeField] string protestAnim = "ProtestIdle";
     [SerializeField] string leaveAnim   = "Walking";
 
+    [Header("이동 속도")]
+    [SerializeField, Min(0.1f)] float moveSpeed = 1f;
+
     [Header("도착/퇴장 판정")]
     [SerializeField, Min(0.1f)] float arriveDist = 0.35f;
     [SerializeField, Min(0.1f)] float exitDist   = 1.0f;
@@ -39,6 +42,7 @@ public class Protestor : MonoBehaviour
     {
         agent = GetComponent<NavMeshAgent>();
         anim  = GetComponent<Animator>();
+        agent.speed = moveSpeed;
     }
 
     public void Init(Vector3 rallyPos, Transform exitT, float dwellSec, Transform faceT = null)
@@ -84,6 +88,7 @@ public class Protestor : MonoBehaviour
     {
         SetSign(false);
         agent.isStopped = false;
+        agent.speed = moveSpeed;
         Play(leaveAnim);
         if (exitT) MoveTo(exitT.position);
         while (exitT && !Reached(exitT.position, exitDist)) yield return null;

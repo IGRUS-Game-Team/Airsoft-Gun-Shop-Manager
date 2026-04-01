@@ -11,6 +11,12 @@ public class InputApplier : MonoBehaviour
         SceneManager.sceneLoaded += OnSceneLoaded;
         TryBind();
     }
+
+    void Start()
+    {
+        TryBind();
+        if (SettingsManager.Instance) Apply(SettingsManager.Instance.Data);
+    }
     void OnDisable()
     {
         SceneManager.sceneLoaded -= OnSceneLoaded;
@@ -31,6 +37,5 @@ public class InputApplier : MonoBehaviour
     {
         if (!binding) binding = FindFirstObjectByType<LookBinding>();
         if (binding) binding.Apply(d.mouseSensitivity, d.invertY);
-        // 없으면(메인 메뉴) 조용히 스킵
     }
 }

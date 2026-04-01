@@ -125,6 +125,8 @@ public class OnDayEnd : MonoBehaviour
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible   = true;
 
+        Time.timeScale = 0f;   // 정산 중 게임 전체 일시정지
+
         if (AdjustmentAppearSound) audioSource.PlayOneShot(AdjustmentAppearSound);
         if (AdjustmentCanvas)  AdjustmentCanvas.SetActive(true);
         if (BackgroundImage)   BackgroundImage.SetActive(true);
@@ -139,9 +141,15 @@ public class OnDayEnd : MonoBehaviour
 
     public void StartNextDay()
     {
+        // 일시정지 해제
+        Time.timeScale = 1f;
+
         // UI 끄기
         if (AdjustmentCanvas)  AdjustmentCanvas.SetActive(false);
         if (BackgroundImage)   BackgroundImage.SetActive(false);
+
+        // 매장 내 NPC 전부 제거
+        DespawnAllNpcs();
 
         // 하루 집계 리셋
         SettlementManager.Instance?.ResetToday();
@@ -162,6 +170,13 @@ public class OnDayEnd : MonoBehaviour
         // 내부 플래그/코루틴 정리
         ResetFlagsForNewDay();
 
+        // 점원 출근
+        AutoClerkController.Instance?.OnNewDayStarted();
+
+        // 사회 이벤트 실행 (정산 UI 완전히 닫힌 후)
+        if (SocialEventManager.Instance != null)
+            SocialEventManager.Instance.ExecuteStrategy();
+
         Debug.Log("[OnDayEnd] 다음날 시작 - 상태 리셋 완료");
     }
 
@@ -169,11 +184,25 @@ public class OnDayEnd : MonoBehaviour
     {
         foreach (Transform t in TextGroup)
         {
-            yield return new WaitForSeconds(0.4f);
+            yield return new WaitForSecondsRealtime(0.4f);
             if (UIAppearSound) audioSource.PlayOneShot(UIAppearSound);
             t.gameObject.SetActive(true);
         }
         showTextCo = null;
+    }
+
+    /// 매장 내 NPC를 모두 파괴하고 대기열·입장 카운트를 초기화
+    void DespawnAllNpcs()
+    {
+        AutoClerkController.Instance?.OnDayEnded();
+
+        var spawner = FindFirstObjectByType<NpcSpawnManager>();
+        if (spawner != null) spawner.DespawnAll();
+
+        if (QueueManager.Instance != null) QueueManager.Instance.ClearAll();
+
+        foreach (var door in FindObjectsByType<DoorTrigger>(FindObjectsSortMode.None))
+            door.ResetInsideCount();
     }
 
     /// 다음날 시작 시 공통 리셋(버튼/자정/외부 이벤트 모두 이 함수 호출)

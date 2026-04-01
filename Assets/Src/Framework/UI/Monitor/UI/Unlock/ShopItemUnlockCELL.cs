@@ -94,6 +94,7 @@ public void RefreshText()
 
             unlocked = true;
             UnlockedItemsStore.MarkUnlocked(data.itemId);
+            TutorialEvents.RaiseItemUnlocked();
 
             RefreshButtonVisual();
 

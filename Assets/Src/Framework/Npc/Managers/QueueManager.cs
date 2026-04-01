@@ -74,10 +74,22 @@ public class QueueManager : MonoBehaviour
         RefreshLookTargets();
     }
 
+    /// <summary>대기열을 전부 비운다 (다음날 초기화용).</summary>
+    public void ClearAll()
+    {
+        waitingLine.Clear();
+        lookTargets.Clear();
+    }
+
     // 특정 NPC가 맨 앞인지
     public bool IsFront(NpcController npcController)
     {
         return waitingLine.Count > 0 && waitingLine[0] == npcController;
+    }
+
+    public NpcController GetFrontNpc()
+    {
+        return waitingLine.Count > 0 ? waitingLine[0] : null;
     }
 
     // ── 내부: LookTarget 일괄 갱신(맨 앞은 카운터, 나머지는 앞사람) ──

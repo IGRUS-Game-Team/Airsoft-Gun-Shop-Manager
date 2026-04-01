@@ -32,6 +32,11 @@ public class ESCInteractionBehaviours : MonoBehaviour
             Debug.Log("모달이 1 이상입니다");
             return;
         }
+        else if (ShootingZoneManager.Instance != null && ShootingZoneManager.Instance.IsInShootingMode)
+        {
+            Debug.Log("사격 모드 종료");
+            ShootingZoneManager.Instance.ExitShootingMode();
+        }
         else
         {
             Debug.Log("인게임세팅ui on");

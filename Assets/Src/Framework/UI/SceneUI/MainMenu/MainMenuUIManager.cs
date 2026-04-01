@@ -3,13 +3,13 @@ using UnityEngine.SceneManagement;
 
 public class MainMenuUIManager : MonoBehaviour
 {
-
     [SerializeField] public GameObject settingPopup;
     [SerializeField] public GameObject saveLoadPopup;
 
     public void OnClickNewGame()
     {
         Debug.Log("새 게임 시작");
+        GameResetHelper.ResetAll();
         SceneManager.LoadScene("RealFinal 1");
     }
 
@@ -23,7 +23,8 @@ public class MainMenuUIManager : MonoBehaviour
     public void OnClickSetting()
     {
         Debug.Log("설정창 열기");
-        settingPopup.SetActive(true);
+        if (settingPopup != null)
+            settingPopup.SetActive(true);
     }
 
     public void OnClickQuit()
@@ -33,6 +34,6 @@ public class MainMenuUIManager : MonoBehaviour
 
 #if UNITY_EDITOR
         UnityEditor.EditorApplication.isPlaying = false;
-#endif 
+#endif
     }
 }

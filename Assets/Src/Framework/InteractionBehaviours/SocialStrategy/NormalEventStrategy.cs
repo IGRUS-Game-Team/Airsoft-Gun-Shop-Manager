@@ -30,5 +30,6 @@ public class NormalEventStrategy : ISocialEventStrategy
     public string EventName => "Day";
     public string StatusText => "공백";
     public float MarketModifier => 0;
+    public bool IsGunRegulation => false;
     //public int Duration => currentDuration;
 }

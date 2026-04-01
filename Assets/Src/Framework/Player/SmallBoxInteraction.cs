@@ -1,7 +1,8 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 [RequireComponent(typeof(BlockIsHolding))]
-public class SmallBoxInteraction : MonoBehaviour, IPickable
+public class SmallBoxInteraction : MonoBehaviour, IPickable, IHasInteractionPrompts
 {
     [Header("참조")]
     [SerializeField] private PlayerObjectHoldController holdController;
@@ -31,17 +32,31 @@ public class SmallBoxInteraction : MonoBehaviour, IPickable
             animator.enabled = false;
     }
 
+    /// Awake에서 못 찾았을 때를 대비한 지연 초기화 (Instance 싱글턴 우선)
+    private PlayerObjectHoldController HoldCtrl
+    {
+        get
+        {
+            if (holdController == null)
+                holdController = PlayerObjectHoldController.Instance;
+            if (holdController == null)
+                holdController = FindFirstObjectByType<PlayerObjectHoldController>();
+            return holdController;
+        }
+    }
+
     // 클릭(Interaction)으로 호출
     public void Interact()
     {
-        Debug.Log("[SmallBox] Interact called on " + name);
-        if (isOpened) return;
+        Debug.Log($"[SmallBox] Interact called on {name} | isOpened={isOpened} | HoldCtrl={HoldCtrl} | heldObject={HoldCtrl?.heldObject}");
+        if (isOpened) { Debug.Log("[SmallBox] BLOCKED: isOpened"); return; }
 
         // 이미 뭔가 들고 있으면 이 박스는 안 집기 (필요에 따라 변경 가능)
-        if (holdController != null && holdController.heldObject != null)
-            return;
+        if (HoldCtrl != null && HoldCtrl.heldObject != null)
+        { Debug.Log("[SmallBox] BLOCKED: already holding " + HoldCtrl.heldObject.name); return; }
 
         // 아직 안 들고 있으면 → 손으로 집기 (화면 중앙 고정)
+        Debug.Log("[SmallBox] → calling PickUp()");
         PickUp();
     }
 
@@ -60,36 +75,43 @@ public class SmallBoxInteraction : MonoBehaviour, IPickable
         animator.Play("Open", 0, 0f);
     }
 
-    // 애니메이션 끝에서 호출: 박스 제거 + 총기 스폰
+    // 애니메이션 끝에서 호출: 박스 제거 + 총기를 WallGunSlot 배치 모드로
     public void SpawnGunFromBox()
     {
-        // 0) 혹시 한 번 이상 실행되지 않게 방어
         if (gunPrefab == null) return;
 
-        // 1) 상자가 있던 위치/회전/부모 기억해 두기
-        Transform boxTr = transform;           // SmallBoxInteraction 달린 오브젝트 (작은 박스 루트)
-        Transform parent = boxTr.parent;        // 보통 holdPoint 밑에 매달려 있을 것
+        Transform boxTr = transform;
         Vector3 pos = boxTr.position;
         Quaternion rot = boxTr.rotation;
 
-        // 2) 들고 있던 상태 정리 (holdController랑 끊기)
+        // 들고 있던 상태 정리
         if (holdController != null && holdController.heldObject == holdData)
-        {
             holdController.heldObject = null;
-        }
         holdData.isHeld = false;
 
-        // 3) 상자 오브젝트 제거
+        // 상자 제거
         Destroy(gameObject);
 
-        // 4) 총 프리팹을 "상자가 있던 자리"에 생성
-        GameObject gun = Instantiate(gunPrefab, pos, rot, parent);
+        // 총 생성 (월드 루트에)
+        GameObject gun = Instantiate(gunPrefab, pos, rot);
 
-        // 총을 바로 플레이어 손에 쥐어 주기
-        var gunInteraction = gun.GetComponent<GunInteraction>();
-        if (gunInteraction != null)
+        // WallGunSlot 배치 모드 진입
+        if (WallGunPlacementMode.Instance != null)
+            WallGunPlacementMode.Instance.EnterMode(gun);
+    }
+
+    // ===== IHasInteractionPrompts 구현 =====
+
+    public void GetPrompts(PlayerInteractionContext ctx, List<InteractionPrompt> prompts)
+    {
+        if (holdData.isHeld)
         {
-            gunInteraction.PickUp();   // 위에서 만든 PickUp() 호출
+            if (!isOpened)
+                prompts.Add(new InteractionPrompt(InputHint.E, "Open Box"));
+        }
+        else
+        {
+            prompts.Add(new InteractionPrompt(InputHint.LMB, "Pick Up"));
         }
     }
 
@@ -97,14 +119,17 @@ public class SmallBoxInteraction : MonoBehaviour, IPickable
 
     public void PickUp()
     {
-        if (holdController == null) return;
-        if (holdController.heldObject != null) return;
+        if (HoldCtrl == null) { Debug.LogWarning("[SmallBox] PickUp FAILED: HoldCtrl is null"); return; }
+        if (HoldCtrl.heldObject != null) { Debug.LogWarning("[SmallBox] PickUp FAILED: already holding " + HoldCtrl.heldObject.name); return; }
+
+        Debug.Log($"[SmallBox] PickUp proceeding | holdData={holdData} | holdData.isHeld={holdData?.isHeld}");
 
         // 1) 선반에 꽂혀 있던 상태라면, 선반과의 관계를 먼저 끊는다
         DetachFromShelfIfNeeded();
 
         // 2) 실제로 플레이어 손에 들기
         holdController.SetHeldObject(holdData);
+        Debug.Log($"[SmallBox] SetHeldObject done | isHeld={holdData?.isHeld}");
 
         // 3) 작은 박스는 위치/각도를 따로 보정해서 화면에 잘 보이게
         var t = holdData.transform;
@@ -133,8 +158,22 @@ public class SmallBoxInteraction : MonoBehaviour, IPickable
 
     public void ThrowObject()
     {
-        // 개별 박스를 던지는 기능이 필요하면 나중에 여기에 구현
-        Debug.Log("상자 집어 던짐");
+        if (!holdData.isHeld) return;
+
+        var rb = GetComponent<Rigidbody>();
+        var col = GetComponentInChildren<Collider>();
+
+        transform.SetParent(holdData.originalParent, true);
+        if (col) col.enabled = true;
+
+        holdData.EnablePhysics();
+
+        if (rb)
+            rb.AddForce(Camera.main.transform.forward * 10f, ForceMode.Impulse);
+
+        holdData.isHeld = false;
+        if (holdController != null && holdController.heldObject == holdData)
+            holdController.heldObject = null;
     }
 
     // 선반에서 집어 들 때, 선반과의 관계를 끊어준다

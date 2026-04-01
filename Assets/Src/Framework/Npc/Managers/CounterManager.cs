@@ -12,6 +12,7 @@ public class CounterManager : MonoBehaviour
     [Header("결제용 프리팹")]
     [SerializeField] GameObject cashPrefab;
     [SerializeField] GameObject cardPrefab;
+    [SerializeField] Vector3 paymentObjectOffset = new Vector3(0f, -0.1f, 0f);
 
     [Header("스캐너, 봉투 위치, 스캔 효과음")]
     [SerializeField] Transform scannerPoint;    // 바코드 위치
@@ -75,6 +76,11 @@ public class CounterManager : MonoBehaviour
         var beh = item.GetComponent<CheckoutItemBehaviour>();
         beh.Init(this, npc, scannerPoint, bagPoint, beepClip);
 
+        // 카운터에 올라온 상품은 슬라이딩(CheckoutItemBehaviour)으로만 처리
+        // SmallBoxInteraction이 남아 있으면 클릭 시 집기가 우선되어 슬라이딩이 안 됨
+        var small = item.GetComponent<SmallBoxInteraction>();
+        if (small != null) DestroyImmediate(small);
+
         return slot;
     }
 
@@ -85,6 +91,8 @@ public class CounterManager : MonoBehaviour
         npcBaggedCount[npc] = 0;
         npcScannedCount[npc] = 0;           // ★추가: 스캔 카운트 초기화
         readyToPay.Remove(npc);
+
+        TutorialEvents.RaiseScanTargetSet(Mathf.Max(0, totalItems));
     }
 
     /* ─ 상품 한 개가 봉투에 완전히 들어갔을 때 호출 ─ */
@@ -105,6 +113,8 @@ public class CounterManager : MonoBehaviour
         if (!npcScannedCount.ContainsKey(npc)) npcScannedCount[npc] = 0;
 
         npcScannedCount[npc]++;
+
+        TutorialEvents.RaiseScanProgressChanged(npcScannedCount[npc], target);
 
         bool ready = npcScannedCount[npc] >= target && target > 0;
         if (ready)
@@ -183,7 +193,7 @@ public class CounterManager : MonoBehaviour
         GameObject prefab = (method == PaymentType.Cash) ? cashPrefab : cardPrefab;
 
         GameObject payObj = Instantiate(prefab, handSocket.position, handSocket.rotation, handSocket);
-        payObj.transform.localPosition = Vector3.zero;
+        payObj.transform.localPosition = paymentObjectOffset;
         payObj.transform.localRotation = Quaternion.identity;
 
         npcToPay[npc] = payObj;
@@ -273,10 +283,15 @@ public class CounterManager : MonoBehaviour
             // 플레이어 자금 반영(기존 로직 유지)
             GameState.Instance.AddRevenue(npcPaymentAmount);
 
+            // ★ 정산 집계(CompletePayment 체인 실패에 대비해 먼저 호출)
+            SettlementManager.Instance?.OnPaymentCompleted(currentNpcForPayment);
+
             // 모니터 비우기 전에 완료 처리/정산 마무리
             CompletePayment(currentNpcForPayment);
             countorMonitorController.Clear();
         }
+
+        TutorialEvents.RaiseCardPaid();
 
         //이벤트 구독 해제
         UnsubscribeCalculatorEvents();
@@ -330,18 +345,23 @@ public void StartCashPayment(NpcController npc)
     SubscribeCashRegisterEvents();
     cashSessionActive = true;
 
+    // 거스름돈 지연 불평 타이머
+    StopComplainTimer();
+    paymentComplainRoutine = StartCoroutine(PaymentComplainTimer(npc));
+
     cashRegisterEnterHandler.OpenBasket();
 }
 private float GetCustomerPayment(float amount)
 {
-    // 지폐 단위 (여기선 10 단위 기준으로 처리)
+    // 10단위 올림 (항상 거스름돈이 생기도록 +10 보장)
     float rounded = Mathf.Ceil(amount / 10f) * 10f;
+    if (rounded <= amount) rounded += 10f;
 
     int roll = Random.Range(0, 100);
 
     if (roll < 60)
     {
-        // 60% 확률 → 가장 가까운 10단위
+        // 60% 확률 → 가장 가까운 10단위 (amount보다 반드시 큼)
         return rounded;
     }
     else if (roll < 90)
@@ -383,6 +403,10 @@ private float GetCustomerPayment(float amount)
             SettlementManager.Instance?.ExcessChangeCost(excessChange);
         }
 
+        // ★ 정산 집계(CompletePayment 체인 실패에 대비해 먼저 호출)
+        if (currentNpcForPayment != null)
+            SettlementManager.Instance?.OnPaymentCompleted(currentNpcForPayment);
+
         // 결제 완료 처리
         if (currentNpcForPayment != null)
             CompletePayment(currentNpcForPayment);
@@ -391,12 +415,29 @@ private float GetCustomerPayment(float amount)
         countorMonitorController.Clear();
         cashUI?.Clear();
 
+        TutorialEvents.RaiseCashPaid();
+
         // 상태/이벤트 정리
         //cashRegisterEnterHandler.CloseBasket();
         npcSendMe = 0;
         cashSessionActive = false;
         UnsubscribeCashRegisterEvents();
         counterCashUI.SetActive(false);
+    }
+
+    public void AutoCompletePayment(NpcController npc)
+    {
+        if (npc == null) return;
+        StopComplainTimer();
+
+        float saleAmount = countorMonitorController != null
+            ? countorMonitorController.GetCurrentTotalAmount() : 0f;
+
+        GameState.Instance.AddRevenue(saleAmount);
+        SettlementManager.Instance?.RegisterSaleAmount(saleAmount);
+        SettlementManager.Instance?.OnPaymentCompleted(npc);
+        countorMonitorController?.Clear();
+        CompletePayment(npc);
     }
 
     private void HandleCashPaymentFailure()//계산 실패(= 아직 모자람)

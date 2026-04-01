@@ -7,7 +7,7 @@ public class SettingsData
     // — 그래픽(안전 옵션: 인게임 허용)
     public bool vSync = true;
     public int targetFps = 120;
-    public float fov = 60f;                 // 카메라 FOV
+    public float fov = 90f;                 // 카메라 FOV
     public bool motionBlur = false;         // 포스트 효과 on/off
 
     // — 그래픽(위험 옵션: 메인메뉴 전용)
@@ -23,7 +23,7 @@ public class SettingsData
     public float sfxDb = -5f;
 
     // — 조작
-    public float mouseSensitivity = 1.0f;
+    public float mouseSensitivity = 0.5f;
     public bool invertY = false;
     public bool gamepadVibration = true;
 

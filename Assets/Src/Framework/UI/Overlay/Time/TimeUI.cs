@@ -7,8 +7,7 @@ using UnityEngine.UI;
 
 public class TimeUI : MonoBehaviour
 {
-    [System.Serializable] public class ComplainWithTimeEvent : UnityEvent<string> { }
-    public ComplainWithTimeEvent OnComplainWithTime = new();
+    public event Action<string, ComplainReason> OnComplainWithTime;
     private NewsPaperController newsPaperController;
     //총 플레이타임을 초로 누적시켜서 계산
     [SerializeField] TextMeshProUGUI hourAndMinute;
@@ -38,7 +37,7 @@ public class TimeUI : MonoBehaviour
     private void Start()
     {
         if (SettlementManager.Instance != null)
-            SettlementManager.Instance.OnComplainInvoked.AddListener(HandleComplainFromSettlement);
+            SettlementManager.Instance.OnComplainInvoked += HandleComplainFromSettlement;
     }
 
     void Update()
@@ -100,10 +99,10 @@ public class TimeUI : MonoBehaviour
         }
     }
 
-    private void HandleComplainFromSettlement()
+    private void HandleComplainFromSettlement(ComplainReason reason)
     {
         string timeString = GetFormattedTime();
-        OnComplainWithTime.Invoke(timeString);
+        OnComplainWithTime?.Invoke(timeString, reason);
     }
 
     public string GetFormattedTime()

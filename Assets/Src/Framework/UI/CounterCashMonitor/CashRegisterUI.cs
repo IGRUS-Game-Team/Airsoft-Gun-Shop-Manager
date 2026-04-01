@@ -46,6 +46,12 @@ public class CashRegisterUI : MonoBehaviour
         givingText.text = $"${currentGiven:0.00}";
     }
 
+    // 거스름돈이 충분한지 확인
+    public bool IsChangeSatisfied()
+    {
+        return currentGiven + 1e-4f >= targetChange;
+    }
+
     // Enter 로 호출: 충분하면 성공, 아니면 실패 이벤트
     public void TryConfirm()
     {

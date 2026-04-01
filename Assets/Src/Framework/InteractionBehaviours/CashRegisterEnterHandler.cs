@@ -1,20 +1,31 @@
+using System.Collections.Generic;
 using UnityEngine;
 
-public class CashRegisterEnterHandler : MonoBehaviour
+public class CashRegisterEnterHandler : MonoBehaviour, IHasInteractionPrompts
 {
+    public static CashRegisterEnterHandler Instance { get; private set; }
+
     [SerializeField] private Transform cashBasket; // 현금 바구니 오브젝트
     [SerializeField] private Vector3 openOffset = new Vector3(0f, 0f, 0.27f);
     [SerializeField] private float moveSpeed = 2f;
     [SerializeField] private CashRegisterUI cashUI;
+    [SerializeField] private GameObject cashLabelRoot; // 금액 라벨 UI 루트 오브젝트
 
     private Vector3 closedPos;
     private Vector3 openPos;
     private bool canPressEnter = false;
 
+    private void Awake()
+    {
+        if (Instance == null) Instance = this;
+        else Destroy(gameObject);
+    }
+
     private void Start()
     {
         closedPos = cashBasket.localPosition;
         openPos = closedPos + openOffset;
+        if (cashLabelRoot != null) cashLabelRoot.SetActive(false);
         InteractionController.Instance.OnCashRegister += HandleExitKeyPressed;
     }
 
@@ -30,6 +41,7 @@ public class CashRegisterEnterHandler : MonoBehaviour
     public void OpenBasket()
     {
         canPressEnter = true;
+        if (cashLabelRoot != null) cashLabelRoot.SetActive(true);
         StopAllCoroutines();
         StartCoroutine(MoveBasket(openPos));
     }
@@ -37,8 +49,17 @@ public class CashRegisterEnterHandler : MonoBehaviour
     public void CloseBasket()
     {
         canPressEnter = false;
+        if (cashLabelRoot != null) cashLabelRoot.SetActive(false);
         StopAllCoroutines();
         StartCoroutine(MoveBasket(closedPos));
+    }
+
+    public void GetPrompts(PlayerInteractionContext ctx, List<InteractionPrompt> prompts)
+    {
+        if (canPressEnter && cashUI.IsChangeSatisfied())
+        {
+            prompts.Add(new InteractionPrompt(InputHint.E, "Confirm"));
+        }
     }
 
     private void HandleExitKeyPressed()

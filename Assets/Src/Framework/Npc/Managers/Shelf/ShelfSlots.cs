@@ -2,7 +2,31 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-/// 한 칸 슬롯 – 최대 2개의 상품을 안쪽→바깥쪽 순으로 보관
+/// <summary>
+/// 선반의 한 칸 슬롯. 최대 2개의 상품을 안쪽(0)→바깥쪽(1) 순으로 보관.
+///
+/// [상품 진열 흐름]
+/// 플레이어가 상품을 들고 선반 클릭
+///   → SlotFillBehaviour → ShelfSlot.RegisterNewItem(go)
+///   → ItemDataManager에서 ItemData 추출
+///   → OnProductPlacedToFactory 이벤트 발생 → PriceCardFactory가 가격표 생성
+///
+/// [NPC 구매 흐름]
+/// NpcState_PickItem → ShelfSlot.TryGetPricing(itemId, offerPrice)으로 가격 확인
+///   → ShelfSlot.PopItem()으로 바깥쪽 상품 꺼냄 → NPC가 카운터로 이동
+///
+/// [가격표 시스템]
+/// - RegisterNewItem 시 OnProductPlacedToFactory 이벤트 → PriceCardFactory가 가격표 프리팹 생성
+/// - 로드 시 FirePriceCardEvent()로 가격표 재생성
+/// - priceCardParent Transform 아래에 가격표가 붙음
+/// - controll 벡터로 가격표 위치 오프셋, priceCardEuler로 회전 설정
+///
+/// [새 선반 프리팹 만들 때]
+/// 1. ShelfSlot 컴포넌트 추가
+/// 2. points[0]=안쪽, points[1]=바깥쪽 Transform 설정
+/// 3. priceCardParent에 가격표 부착 위치 Transform 연결
+/// 4. standPoint에 NPC가 서서 물건을 볼 위치 설정 (에디터에서 ContextMenu로 생성 가능)
+/// </summary>
 [DisallowMultipleComponent]
 [RequireComponent(typeof(Collider))]
 public class ShelfSlot : MonoBehaviour
@@ -154,6 +178,21 @@ public class ShelfSlot : MonoBehaviour
         }
 
         return offerPrice > 0f;
+    }
+
+    /* ---------- 가격표 없이 슬롯에 다시 등록 (재전시용) ---------- */
+    public void ReRegisterItem(GameObject go)
+    {
+        items.Add(go);
+    }
+
+    /* ---------- 저장/복원 시 가격표 재생성 이벤트 발행 ---------- */
+    public void FirePriceCardEvent(ItemData itemData)
+    {
+        if (priceCardParent == null || itemData == null) return;
+        Vector3 pos = transform.position + controll;
+        Quaternion rot = Quaternion.Euler(priceCardEuler);
+        OnProductPlacedToFactory?.Invoke(itemData, pos, rot, priceCardParent);
     }
 
     // 플레이어가 직접 가져간 상품을 리스트에서 제거할 때 사용

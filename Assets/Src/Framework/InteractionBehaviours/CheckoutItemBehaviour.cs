@@ -19,6 +19,9 @@ public class CheckoutItemBehaviour : MonoBehaviour, IInteractable
     private CashRegisterUI cashRegisterUI;
     private CounterSlotData counterSlotData;
 
+    public NpcController Owner => owner;
+    public bool IsMoving => moving;
+
     const float speed = 12f;   // 이동 속도
     bool moving, beeped;
     bool isInitialized = false;

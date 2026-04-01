@@ -36,9 +36,17 @@ public class NpcState_OfferPayment : IState
     // 상태 시작: 결제 데이터를 준비하고 이동·회전을 잠시 멈춘다
     public void Enter()
 {
+    // 튜토리얼 Pay 단계: 첫 결제 완료 후 반대 수단 강제
+    PaymentType decidedMethod;
+    if (TutorialManager.Instance != null
+        && TutorialManager.Instance.TryGetForcedPaymentType(out var forced))
+        decidedMethod = forced;
+    else
+        decidedMethod = Random.value < 0.5f ? PaymentType.Cash : PaymentType.Card;
+
     paymentContext = new PaymentContext {
         totalPrice = 0f,
-        method = Random.value < 0.5f ? PaymentType.Cash : PaymentType.Card,
+        method = decidedMethod,
         payer = npcController
     };
 

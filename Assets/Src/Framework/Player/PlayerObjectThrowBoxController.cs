@@ -17,26 +17,32 @@ public class PlayerObjectThrowBoxController : MonoBehaviour
         var held = PlayerObjectHoldController.Instance.heldObject;
         if (held == null) return;
 
-        // 1) 던질 때는 무조건 HoldPoint에서 분리해서 월드 기준으로 만든다
-        held.transform.SetParent(null, true);   // ← 여기서 부모 완전 끊김
+        // IPickable 구현이 있으면 그쪽에 위임 (상태 정리를 해당 컴포넌트가 담당)
+        var pickable = held.GetComponent<IPickable>();
+        if (pickable != null)
+        {
+            pickable.ThrowObject();
+            TutorialEvents.RaiseThrew();
+            return;
+        }
 
-        // 2) 콜라이더 켜기
+        // IPickable이 없는 경우 직접 처리 (폴백)
+        held.transform.SetParent(null, true);
+
         var col = held.GetComponentInChildren<Collider>();
         if (col != null) col.enabled = true;
 
-        // 3) 물리 켜기
         held.EnablePhysics();
 
-        // 4) 힘을 앞으로 가해 던지기
         var rb = held.GetComponent<Rigidbody>();
         if (rb != null)
         {
             rb.AddForce(Camera.main.transform.forward * throwForce, ForceMode.Impulse);
         }
 
-        // 5) 상태 정리
         held.isHeld = false;
         PlayerObjectHoldController.Instance.heldObject = null;
+        TutorialEvents.RaiseThrew();
 
         Debug.Log("[Throw] 던짐, 부모=null");
     }

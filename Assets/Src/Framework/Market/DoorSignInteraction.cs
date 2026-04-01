@@ -1,7 +1,8 @@
+using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 
-public class DoorSignInteraction : MonoBehaviour, IInteractable
+public class DoorSignInteraction : MonoBehaviour, IInteractable, IHasInteractionPrompts
 {
     [Header("참조")]
     [SerializeField] private DoorTrigger doorTrigger;   // 문 트리거
@@ -35,9 +36,12 @@ public class DoorSignInteraction : MonoBehaviour, IInteractable
 
         doorTrigger.ToggleOpen();
         RefreshVisual();
+
+        if (doorTrigger.IsOpen)
+            TutorialEvents.RaiseShopOpened();
     }
 
-    private void RefreshVisual()
+    public void RefreshVisual()
     {
         if (doorTrigger == null || signText == null) return;
 
@@ -51,5 +55,12 @@ public class DoorSignInteraction : MonoBehaviour, IInteractable
             signText.text  = "CLOSED";
             signText.color = closedColor;
         }
+    }
+
+    public void GetPrompts(PlayerInteractionContext ctx, List<InteractionPrompt> prompts)
+    {
+        if (doorTrigger == null) return;
+        string action = doorTrigger.IsOpen ? "Close Shop" : "Open Shop";
+        prompts.Add(new InteractionPrompt(InputHint.LMB, action));
     }
 }

@@ -10,20 +10,41 @@ public class BoxSaveHandler : MonoBehaviour, ISaveable
     {
         var boxes = new List<BoxSaveData>();
 
+        // 1) 기존 BoxItemContainer 박스 캡처
         foreach (var box in FindObjectsOfType<BlockIsHolding>())
         {
             var container = box.GetComponent<BoxItemContainer>();
             if (container == null || container.ItemId == 0) continue;
+
+            // BoxContainer가 있으면 배달 박스이므로 아래에서 처리
+            if (box.GetComponent<BoxContainer>() != null) continue;
 
             boxes.Add(new BoxSaveData
             {
                 position = box.transform.position,
                 rotation = box.transform.rotation,
                 itemId   = container.ItemId,
-                amount   = container.Amount
-                // 이름/카테고리 저장 X (표시는 런타임에서 DB+Override로)
+                amount   = container.Amount,
+                isDeliveryBox = false
             });
         }
+
+        // 2) BoxContainer (배달 박스) 캡처
+        foreach (var dc in FindObjectsOfType<BoxContainer>())
+        {
+            if (dc.Item == null || dc.Item.itemId == 0) continue;
+
+            boxes.Add(new BoxSaveData
+            {
+                position = dc.transform.position,
+                rotation = dc.transform.rotation,
+                itemId   = dc.Item.itemId,
+                amount   = dc.Remaining,
+                isOpen   = dc.IsOpen,
+                isDeliveryBox = true
+            });
+        }
+
         return boxes;
     }
 
@@ -32,17 +53,38 @@ public class BoxSaveHandler : MonoBehaviour, ISaveable
         var boxes = data as List<BoxSaveData>;
         if (boxes == null || spawner == null) return;
 
+        // 기존 배달 박스 제거 (중복 방지)
+        foreach (var existing in FindObjectsOfType<BoxContainer>())
+            Destroy(existing.gameObject);
+
         foreach (var b in boxes)
         {
-            // 스포너가 실제 프리팹을 만들고 BoxItemContainer에 세팅하도록
-            var go = spawner.RestoreBoxTransform(b.position, b.rotation); // ← 스포너에 이런 메서드가 없다면 하나 만들어줘
-            if (!go) continue;
+            if (b.isDeliveryBox)
+            {
+                // 배달 박스: BoxSpawner.RestoreBox 사용 (BoxContainer + SetContent)
+                var go = spawner.RestoreBox(b);
+                if (go == null) continue;
 
-            var container = go.GetComponent<BoxItemContainer>();
-            if (container == null)
-                container = go.AddComponent<BoxItemContainer>();
+                // 열림 상태 복원
+                if (b.isOpen)
+                {
+                    var container = go.GetComponent<BoxContainer>();
+                    if (container != null && !container.IsOpen)
+                        container.ToggleLid();
+                }
+            }
+            else
+            {
+                // 기존 BoxItemContainer 박스 복원
+                var go = spawner.RestoreBoxTransform(b.position, b.rotation);
+                if (!go) continue;
 
-            container.SetupById(b.itemId, database, b.amount);
+                var container = go.GetComponent<BoxItemContainer>();
+                if (container == null)
+                    container = go.AddComponent<BoxItemContainer>();
+
+                container.SetupById(b.itemId, database, b.amount);
+            }
         }
     }
 }

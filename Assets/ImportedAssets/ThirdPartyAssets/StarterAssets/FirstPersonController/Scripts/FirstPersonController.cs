@@ -74,6 +74,8 @@ namespace StarterAssets
 
 		private const float _threshold = 0.01f;
 
+		private bool _wasInUIMode;
+
 		private bool IsCurrentDeviceMouse
 		{
 			get
@@ -110,16 +112,19 @@ namespace StarterAssets
 			_fallTimeoutDelta = FallTimeout;
 		}
 
+		private bool IsInAnyUIMode()
+		{
+			if (GlobalInteractionFlagS.IsInModal) return true;
+			if (MonitorUIModeManager.Instance.getInUIMode()) return true;
+			if (InGameSettingManager.Instance.GetIsSettingOpen()) return true;
+			if (OnDayEnd.isDayEndUIActive) return true;
+			if (ClickObjectUIManager.Instance != null && ClickObjectUIManager.Instance.IsUIOpen) return true;
+			return false;
+		}
+
 		private void Update()
 		{
-
-			// 8/2 추가
-			// ui모드 진입시 플레이어 움직임 막기
-			// 8/12 추가
-			// 정산 창 진입시 플레이어 움직임 막기
-			if (MonitorUIModeManager.Instance.getInUIMode()) return;
-			if (InGameSettingManager.Instance.GetIsSettingOpen()) return;
-			if (OnDayEnd.isDayEndUIActive) return;
+			if (IsInAnyUIMode()) return;
 			JumpAndGravity();
 			GroundedCheck();
 			Move();
@@ -127,13 +132,19 @@ namespace StarterAssets
 
 		private void LateUpdate()
 		{
-			// 8/2 추가
-			// ui모드 진입시 카메라 회전 막기
-			// 8/12 추가
-			// 정산 창 진입시 카메라 회전 막기
-			if (MonitorUIModeManager.Instance.getInUIMode()) return;
-			if (InGameSettingManager.Instance.GetIsSettingOpen()) return;
-			if (OnDayEnd.isDayEndUIActive) return;
+			if (IsInAnyUIMode())
+			{
+				_wasInUIMode = true;
+				return;
+			}
+
+			// UI 모드 → 일반 모드 전환 직후: 잔여 마우스 입력 제거
+			if (_wasInUIMode)
+			{
+				_wasInUIMode = false;
+				_input.look = Vector2.zero;
+			}
+
 			CameraRotation();
 		}
 

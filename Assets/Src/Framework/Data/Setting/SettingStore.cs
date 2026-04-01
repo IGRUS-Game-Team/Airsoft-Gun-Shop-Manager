@@ -32,7 +32,9 @@ public static class SettingsStore
         {
             try
             {
-                return ES3.Load<SettingsData>(KEY, Es3Path);
+                var loaded = ES3.Load<SettingsData>(KEY, Es3Path);
+                Sanitize(loaded);
+                return loaded;
             }
             catch
             {
@@ -61,6 +63,17 @@ public static class SettingsStore
         var fresh = new SettingsData();
         ES3.Save(KEY, fresh, Es3Path);
         return fresh;
+    }
+
+    /// <summary>
+    /// 로드된 데이터에 비정상 값(0 감도 등)이 있으면 기본값으로 보정
+    /// </summary>
+    private static void Sanitize(SettingsData d)
+    {
+        if (d.mouseSensitivity <= 0f)
+            d.mouseSensitivity = new SettingsData().mouseSensitivity;
+        if (d.fov < 40f || d.fov > 110f)
+            d.fov = new SettingsData().fov;
     }
 
     // 필요 시 다른 슬롯 지원

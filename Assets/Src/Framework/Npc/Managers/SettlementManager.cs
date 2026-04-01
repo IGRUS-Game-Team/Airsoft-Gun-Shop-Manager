@@ -3,6 +3,14 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 
+/// 불평 사유 분류
+public enum ComplainReason
+{
+    Expensive,      // 가격이 비싸서 (선반)
+    PaymentDelay,   // 결제 대기가 길어서 (계산대)
+    Protest         // 시위로 인한 퇴장
+}
+
 public class SettlementManager : MonoBehaviour
 {
     public static SettlementManager Instance { get; private set; }
@@ -22,12 +30,16 @@ public class SettlementManager : MonoBehaviour
 
     [SerializeField] int   satisfiedCustomers;
     [SerializeField] int   dissatisfiedCustomers;
+    [SerializeField] int   expensiveComplaints;
     [SerializeField] int   shopLevel;
     readonly HashSet<NpcController> complained = new();
 
     [Header("평판 변화량(Inspector)")]
     [SerializeField] float happyReputationDelta   = +3f;
     [SerializeField] float unhappyReputationDelta = -3f;
+
+    [Header("일수")]
+    [SerializeField] int   dayNumber = 1;
 
     [Header("오늘 집계(런타임)")]
     [SerializeField] int   totalCustomersToday;
@@ -41,16 +53,21 @@ public class SettlementManager : MonoBehaviour
     // 총 고객 수 중복 방지
     readonly HashSet<int> countedNpcIdsToday = new();
 
+    // 결제 완료 중복 방지 (같은 NPC가 두 번 집계되는 것 방지)
+    readonly HashSet<int> paidNpcIdsToday = new();
+
     // 디버그(원인 추적에 유용)
     [Header("Debug")]
     public bool debugSalesLog = false;
 
     // UI 바인딩
     public event Action<Snapshot> OnChanged;
-    public UnityEvent OnComplainInvoked = new();
+    public event Action<ComplainReason> OnComplainInvoked;
 
+    public int  DayNumber            => dayNumber;
     public int  SatisfiedCustomers   => satisfiedCustomers;
     public int  DissatisfiedCustomers=> dissatisfiedCustomers;
+    public int  ExpensiveComplaints  => expensiveComplaints;
     public int  ShopLevel            => shopLevel;
     public int  TotalCustomersToday  => totalCustomersToday;
     public float GrossProfitToday    => grossProfitToday;
@@ -75,16 +92,32 @@ public class SettlementManager : MonoBehaviour
     }
 
     // ───────── 외부 API ─────────
-    public void MarkNpcComplained(NpcController npc)
+    public void AdvanceDay()
+    {
+        dayNumber++;
+        OnChanged?.Invoke(GetSnapshot());
+    }
+
+    public void MarkNpcComplained(NpcController npc, ComplainReason reason = ComplainReason.PaymentDelay)
     {
         if (npc == null) return;
         complained.Add(npc);
-        OnComplainInvoked?.Invoke();
+        OnComplainInvoked?.Invoke(reason);
+    }
+
+    /// <summary>가격이 비싸서 불평한 횟수 (MarkNpcComplained와 별도 집계)</summary>
+    public void MarkExpensiveComplaint()
+    {
+        expensiveComplaints++;
+        OnChanged?.Invoke(GetSnapshot());
     }
 
     public void OnPaymentCompleted(NpcController npc)
     {
         if (npc == null) return;
+
+        // 같은 NPC에 대해 중복 호출 방지
+        if (!paidNpcIdsToday.Add(npc.GetInstanceID())) return;
 
         bool had = complained.Remove(npc);
         if (had)
@@ -107,7 +140,11 @@ public class SettlementManager : MonoBehaviour
 
     public void RegisterCustomerEnter(NpcController npc)
     {
-        if (npc == null || timeUI == null) return;
+        if (npc == null) return;
+
+        if (timeUI == null)
+            timeUI = FindFirstObjectByType<TimeUI>();
+        if (timeUI == null) return;
 
         int hours = (timeUI.totalGameMinutes / 60) % 24;
         if (hours < openHour || hours >= closeHour) return;
@@ -169,12 +206,17 @@ public class SettlementManager : MonoBehaviour
 
     public void ResetToday()
     {
+        satisfiedCustomers  = 0;
+        dissatisfiedCustomers = 0;
         totalCustomersToday = 0;
+        expensiveComplaints = 0;
         grossProfitToday    = 0f;
         purchaseCostToday   = 0f;
         netProfitToday      = 0f;
+        complained.Clear();
         countedNpcIdsToday.Clear();
-        processedReceiptIds.Clear(); // ✅ 영수증 가드 초기화
+        paidNpcIdsToday.Clear();
+        processedReceiptIds.Clear();
 
         OnChanged?.Invoke(GetSnapshot());
     }
@@ -220,31 +262,60 @@ public class SettlementManager : MonoBehaviour
             ReputationState.Instance?.SetRaw(0f);
 
         complained.Clear();
+        paidNpcIdsToday.Clear();
         OnChanged?.Invoke(GetSnapshot());
     }
 
     public Snapshot GetSnapshot() => new Snapshot
     {
-        satisfied      = satisfiedCustomers,
-        dissatisfied   = dissatisfiedCustomers,
-        shopLevel      = shopLevel,
-        reputation     = Mathf.RoundToInt(ReputationState.CurrentGlobal),
-        totalCustomers = totalCustomersToday,
-        grossProfit    = grossProfitToday,
-        purchaseCost   = purchaseCostToday,
-        netProfit      = netProfitToday
+        dayNumber           = dayNumber,
+        satisfied           = satisfiedCustomers,
+        dissatisfied        = dissatisfiedCustomers,
+        expensiveComplaints = expensiveComplaints,
+        shopLevel           = shopLevel,
+        reputation          = Mathf.RoundToInt(ReputationState.CurrentGlobal),
+        totalCustomers      = totalCustomersToday,
+        grossProfit         = grossProfitToday,
+        purchaseCost        = purchaseCostToday,
+        netProfit           = netProfitToday
     };
 
     public struct Snapshot
     {
+        public int   dayNumber;
         public int   satisfied;
         public int   dissatisfied;
+        public int   expensiveComplaints;
         public int   shopLevel;
         public int   reputation;
         public int   totalCustomers;
         public float grossProfit;
         public float purchaseCost;
         public float netProfit;
+    }
+
+    // ───────── 세이브/로드 ─────────
+    public void RestoreState(SettlementSaveData d)
+    {
+        if (d == null) return;
+        dayNumber            = d.dayNumber;
+        satisfiedCustomers   = d.satisfiedCustomers;
+        dissatisfiedCustomers= d.dissatisfiedCustomers;
+        shopLevel            = d.shopLevel;
+        expensiveComplaints  = d.expensiveComplaints;
+        totalCustomersToday  = d.totalCustomersToday;
+        grossProfitToday     = d.grossProfitToday;
+        purchaseCostToday    = d.purchaseCostToday;
+        netProfitToday       = d.netProfitToday;
+
+        // 런타임 중복 가드는 초기화 (로드 후 새 세션이므로)
+        processedReceiptIds.Clear();
+        countedNpcIdsToday.Clear();
+        paidNpcIdsToday.Clear();
+        complained.Clear();
+
+        OnChanged?.Invoke(GetSnapshot());
+        Debug.Log($"[Load] Settlement ← day {dayNumber}");
     }
 
     // 테스트용 수동 조정

@@ -20,9 +20,12 @@ public class NextDay : MonoBehaviour
         if (dateUI != null)
             dateUI.UpdateDate();
 
-        // 2) SettlementManager 오늘 데이터 리셋
+        // 2) 일수 카운터 증가 + 오늘 데이터 리셋
         if (SettlementManager.Instance != null)
+        {
+            SettlementManager.Instance.AdvanceDay();
             SettlementManager.Instance.ResetToday();
+        }
 
         // 3) 시간 08:00으로 리셋
         if (timeUI != null)

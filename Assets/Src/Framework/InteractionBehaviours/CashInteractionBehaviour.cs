@@ -1,9 +1,10 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
 /// 돈 오브젝트 클릭 시 CashRegisterUI에 전달
 /// </summary>
-public class CashInteractionBehaviour : MonoBehaviour, IInteractable
+public class CashInteractionBehaviour : MonoBehaviour, IInteractable, IHasInteractionPrompts
 {
     [SerializeField] private float value;
     [SerializeField] private CashRegisterUI cashUI;
@@ -18,5 +19,9 @@ public class CashInteractionBehaviour : MonoBehaviour, IInteractable
         {
             Debug.LogWarning("cashUI가 연결되지 않았습니다");
         }
+    }
+
+    public void GetPrompts(PlayerInteractionContext ctx, List<InteractionPrompt> prompts)
+    {
     }
 }

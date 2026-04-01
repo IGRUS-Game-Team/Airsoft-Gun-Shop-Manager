@@ -51,6 +51,7 @@ public class BouncerEscort : MonoBehaviour
         this.lateralOffset = lateralOffset;
 
         _agent = GetComponent<NavMeshAgent>();
+        _agent.speed = escortSpeed;
         _agent.stoppingDistance = 0.4f;
         _agent.updateRotation = true;
 

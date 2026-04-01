@@ -27,7 +27,7 @@ public class ProtestDirector : MonoBehaviour
     [SerializeField] GameObject bouncerPrefab;
     [SerializeField] Transform bouncerSpawn;               // 없으면 spawnCenter 사용
     [SerializeField, Min(0f)] float bouncerCallCooldown = 15f;
-    [SerializeField, Min(0f)] float bouncerEscortSpeed = 2.6f;
+    [SerializeField, Min(0f)] float bouncerEscortSpeed = 1f;
     [SerializeField, Min(0f)] float bouncerOrderRadius = 8f; // 이 반경 안의 시위대에게 퇴장명령
 
     float _nextCallReadyTime;
@@ -50,14 +50,43 @@ public class ProtestDirector : MonoBehaviour
     [SerializeField, Min(1)] int spawnCount = 6;
     [SerializeField, Min(0f)] float spawnInterval = 0.2f;
 
-    [Header("랠리 머무르는 시간(초) — 0이면 무한")]
-    [SerializeField, Min(0f)] float protestDuration = 25f;
+    [Header("랠리 머무르는 시간(초) — 0이면 무한(바운서로만 해산)")]
+    [SerializeField, Min(0f)] float protestDuration = 0f;
 
+    [Header("디메리트")]
+    [SerializeField] float reputationDrainPerSec = 0.5f;
+    [SerializeField, Range(0f, 1f)] float npcFleeChance = 0.3f;
+    [SerializeField, Min(5f)] float scareInterval = 15f;
+
+    float _nextScareTime;
     readonly List<Protestor> spawned = new();
     Coroutine spawnCoro;
 
     public bool IsProtestOn => _protestOn;
     public float CooldownRemaining => Mathf.Max(0f, _nextCallReadyTime - Time.time);
+
+    void Update()
+    {
+        if (!_protestOn) return;
+
+        // 파괴된 시위대 정리
+        spawned.RemoveAll(p => p == null);
+
+        // 시위대 전부 퇴장 완료 → 시위 종료
+        if (spawned.Count == 0 && spawnCoro == null)
+        { _protestOn = false; return; }
+
+        // 지속적 평판 하락
+        if (reputationDrainPerSec > 0f)
+            ReputationState.Instance?.Add(-reputationDrainPerSec * Time.deltaTime);
+
+        // 일정 간격으로 매장 안 NPC 퇴장
+        if (Time.time >= _nextScareTime)
+        {
+            _nextScareTime = Time.time + scareInterval;
+            ScareCustomers();
+        }
+    }
 
     void OnEnable()
     {
@@ -95,6 +124,22 @@ public class ProtestDirector : MonoBehaviour
         }
 
         _protestOn = true;
+        ScareCustomers();
+        _nextScareTime = Time.time + scareInterval;
+    }
+
+    void ScareCustomers()
+    {
+        var npcs = FindObjectsByType<NpcController>(FindObjectsSortMode.None);
+        foreach (var npc in npcs)
+        {
+            if (npc == null || npc.isLeaving || !npc.inStore) continue;
+            if (UnityEngine.Random.value > npcFleeChance) continue;
+
+            SettlementManager.Instance?.MarkNpcComplained(npc, ComplainReason.Protest);
+            SettlementManager.Instance?.OnCustomerLeftUnhappy(npc);
+            npc.StartLeaving(npc.exitPoint ?? exitPoint);
+        }
     }
 
     [ContextMenu("Stop Protest")]
@@ -161,6 +206,7 @@ public class ProtestDirector : MonoBehaviour
         }
 
         _nextCallReadyTime = Time.time + bouncerCallCooldown;
+        TutorialEvents.RaiseBouncerCalled();
 
         var spawnPos = (bouncerSpawn ? bouncerSpawn.position : spawnCenter.position);
         var pos = SampleOnNavmesh(spawnPos, 2f);

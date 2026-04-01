@@ -39,6 +39,7 @@ public class MonitorShopCartManager : MonoBehaviour
         Debug.Log($"장바구니에 추가됨: {item.itemName} x{amount} (총 수량: {cart[item]})");
 
         UpdateCartUI();
+        TutorialEvents.RaiseAddedToCart();
     }
 
     public void ClearCart()
@@ -62,7 +63,7 @@ public class MonitorShopCartManager : MonoBehaviour
         foreach (var kvp in cart)
         {
             var view = Instantiate(cartItemCardPrefab, cartContentRoot);
-            float partTotalCost = kvp.Key.baseCost * kvp.Value;
+            float partTotalCost = kvp.Key.CartPrice * kvp.Value;
             view.Setup(kvp.Key, kvp.Value, partTotalCost);
 
             view.OnPlusClicked = OnPlusClicked;
@@ -72,7 +73,7 @@ public class MonitorShopCartManager : MonoBehaviour
             spawnedViews[kvp.Key] = view;
 
             totalAmount += kvp.Value;
-            totalValue += kvp.Key.baseCost * kvp.Value; // 총 가격 계산
+            totalValue += kvp.Key.CartPrice * kvp.Value; // 총 가격 계산
         }
 
         totalAmountText.text = totalAmount.ToString();
@@ -89,7 +90,7 @@ public class MonitorShopCartManager : MonoBehaviour
             {
                 itemId = kvp.Key.itemId,
                 amount = kvp.Value,
-                unitPrice = kvp.Key.baseCost,
+                unitPrice = kvp.Key.CartPrice,
                 itemName = ItemNameResolver.Get(kvp.Key),
                 category = kvp.Key.category
             };

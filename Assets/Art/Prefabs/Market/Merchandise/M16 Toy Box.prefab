@@ -107,6 +107,7 @@ GameObject:
   - component: {fileID: 2279123312646679705}
   - component: {fileID: 1927505266198611585}
   - component: {fileID: 633000588241982332}
+  - component: {fileID: -932037251318845367}
   m_Layer: 3
   m_Name: M16 Toy Box
   m_TagString: Untagged
@@ -263,7 +264,7 @@ MonoBehaviour:
   holdController: {fileID: 0}
   animator: {fileID: 633000588241982332}
   gunPrefab: {fileID: 3935982119330352909, guid: 07b07190bda8a3c4295ca8805f04a1bc, type: 3}
-  heldLocalOffset: {x: 0, y: 0.7, z: 0.3}
+  heldLocalOffset: {x: 0, y: 0, z: 0.3}
   heldLocalEuler: {x: 0, y: 90, z: 0}
 --- !u!95 &633000588241982332
 Animator:
@@ -287,6 +288,21 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &-932037251318845367
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1848264370535289149}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ad87d0d48e8cb7745afe825d1149743c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CounterSlotData
+  itemObject: {fileID: 1848264370535289149}
+  itemData: {fileID: 11400000, guid: 3ab567b32b6f0514f8a315d3e30e190d, type: 2}
+  amount: 1
 --- !u!1 &6780363114459887329
 GameObject:
   m_ObjectHideFlags: 0

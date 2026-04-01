@@ -45,6 +45,7 @@ public class MarketPriceDataManager : MonoBehaviour
     private void ChangeMarketPrice(int id, float marketPriceRate)
     {
         ItemData selectItem = itemDatabase.GetById(id);// itemDatabase에서 itemId 가 id인 데이터 찾기
+        if (selectItem == null) return;
 
         float marketPrice = (float)(selectItem.baseCost * (1.2 + marketPriceRate));//시세 생성
 
@@ -73,12 +74,34 @@ public class MarketPriceDataManager : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// 모든 아이템의 시세를 기본값(×1.2)으로 리셋한다.
+    /// 새 이벤트 적용 전 전날 변동분을 초기화하는 데 사용.
+    /// </summary>
+    public void ResetAllPrices()
+    {
+        InitializeMarketPrices();
+    }
+
     //딕셔너리의 시세 get
     public float GetMarketPrice(int id)
     {
         return currentMarketPrice[id];
     }
     
+
+    // ───────── 세이브/로드 ─────────
+    public Dictionary<int, float> GetAllPrices()
+    {
+        return new Dictionary<int, float>(currentMarketPrice);
+    }
+
+    public void SetAllPrices(Dictionary<int, float> prices)
+    {
+        if (prices == null) return;
+        currentMarketPrice = new Dictionary<int, float>(prices);
+        Debug.Log($"[Load] MarketPrice ← {prices.Count}개");
+    }
 
     // 추가 : id키 없을 때 에러나는 거 막기 - 준서
     public bool TryGetMarketPrice(int id, out float price)

@@ -13,6 +13,8 @@ public class ActiveGun : MonoBehaviour
     [SerializeField] ShootingZoneManager shootingZoneManager;
 
     FirstPersonController firstPersonController; // 사격 반동 조절
+
+    public bool CanZoom => shootingGunSO != null && shootingGunSO.CanZoom;
     ShootingGun currentGun;
 
     float timeSinceLastShot = 0f; // 단발 사격 시간 계산
@@ -58,12 +60,10 @@ public class ActiveGun : MonoBehaviour
     void OnEnable()
     {
         playerShooting.Enable();
-        playerShooting.Player.Range.performed += OnRangePerformed;
     }
 
     void OnDisable()
     {
-        playerShooting.Player.Range.performed -= OnRangePerformed;
         UnsubscribeShootInput();
         playerShooting.Disable();
     }
@@ -72,11 +72,6 @@ public class ActiveGun : MonoBehaviour
     {
         playerShooting?.Disable();
         UnsubscribeShootInput();
-    }
-
-    void OnRangePerformed(InputAction.CallbackContext ctx)
-    {
-        shootingZoneManager.ToggleZones(this);
     }
 
     void SingleShot() // 단발 사격
@@ -114,7 +109,10 @@ public class ActiveGun : MonoBehaviour
         }
         else
         {
-            playerFollowCamera.m_Lens.FieldOfView = defaultFOV;
+            float settingsFov = (SettingsManager.Instance != null)
+                ? Mathf.Clamp(SettingsManager.Instance.Data.fov, 40f, 110f)
+                : defaultFOV;
+            playerFollowCamera.m_Lens.FieldOfView = settingsFov;
             zoomVignette.SetActive(false);
             firstPersonController.ChangeRotationSpeed(defaultRotationSpeed);
         }
@@ -139,6 +137,10 @@ public class ActiveGun : MonoBehaviour
             currentGun = Instantiate(shootingGunSO.GunPrefab, transform).GetComponent<ShootingGun>();
             Debug.Log($"Switched to gun: {shootingGunSO.name}");
             SubscribeShootInput(); // 새 총 적용과 동시에 입력 바인딩
+
+            // 조준점 + 사격 모드 활성화
+            if (shootingZoneManager != null)
+                shootingZoneManager.EnterShootingMode(this);
         }
         else Debug.LogWarning("SwitchGun failed");
     }

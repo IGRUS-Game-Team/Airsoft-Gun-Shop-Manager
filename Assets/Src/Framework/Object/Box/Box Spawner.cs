@@ -1,5 +1,20 @@
 using UnityEngine;
 
+/// <summary>
+/// 모니터에서 주문한 상품의 배송 박스를 스폰하는 매니저.
+///
+/// [스폰 흐름]
+/// PurchaseProcessor.Purchase() → BoxSpawner.BoxDrop(itemId, boxCount)
+///   → ItemDatabase에서 ItemData 조회
+///   → deliveryBoxPrefab 인스턴스 생성 (basePosition 근처 랜덤 위치, spawnHeight 높이에서 낙하)
+///   → BoxContainer.SetContent(itemData, perBoxCount) → 내용물 설정
+///
+/// [세이브/로드]
+/// BoxSaveHandler가 RestoreBox(BoxSaveData)를 호출하여 저장된 위치/내용물로 복원.
+///
+/// [새 상품 추가 시]
+/// ItemData SO만 잘 만들면 이 스크립트는 수정 불필요 — ItemDatabase.GetById()로 자동 조회.
+/// </summary>
 public class BoxSpawner : MonoBehaviour
 {
     [Header("Spawn")]
@@ -49,6 +64,8 @@ public class BoxSpawner : MonoBehaviour
                 Debug.LogWarning("[BoxSpawner] BoxContainer 컴포넌트가 없음");
             }
         }
+
+        TutorialEvents.RaiseOrderBoxSpawned();
     }
 
     // === 세이브 로드용: SaveData 한 건 복구 ===

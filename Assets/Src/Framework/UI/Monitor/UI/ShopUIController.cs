@@ -17,7 +17,8 @@ public class ShopUIController : MonoBehaviour
     public void OnClickFilter_MainWeapon() => Populate(ItemCategory.MainWeapon);
     public void OnClickFilter_ProtectiveGear() => Populate(ItemCategory.ProtectiveGear);
     public void OnClickFilter_Consumable() => Populate(ItemCategory.Consumable);
-    public void OnClickFilter_Exhibition() => Populate(ItemCategory.Exhibition);
+    public void OnClickFilter_Furniture() => Populate(ItemCategory.Furniture);
+    public void OnClickFilter_Decoration() => Populate(ItemCategory.Decoration);
     List<ItemCardView> spawnedCards = new();
 
     void Start()

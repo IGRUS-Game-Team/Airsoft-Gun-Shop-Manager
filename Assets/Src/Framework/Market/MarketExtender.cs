@@ -19,6 +19,10 @@ public class MarketExtender : MonoBehaviour
     [SerializeField] int rangeUnlockLevel = 3;     // 레벨 3에서 사격장 오픈
     [SerializeField] GameObject rangeDoor;         // 잠금 상태에서 켜짐, 오픈 시 끔
 
+    [Header("확장 시 제거할 DecoZone")]
+    [SerializeField] GameObject[] decoZonesToRemoveOnMarket;   // 매장 확장 시 사라질 Zone
+    [SerializeField] GameObject[] decoZonesToRemoveOnRange;    // 사격장 확장 시 사라질 Zone
+
     [Header("가격(달러)")]
     [SerializeField] float marketPrice = 30000f;
     [SerializeField] float rangePrice  = 50000f;
@@ -36,9 +40,11 @@ public class MarketExtender : MonoBehaviour
 
     void OnEnable()
     {
-        // 저장된 구매 상태 로드
-        MarketPurchased = PlayerPrefs.GetInt(KeyMarketPurchased, 0) == 1;
-        RangePurchased  = PlayerPrefs.GetInt(KeyRangePurchased,  0) == 1;
+        // 폴백: ES3 슬롯 데이터가 아직 복원 안 된 경우 PlayerPrefs에서 읽기 (기존 세이브 호환)
+        if (!MarketPurchased)
+            MarketPurchased = PlayerPrefs.GetInt(KeyMarketPurchased, 0) == 1;
+        if (!RangePurchased)
+            RangePurchased  = PlayerPrefs.GetInt(KeyRangePurchased,  0) == 1;
 
         TrySubscribe();
         TryApplyImmediate();
@@ -102,11 +108,28 @@ public class MarketExtender : MonoBehaviour
         if (shootingRange) shootingRange.SetActive(rangeUnlocked);
         if (rangeDoor) rangeDoor.SetActive(!rangeUnlocked);
 
+        // ─ 확장 시 불필요한 DecoZone 파괴
+        if (marketUnlocked) DestroyZones(decoZonesToRemoveOnMarket);
+        if (rangeUnlocked)  DestroyZones(decoZonesToRemoveOnRange);
+
         // ─ Market Area Collider 조정
         if (marketAreaCollider && marketUnlocked)
         {
             marketAreaCollider.center = new Vector3(-0.5f, 0f, 0f);
             marketAreaCollider.size = new Vector3(2f, 1f, 1f);
+        }
+    }
+
+    private void DestroyZones(GameObject[] zones)
+    {
+        if (zones == null) return;
+        for (int i = 0; i < zones.Length; i++)
+        {
+            if (zones[i] != null)
+            {
+                Destroy(zones[i]);
+                zones[i] = null;
+            }
         }
     }
 
@@ -134,6 +157,7 @@ public class MarketExtender : MonoBehaviour
         PlayerPrefs.Save();
 
         Apply(level);
+        TutorialEvents.RaiseMarketExpanded();
     }
 
     public void PurchaseShootingRange()
@@ -156,6 +180,17 @@ public class MarketExtender : MonoBehaviour
         PlayerPrefs.SetInt(KeyRangePurchased, 1);
         PlayerPrefs.Save();
 
+        Apply(level);
+        TutorialEvents.RaiseShootingRangeExpanded();
+    }
+
+    /// <summary>세이브 슬롯에서 복원 시 호출 (MarketExpansionSaveHandler)</summary>
+    public void RestoreState(bool market, bool range)
+    {
+        MarketPurchased = market;
+        RangePurchased  = range;
+
+        int level = RevenueXPTracker.Instance ? RevenueXPTracker.Instance.CurrentLevel : 0;
         Apply(level);
     }
 

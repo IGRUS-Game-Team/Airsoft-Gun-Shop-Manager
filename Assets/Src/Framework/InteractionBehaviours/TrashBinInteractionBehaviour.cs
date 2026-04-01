@@ -1,8 +1,7 @@
-using Unity.VisualScripting;
+using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UIElements;
 
-public class TrashBinInteractionBehaviour : MonoBehaviour, IInteractable
+public class TrashBinInteractionBehaviour : MonoBehaviour, IInteractable, IHasInteractionPrompts
 {
     public void Interact()
     {
@@ -11,12 +10,17 @@ public class TrashBinInteractionBehaviour : MonoBehaviour, IInteractable
 
         if (boxObject != null)
         {
+            PlayerObjectHoldController.Instance.heldObject = null;
+            TutorialEvents.RaiseBoxTrashed();
             Destroy(heldObject.gameObject);
         }
-        else
-        {
-            return;
-        }
+    }
 
+    public void GetPrompts(PlayerInteractionContext ctx, List<InteractionPrompt> prompts)
+    {
+        if (ctx.hasHeld)
+        {
+            prompts.Add(new InteractionPrompt(InputHint.LMB, "Discard"));
+        }
     }
 }

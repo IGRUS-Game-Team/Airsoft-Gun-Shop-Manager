@@ -32,7 +32,8 @@ public class PlayerObjectHoldController : MonoBehaviour
         rb.isKinematic = true;
         rb.detectCollisions = false;
 
-        heldObject.GetComponent<Collider>().enabled = false;
+        var col = heldObject.GetComponentInChildren<Collider>();
+        if (col != null) col.enabled = false;
 
         heldObject.transform.SetParent(holdPoint);
         heldObject.transform.localPosition = Vector3.zero;
@@ -48,7 +49,8 @@ public class PlayerObjectHoldController : MonoBehaviour
         rb.isKinematic = false;
         rb.detectCollisions = true;
 
-        heldObject.GetComponent<Collider>().enabled = true;
+        var col = heldObject.GetComponentInChildren<Collider>();
+        if (col != null) col.enabled = true;
         heldObject.isHeld = false;
         heldObject = null;
     }

@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
@@ -8,10 +9,15 @@ using UnityEngine;
 /// </summary>
 
 [RequireComponent(typeof(BlockIsHolding))]
-public class BoxInteractionBehaviour : MonoBehaviour, IPickable
+public class BoxInteractionBehaviour : MonoBehaviour, IPickable, IHasInteractionPrompts
 {
     [SerializeField] PlayerObjectHoldController holdController; // 인스펙터에 드래그
     [SerializeField] BoxContainer box;                          // 같은 프리팹에 붙은 컴포넌트
+
+    [Header("손에 들렸을 때 위치/각도 보정")]
+    [SerializeField] private Vector3 heldLocalOffset = new Vector3(0f, -0.3f, 0.5f);
+    [SerializeField] private Vector3 heldLocalEuler  = Vector3.zero;
+
     private BlockIsHolding holdData;
 
     void Awake()
@@ -40,6 +46,13 @@ public class BoxInteractionBehaviour : MonoBehaviour, IPickable
     {
         if (holdController == null) return;
         holdController.SetHeldObject(holdData); // 기존 컨트롤러 API 그대로 사용
+
+        // SetHeldObject가 localPosition=zero로 설정하므로, 이후에 오프셋 덮어쓰기
+        var t = holdData.transform;
+        t.localPosition = heldLocalOffset;
+        t.localRotation = Quaternion.Euler(heldLocalEuler);
+
+        TutorialEvents.RaisePickedUp();
     }
 
     public void SetDown()
@@ -76,5 +89,25 @@ public class BoxInteractionBehaviour : MonoBehaviour, IPickable
 
         holdData.isHeld = false;
         holdController.heldObject = null;
+    }
+
+    public void GetPrompts(PlayerInteractionContext ctx, List<InteractionPrompt> prompts)
+    {
+        // 이 박스를 들고 있는 상태
+        if (holdData.isHeld)
+        {
+            // 박스 열기/닫기
+            if (box != null)
+            {
+                string action = box.IsOpen ? "Close Box" : "Open Box";
+                prompts.Add(new InteractionPrompt(InputHint.LMB, action));
+            }
+            // R, G는 라우터에서 자동 추가됨
+        }
+        else
+        {
+            // 바라보고 있는 상태 → 집기
+            prompts.Add(new InteractionPrompt(InputHint.LMB, "Pick Up"));
+        }
     }
 }

@@ -13,7 +13,7 @@ public class CatalogUIManager : MonoBehaviour
     public Transform popup;
 
     [Header("Filter Buttons")]
-    public Button btnMainWeapon, btnProtective, btnConsumable, btnExhibition; //btnAll;
+    public Button btnMainWeapon, btnProtective, btnConsumable, btnFurniture, btnDecoration; //btnAll;
 
     private readonly List<ShopItemUnlockCELL> spawned = new();
 
@@ -23,7 +23,8 @@ public class CatalogUIManager : MonoBehaviour
         btnMainWeapon.onClick.AddListener(() => Populate(ItemCategory.MainWeapon));
         btnProtective.onClick.AddListener(() => Populate(ItemCategory.ProtectiveGear));
         btnConsumable.onClick.AddListener(() => Populate(ItemCategory.Consumable));
-        btnExhibition.onClick.AddListener(() => Populate(ItemCategory.Exhibition));
+        btnFurniture.onClick.AddListener(() => Populate(ItemCategory.Furniture));
+        btnDecoration.onClick.AddListener(() => Populate(ItemCategory.Decoration));
     }
 
 

@@ -7,6 +7,9 @@ public class MonitorUIModeManager : MonoBehaviour
 {
     public static MonitorUIModeManager Instance { get; private set; }
 
+    [Header("모니터 진입 시 숨길 오버레이 UI")]
+    [SerializeField] private GameObject[] overlayUIObjects;
+
     private Camera previousCam;
     private GameObject player;
     private CharacterController characterController;   // ★ 필드로 뺌
@@ -62,6 +65,10 @@ public class MonitorUIModeManager : MonoBehaviour
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
         inUIMode = true;
+
+        SetOverlayUIActive(false);
+
+        TutorialEvents.RaiseEnteredMonitor();
     }
 
     public void ExitUIMode()
@@ -98,5 +105,19 @@ public class MonitorUIModeManager : MonoBehaviour
         }
 
         inUIMode = false;
+
+        SetOverlayUIActive(true);
+
+        TutorialEvents.RaiseExitedMonitor();
+    }
+
+    private void SetOverlayUIActive(bool active)
+    {
+        if (overlayUIObjects == null) return;
+        foreach (var obj in overlayUIObjects)
+        {
+            if (obj != null)
+                obj.SetActive(active);
+        }
     }
 }

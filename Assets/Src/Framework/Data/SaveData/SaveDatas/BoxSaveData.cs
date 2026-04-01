@@ -14,5 +14,5 @@ public class BoxSaveData
     public int amount; // 얼마나 남았는지
     //public bool isHeld; // 플레이어가 들고 있는지
     public bool isOpen;
-    // 필요하면 isHeld, 상태, 카테고리 등 추가
+    public bool isDeliveryBox;  // true = BoxContainer (배달 박스), false = BoxItemContainer (기존)
 }

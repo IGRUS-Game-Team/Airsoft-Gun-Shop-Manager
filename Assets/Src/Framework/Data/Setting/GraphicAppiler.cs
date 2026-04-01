@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
+using Cinemachine;
 
 public class GraphicsApplier : MonoBehaviour
 {
@@ -22,70 +23,46 @@ public class GraphicsApplier : MonoBehaviour
 
     private void OnSceneLoaded(Scene s, LoadSceneMode m)
     {
-        Debug.Log($"[GraphicsApplier] SceneLoaded: {s.name}");
         TryBindVolumeAndComponents();
 
         if (SettingsManager.Instance != null)
-        {
-            Debug.Log("[GraphicsApplier] SettingsManager Instance OK, ApplySafe 호출");
             ApplySafe(SettingsManager.Instance.Data);
-        }
-        else
-        {
-            Debug.LogWarning("[GraphicsApplier] SettingsManager.Instance 가 null임");
-        }
     }
 
     private void TryBindVolumeAndComponents()
     {
         if (postProcessVolume == null)
-        {
             postProcessVolume = FindFirstObjectByType<Volume>();
-            Debug.Log($"[GraphicsApplier] postProcessVolume FindFirstObjectByType → {(postProcessVolume ? postProcessVolume.name : "NULL")}");
-        }
 
         if (postProcessVolume != null && postProcessVolume.profile != null)
-        {
-            bool found = postProcessVolume.profile.TryGet(out motionBlur);
-            Debug.Log($"[GraphicsApplier] MotionBlur TryGet → found={found}, motionBlur={(motionBlur != null)}");
-        }
+            postProcessVolume.profile.TryGet(out motionBlur);
         else
-        {
-            Debug.LogWarning("[GraphicsApplier] Volume or Profile is NULL → MotionBlur 스킵");
-            motionBlur = null; // Volume 없으면 모션블러 스킵
-        }
+            motionBlur = null;
     }
 
     public void ApplySafe(SettingsData d)
     {
-        Debug.Log($"[GraphicsApplier] ApplySafe 호출: vSync={d.vSync}, fps={d.targetFps}, fov={d.fov}, motionBlur={d.motionBlur}");
-
         QualitySettings.vSyncCount = d.vSync ? 1 : 0;
         Application.targetFrameRate = Mathf.Clamp(d.targetFps, 30, 1000);
 
+        float clampedFov = Mathf.Clamp(d.fov, 40f, 110f);
+
+        Scene myScene = gameObject.scene;
+
         var cam = Camera.main ?? FindFirstObjectByType<Camera>();
-        if (cam)
-        {
-            cam.fieldOfView = Mathf.Clamp(d.fov, 40f, 110f);
-            Debug.Log($"[GraphicsApplier] 카메라 FOV 적용: {cam.fieldOfView}");
-        }
-        else
-        {
-            Debug.LogWarning("[GraphicsApplier] Camera.main 이 없음");
-        }
+        if (cam && cam.gameObject.scene == myScene)
+            cam.fieldOfView = clampedFov;
+
+        // Cinemachine 가상카메라 중 같은 씬에 있는 것만 FOV 적용 (Cinemachine이 매 프레임 Camera를 덮어쓰므로 필수)
+        var allVcams = FindObjectsByType<CinemachineVirtualCamera>(FindObjectsSortMode.None);
+        foreach (var vc in allVcams)
+            if (vc.gameObject.scene == myScene)
+                vc.m_Lens.FieldOfView = clampedFov;
 
         if (motionBlur != null)
-        {
             motionBlur.active = d.motionBlur;
-            Debug.Log($"[GraphicsApplier] MotionBlur 적용됨: {motionBlur.active}, Intensity={(motionBlur.intensity != null ? motionBlur.intensity.value : -1f)}");
-        }
-        else
-        {
-            Debug.LogWarning("[GraphicsApplier] motionBlur NULL, 적용 실패");
-        }
     }
 
-    // 해상도/품질/창모드 적용은 이전 코드 그대로 사용
     public enum HeavyOptions { Resolution, QualityLevel, FullscreenMode }
 
     public void ApplyHeavyOption(SettingsData d, HeavyOptions what)
@@ -99,18 +76,15 @@ public class GraphicsApplier : MonoBehaviour
                     denominator = 1u
                 };
                 Screen.SetResolution(d.width, d.height, d.fullscreenMode, rr);
-                Debug.Log($"[GraphicsApplier] 해상도 적용: {d.width}x{d.height}@{d.refreshRate}Hz");
                 break;
 
             case HeavyOptions.QualityLevel:
                 d.qualityLevel = Mathf.Clamp(d.qualityLevel, 0, QualitySettings.names.Length - 1);
                 QualitySettings.SetQualityLevel(d.qualityLevel, true);
-                Debug.Log($"[GraphicsApplier] 퀄리티 적용: {d.qualityLevel} ({QualitySettings.names[d.qualityLevel]})");
                 break;
 
             case HeavyOptions.FullscreenMode:
                 Screen.fullScreenMode = d.fullscreenMode;
-                Debug.Log($"[GraphicsApplier] 창모드 적용: {d.fullscreenMode}");
                 break;
         }
     }

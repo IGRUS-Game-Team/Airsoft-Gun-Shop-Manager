@@ -1,6 +1,4 @@
 using UnityEngine;
-
-// Cinemachine을 쓰지 않는다면 다음 using은 지워도 됩니다.
 using Cinemachine;
 
 public class LookBinding : MonoBehaviour
@@ -10,8 +8,8 @@ public class LookBinding : MonoBehaviour
     public CinemachineVirtualCamera vcam;           // 없으면 자동 탐색
 
     [Header("Base speeds for Cinemachine POV")]
-    public float baseHorizontalSpeed = 200f;        // 프로젝트에 맞게 조정
-    public float baseVerticalSpeed = 200f;
+    public float baseHorizontalSpeed = 100f;
+    public float baseVerticalSpeed = 100f;
 
     void Awake()
     {
@@ -21,6 +19,9 @@ public class LookBinding : MonoBehaviour
 
     public void Apply(float sensitivity, bool invertY)
     {
+        // vcam이 아직 없으면 다시 탐색 (씬 로드 타이밍 이슈 방지)
+        if (!vcam) vcam = FindFirstObjectByType<CinemachineVirtualCamera>();
+
         // 1) Cinemachine POV 우선
         if (vcam != null)
         {
@@ -35,14 +36,12 @@ public class LookBinding : MonoBehaviour
         }
 
         // 2) 리플렉션으로 자주 쓰는 필드/프로퍼티 찾기 (Starter Assets 등)
-        //   - 후보: "RotationSpeed", "mouseSensitivity", "Sensitivity", "lookSpeed" ...
-        var comp = GetComponentInChildren<MonoBehaviour>(); // 플레이어 컨트롤러 스크립트로 교체 가능
+        var comp = GetComponentInChildren<MonoBehaviour>();
         if (comp != null)
         {
             TrySetFloat(comp, new[] { "RotationSpeed", "rotationSpeed", "MouseSensitivity", "mouseSensitivity", "Sensitivity", "sensitivity", "LookSpeed", "lookSpeed" }, sensitivity);
             TrySetBool (comp, new[] { "InvertY", "invertY", "YInverted", "yInverted" }, invertY);
         }
-        // 3) 더 이상 할 게 없으면 스킵(메인 메뉴 등)
     }
 
     private static void TrySetFloat(object target, string[] names, float value)

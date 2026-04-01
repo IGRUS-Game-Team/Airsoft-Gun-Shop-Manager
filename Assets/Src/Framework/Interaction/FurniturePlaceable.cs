@@ -1,8 +1,27 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// 가구/장식 오브젝트를 배치 가능하게 만드는 컴포넌트.
+///
+/// [배치 흐름]
+/// 1. DecorationPlacementManager.SpawnNext() → 프리팹 인스턴스 생성
+/// 2. EnterPreview() → 반투명 고스트 모드 (물리/충돌 비활성)
+/// 3. 플레이어가 위치 지정 → SetPreviewTint(Green/Red)으로 유효성 표시
+/// 4. 클릭으로 확정 → ExitPreview(placed:true) → 물리/충돌 복원
+///
+/// [세이브/로드]
+/// - PrefabName이 설정된 오브젝트만 FurnitureSaveHandler가 저장
+/// - 씬에 미리 배치된 오브젝트(BaseShelf 등)는 PrefabName == null → 저장 대상 아님
+/// - PrefabName은 DecorationPlacementManager(배치 시)와 FurnitureSaveHandler(복원 시)에서만 설정
+///
+/// [새 가구 프리팹에 이 컴포넌트 추가 시]
+/// 1. BoxCollider 추가 후 placementBounds에 연결
+/// 2. previewGhostMaterial에 반투명 URP 머티리얼 할당
+/// 3. 선반이면 ShelfSlot 컴포넌트도 함께 추가
+/// </summary>
 [DisallowMultipleComponent]
-[RequireComponent(typeof(Collider))] // 루트에 가벼운 콜라이더 1개(Trigger 권장)
+[RequireComponent(typeof(Collider))]
 public class FurniturePlaceable : MonoBehaviour
 {
     [Header("프리뷰(유령)용")]
@@ -25,8 +44,22 @@ public class FurniturePlaceable : MonoBehaviour
     private bool _isPreview;
     private float _holdTimer;
     private bool _mouseOver;
+    private bool _isDecoration;
+    private float _unitPrice;
+    private string _prefabName;
 
     public bool IsPreviewing => _isPreview; // 외부에서 프리뷰 여부 확인용
+    public float UnitPrice => _unitPrice;
+    public bool IsDecoration => _isDecoration;
+
+    /// <summary>
+    /// 세이브/로드용 프리팹 이름. SetPrefabName 으로 배치 시 설정.
+    /// </summary>
+    public string PrefabName
+    {
+        get => _prefabName;
+        set => _prefabName = value;
+    }
 
     void Awake()
     {
@@ -58,7 +91,7 @@ public class FurniturePlaceable : MonoBehaviour
             if (_holdTimer >= holdSeconds)
             {
                 _holdTimer = 0f;
-                PlacementManager.Instance.BeginPlacement(this);
+                PlacementManager.Instance.BeginPlacement(this, decoMode: _isDecoration);
             }
         }
         else
@@ -156,4 +189,28 @@ public class FurniturePlaceable : MonoBehaviour
     }
 
     public BoxCollider GetPlacementBounds() => placementBounds;
+
+    /// <summary>
+    /// 장식품 여부를 설정한다. 재편집 시 decoMode를 올바르게 전달하기 위해 사용.
+    /// </summary>
+    public void SetIsDecoration(bool value)
+    {
+        _isDecoration = value;
+    }
+
+    /// <summary>
+    /// 단가를 저장한다. 취소 시 환불 금액 계산에 사용.
+    /// </summary>
+    public void SetUnitPrice(float price)
+    {
+        _unitPrice = price;
+    }
+
+    /// <summary>
+    /// 동적 생성 시 프리뷰 머티리얼을 외부에서 주입한다.
+    /// </summary>
+    public void SetPreviewGhostMaterial(Material mat)
+    {
+        previewGhostMaterial = mat;
+    }
 }

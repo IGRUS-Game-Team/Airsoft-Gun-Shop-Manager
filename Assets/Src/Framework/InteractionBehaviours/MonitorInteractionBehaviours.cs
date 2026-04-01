@@ -1,6 +1,7 @@
+using System.Collections.Generic;
 using UnityEngine;
 
-public class MonitorInteractionBehaviour : MonoBehaviour, IInspectable
+public class MonitorInteractionBehaviour : MonoBehaviour, IInspectable, IHasInteractionPrompts
 {
     [SerializeField] Camera monitorUICam;
     [SerializeField] RenderTextureUIClicker uiClicker;
@@ -24,5 +25,12 @@ public class MonitorInteractionBehaviour : MonoBehaviour, IInspectable
     public void ExitInspection()
     {
         MonitorUIModeManager.Instance.ExitUIMode();
+    }
+
+    public void GetPrompts(PlayerInteractionContext ctx, List<InteractionPrompt> prompts)
+    {
+        if (ctx.inMonitorMode) return; // 이미 UI 모드면 표시 안함
+
+        prompts.Add(new InteractionPrompt(InputHint.LMB, "Use"));
     }
 }

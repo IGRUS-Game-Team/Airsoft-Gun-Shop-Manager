@@ -37,12 +37,13 @@ public class BoomEventStrategy : ISocialEventStrategy
         currentEventName = EventNames[UnityEngine.Random.Range(0, EventNames.Count)]; //이벤트이름 고르기
         currentMarketModifier = UnityEngine.Random.Range(0.1f, 0.3f); // 10%~30% 상승
         //currentDuration = UnityEngine.Random.Range(1, 4); // 1~3일
-
-        Debug.Log($"Boom 전략 : {currentEventName}, {currentMarketModifier}");
     }
 
-    public string EventName => currentEventName;        
-    public string StatusText => "Increase in demand";             
-    public float MarketModifier => currentMarketModifier; 
+    public string EventName => currentEventName;
+    public string StatusText => "Increase in demand";
+    public float MarketModifier => currentMarketModifier;
+    // "Relaxation of gun regulations"만 규제 이벤트 (특정 1~2개 총기)
+    public bool IsGunRegulation => currentEventName != null
+        && currentEventName.Contains("gun regulations", System.StringComparison.OrdinalIgnoreCase); 
     // public int Duration => currentDuration;             
 }

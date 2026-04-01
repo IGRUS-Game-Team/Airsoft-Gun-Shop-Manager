@@ -13,10 +13,12 @@ public class AdjustmentUIValue : MonoBehaviour
     [SerializeField] SettlementManager settlement;   // 비워두면 런타임에 Instance로 채움
 
     [Header("정산UI 값 텍스트")]
+    [SerializeField] TextMeshProUGUI DayText;
     [SerializeField] TextMeshProUGUI SCustomersText;
     [SerializeField] TextMeshProUGUI DSCustomersText;
     [SerializeField] TextMeshProUGUI TotalCustomersText;
 
+    [SerializeField] TextMeshProUGUI ExpensiveText;
     [SerializeField] TextMeshProUGUI ReputationText;
     [SerializeField] TextMeshProUGUI StoreLevelText;
 
@@ -32,6 +34,10 @@ public class AdjustmentUIValue : MonoBehaviour
 
     void OnEnable()
     {
+        // Awake 시점에 Instance가 없었으면 여기서 재탐색
+        if (settlement == null)
+            settlement = SettlementManager.Instance;
+
         if (settlement != null)
         {
             settlement.OnChanged += HandleSnapshot;
@@ -48,10 +54,12 @@ public class AdjustmentUIValue : MonoBehaviour
 
     void HandleSnapshot(SettlementManager.Snapshot s)
     {
+        if (DayText)             DayText.text             = $"Day {s.dayNumber}";
         if (SCustomersText)      SCustomersText.text      = $"Satisfied Customers : {s.satisfied}";
         if (DSCustomersText)     DSCustomersText.text     = $"Dissatisfied Customers : {s.dissatisfied}";
         if (TotalCustomersText)  TotalCustomersText.text  = $"Total number of customers : {s.totalCustomers}";
 
+        if (ExpensiveText)       ExpensiveText.text       = $"Expensive product : {s.expensiveComplaints}";
         if (ReputationText)      ReputationText.text      = $"Reputation : {s.reputation}";
         if (StoreLevelText)      StoreLevelText.text      = $"Store Level : {s.shopLevel}";
 

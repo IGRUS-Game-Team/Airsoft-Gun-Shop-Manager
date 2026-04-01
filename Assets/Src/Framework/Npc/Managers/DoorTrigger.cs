@@ -26,6 +26,9 @@ public class DoorTrigger : MonoBehaviour
     [Range(0, 100)] [SerializeField] private int minFinalChance = 5;
     [Range(0, 100)] [SerializeField] private int maxFinalChance = 95;
 
+    [Header("시위 페널티")]
+    [SerializeField] private int protestEntryPenalty = 40;
+
     [Header("입장 목적지 분배(%)")]
     [Tooltip("선반으로 보낼 확률(사격장은 100 - 이 값)")]
     [Range(0, 100)] [SerializeField] private int percentToShelves = 80;
@@ -38,6 +41,7 @@ public class DoorTrigger : MonoBehaviour
 
     private const string TagNpc = "Npc";
     private int insideCount;
+    private ProtestDirector _cachedProtest;
 
     // =========================================================
     // Unity Events
@@ -87,6 +91,14 @@ public class DoorTrigger : MonoBehaviour
     public void OpenStore()  => isOpen = true;
     public void CloseStore() => isOpen = false;
     public void ToggleOpen() => isOpen = !isOpen;
+    public void SetOpen(bool open) => isOpen = open;
+
+    /// <summary>매장 내 인원 카운트를 0으로 초기화 (다음날 초기화용).</summary>
+    public void ResetInsideCount()
+    {
+        insideCount = 0;
+        UpdateCustomerUI();
+    }
 
     // =========================================================
     // Private helpers
@@ -213,6 +225,13 @@ public class DoorTrigger : MonoBehaviour
 
         float bonus  = Mathf.Lerp(bonusAtLowRep, bonusAtHighRep, t);
         float chance = baseEntryChancePercent + bonus;
+
+        // 시위 페널티
+        if (_cachedProtest == null)
+            _cachedProtest = FindFirstObjectByType<ProtestDirector>();
+        if (_cachedProtest != null && _cachedProtest.IsProtestOn)
+            chance -= protestEntryPenalty;
+
         chance       = Mathf.Clamp(chance, minFinalChance, maxFinalChance);
 
         return Mathf.RoundToInt(chance);

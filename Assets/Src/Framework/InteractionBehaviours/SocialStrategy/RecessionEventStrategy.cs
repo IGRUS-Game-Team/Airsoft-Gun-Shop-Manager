@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 
 public class RecessionEventStrategy : ISocialEventStrategy
@@ -26,13 +25,15 @@ public class RecessionEventStrategy : ISocialEventStrategy
     private void GenerateRandomEventData()
     {
         currentEventName = EventNames[UnityEngine.Random.Range(0, EventNames.Count)]; //이벤트이름 고르기
-        currentMarketModifier = UnityEngine.Random.Range(-0.3f,-0.1f); // 10%~30% 상승
-
-        Debug.Log($"Boom 전략 : {currentEventName}, {currentMarketModifier}");
+        currentMarketModifier = UnityEngine.Random.Range(-0.3f,-0.1f); // -10%~-30% 하락
     }
 
     public string EventName => currentEventName;
     public string StatusText => "Decrease in demand";
     public float MarketModifier => currentMarketModifier;
+    // "shooting incident", "Gun control protest"가 규제 이벤트 (특정 1~2개 총기)
+    // "Economic recession"은 전체 총기
+    public bool IsGunRegulation => currentEventName != null
+        && !currentEventName.Contains("Economic", System.StringComparison.OrdinalIgnoreCase);
 
 }

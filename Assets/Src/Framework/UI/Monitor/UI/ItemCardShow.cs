@@ -49,6 +49,9 @@ public void Setup(ItemData item)
     {
         amount = Mathf.Clamp(amount + delta, 0, 999);
         UpdateAmount(amount);
+
+        if (amount > 0)
+            TutorialEvents.RaiseOrderAmountSet();
     }
 
     void UpdateAmount(int a)

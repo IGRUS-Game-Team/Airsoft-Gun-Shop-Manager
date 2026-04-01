@@ -29,7 +29,19 @@ public class NpcState_PickItem : IState
         npcController.Agent.isStopped = true;
         npcController.Agent.ResetPath();
 
-        // 집기 전 가격 판정: 비싸면 즉시 불평 → 퇴장
+        // 슬롯이 비어있으면 다른 선반 탐색 시도
+        var slot = npcController.targetShelfSlot != null
+            ? npcController.targetShelfSlot.GetComponent<ShelfSlot>()
+            : null;
+
+        if (slot == null || !slot.HasItem)
+        {
+            if (!TryRedirect())
+                LeaveQuietly();
+            return;
+        }
+
+        // 가격 판정: 비싸면 즉시 불평 → 퇴장
         if (!WantsToBuyCurrentSlot())
         {
             StartComplainAndLeave();
@@ -76,11 +88,27 @@ public class NpcState_PickItem : IState
             return;
         }
 
-        // 손에 들기 전 재판정: 비싸면 즉시 불평 → 퇴장
-        if (!npcController.hasItemInHand && !WantsToBuyCurrentSlot())
+        // 손에 들기 전 재판정
+        if (!npcController.hasItemInHand)
         {
-            StartComplainAndLeave();
-            return;
+            var slotCheck = npcController.targetShelfSlot != null
+                ? npcController.targetShelfSlot.GetComponent<ShelfSlot>()
+                : null;
+
+            // 슬롯이 비어있으면 → 다른 선반 탐색, 없으면 불평 없이 퇴장
+            if (slotCheck == null || !slotCheck.HasItem)
+            {
+                if (TryRedirect()) return;
+                LeaveQuietly();
+                return;
+            }
+
+            // 슬롯에 물건은 있지만 가격이 안 맞으면 → 불평 후 퇴장
+            if (!WantsToBuyCurrentSlot())
+            {
+                StartComplainAndLeave();
+                return;
+            }
         }
 
         if (!npcController.hasItemInHand) return;
@@ -94,11 +122,27 @@ public class NpcState_PickItem : IState
             ShelfSlot cur = npcController.targetShelfSlot ? npcController.targetShelfSlot.GetComponent<ShelfSlot>() : null;
             ShelfSlot next = null;
 
-            if (cur != null && cur.HasItem) next = cur; // 같은 슬롯 반복 허용
-            else if (ShelfManager.Instance != null && ShelfManager.Instance.TryGetAvailableSlot(out var other)) next = other;
+            // 1) 같은 슬롯에 아이템 남아있으면 재사용
+            if (cur != null && cur.HasItem)
+                next = cur;
+            // 2) 같은 그룹의 다른 슬롯 탐색
+            else if (npcController.targetShelfGroup != null)
+            {
+                var sameGroupSlots = npcController.targetShelfGroup.GetItemSlots();
+                if (sameGroupSlots.Count > 0)
+                    next = sameGroupSlots[Random.Range(0, sameGroupSlots.Count)];
+            }
+            // 3) 다른 그룹에서 탐색
+            if (next == null && ShelfManager.Instance != null &&
+                ShelfManager.Instance.TryGetAvailableSlot(out var other))
+                next = other;
 
             if (next != null)
             {
+                // 다른 그룹으로 이동 시 이전 그룹 예약 해제
+                if (next.ParentGroup != npcController.targetShelfGroup)
+                    npcController.targetShelfGroup?.Release();
+
                 npcController.hasItemInHand = false;
                 npcController.heldItem = null;
                 npcController.targetShelfSlot = next.transform;
@@ -122,7 +166,37 @@ public class NpcState_PickItem : IState
 
     // ───────────── 헬퍼 ─────────────
 
-    // 현재 슬롯이 “시세 + N%” 기준으로 살만한지
+    // 빈 슬롯 도착 시 다른 선반으로 리다이렉트
+    private bool TryRedirect()
+    {
+        ShelfSlot next = null;
+
+        // 1) 같은 그룹의 다른 슬롯 확인
+        if (npcController.targetShelfGroup != null)
+        {
+            var itemSlots = npcController.targetShelfGroup.GetItemSlots();
+            if (itemSlots.Count > 0)
+                next = itemSlots[Random.Range(0, itemSlots.Count)];
+        }
+
+        // 2) 다른 그룹에서 찾기
+        if (next == null && ShelfManager.Instance != null &&
+            ShelfManager.Instance.TryGetAvailableSlot(out var other))
+            next = other;
+
+        if (next == null) return false;
+
+        // 다른 그룹이면 이전 그룹 예약 해제
+        if (next.ParentGroup != npcController.targetShelfGroup)
+            npcController.targetShelfGroup?.Release();
+
+        npcController.targetShelfSlot = next.transform;
+        npcController.targetShelfGroup = next.ParentGroup;
+        npcController.stateMachine.SetState(new NpcState_ToShelf(npcController));
+        return true;
+    }
+
+    // 현재 슬롯이 "시세 + N%" 기준으로 살만한지
     private bool WantsToBuyCurrentSlot()
     {
         if (npcController == null || npcController.targetShelfSlot == null) return false;
@@ -142,6 +216,19 @@ public class NpcState_PickItem : IState
         return profile.WillBuyWithMarket(offerPrice, market);
     }
 
+    // 재고 소진 시 불평 없이 조용히 퇴장
+    private void LeaveQuietly()
+    {
+        npcController.GetComponent<CarriedItemHandler>()?.ClosePicking();
+        npcController.hasItemInHand = false;
+        npcController.heldItem = null;
+
+        npcController.targetShelfGroup?.Release();
+        npcController.targetShelfGroup = null;
+
+        npcController.StartLeaving(npcController.exitPoint);
+    }
+
     // 불평 + 집기 종료 + 평판 기록 + 잠깐 대기 후 퇴장
     private void StartComplainAndLeave()
     {
@@ -157,8 +244,9 @@ public class NpcState_PickItem : IState
         npcController.targetShelfGroup?.Release();
         npcController.targetShelfGroup = null;
 
-        // 평판에 불평 기록
-        SettlementManager.Instance?.MarkNpcComplained(npcController);
+        // 평판에 불평 기록 (가격 불평)
+        SettlementManager.Instance?.MarkNpcComplained(npcController, ComplainReason.Expensive);
+        SettlementManager.Instance?.MarkExpensiveComplaint();
 
         // 이동 멈추고 불평 모션
         npcController.Agent.isStopped = true;

@@ -1,7 +1,27 @@
 using UnityEngine;
 using UnityEngine.AI;
 
-// NPC의 이동, 애니메이션, 상태 전환을 관리하는 클래스
+/// <summary>
+/// NPC의 이동, 애니메이션, 상태 전환을 관리하는 메인 컨트롤러.
+///
+/// [상태머신 패턴]
+/// StateMachine이 현재 상태의 Enter/Update/Exit를 호출.
+/// 각 상태는 NpcStates/ 폴더의 NpcState_*.cs 파일에 정의됨.
+///
+/// [NPC 생애주기]
+/// NpcSpawnManager가 생성 → Start()에서 NpcState_ToDoor로 초기화
+/// → DoorTrigger가 AllowEntry/AllowRange 호출 → 쇼핑 or 사격
+/// → 결제 완료 또는 퇴장 시 NpcState_Leave → 디스폰
+///
+/// [주요 상태 전이]
+/// ToDoor → (DoorTrigger) → ToShelf → PickItem → ToQueue → QueueWait → ToCounter → OfferPayment → Leave
+///                        → ToRange → Shoot → Leave
+///                        → Wander → Leave
+///
+/// [새 상태 추가]
+/// 1. NpcStates/에 새 클래스 생성 (Enter/Update/Exit 구현)
+/// 2. 적절한 시점에 stateMachine.SetState(new NpcState_New(this)) 호출
+/// </summary>
 public class NpcController : MonoBehaviour
 {
     public NavMeshAgent Agent { get; private set; }
@@ -123,9 +143,8 @@ public class NpcController : MonoBehaviour
             targetShelfGroup.Release();
             targetShelfGroup = null;
         }
-        // ★ 결제 완료 집계 통지 (CounterManager 수정 없이 완료 시점 훅)
-        SettlementManager.Instance?.OnPaymentCompleted(this);
-        
+        // ★ 정산 집계는 CounterManager가 직접 호출하므로 여기서는 제거 (중복 방지)
+
         stateMachine.SetState(new NpcState_Leave(this));
     }
 }

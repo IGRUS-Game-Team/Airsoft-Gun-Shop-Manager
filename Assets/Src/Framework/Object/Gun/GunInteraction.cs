@@ -1,7 +1,8 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 [RequireComponent(typeof(BlockIsHolding))]
-public class GunInteraction : MonoBehaviour, IPickable
+public class GunInteraction : MonoBehaviour, IPickable, IHasInteractionPrompts
 {
     [SerializeField] private PlayerObjectHoldController holdController;
     [SerializeField] private Vector3 heldLocalOffset = new Vector3(0f, 0.7f, 0.3f);
@@ -48,13 +49,41 @@ public class GunInteraction : MonoBehaviour, IPickable
         t.localRotation = Quaternion.Euler(heldLocalEuler);
     }
 
+    public void GetPrompts(PlayerInteractionContext ctx, List<InteractionPrompt> prompts)
+    {
+        if (!holdData.isHeld)
+        {
+            prompts.Add(new InteractionPrompt(InputHint.LMB, "Pick Up"));
+        }
+        // 들고 있을 때: R/G(Throw/Drop)는 라우터에서 자동 추가
+        // Fire/Aim은 사격장 전용 시스템(ActiveGun)에서 처리
+    }
+
     public void SetDown()
     {
+        if (!holdData.isHeld) return;
 
+        transform.SetParent(holdData.originalParent, true);
+        if (col != null) col.enabled = true;
+        if (rb != null) { rb.isKinematic = false; rb.detectCollisions = true; rb.useGravity = true; }
+
+        holdData.isHeld = false;
+        holdController.heldObject = null;
     }
 
     public void ThrowObject()
     {
-        // 필요하면 나중에 구현
+        if (!holdData.isHeld) return;
+
+        transform.SetParent(holdData.originalParent, true);
+        if (col != null) col.enabled = true;
+        if (rb != null)
+        {
+            rb.isKinematic = false; rb.detectCollisions = true; rb.useGravity = true;
+            rb.AddForce(Camera.main.transform.forward * 10f, ForceMode.Impulse);
+        }
+
+        holdData.isHeld = false;
+        holdController.heldObject = null;
     }
 }

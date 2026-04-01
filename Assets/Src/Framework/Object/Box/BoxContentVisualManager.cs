@@ -117,6 +117,12 @@ public class BoxContentVisualManager : MonoBehaviour
         // ItemData에 displayPrefab 필드 추가했다고 했으니까 그거 우선 사용
         var prefab = (item != null && item.displayPrefab != null) ? item.displayPrefab : fallbackCube;
 
+        if (prefab == null)
+        {
+            Debug.LogWarning($"[BoxContentVisualManager] displayPrefab과 fallbackCube 모두 없음 (item={item?.itemName})");
+            return null;
+        }
+
         var go = Instantiate(prefab, contentRoot);
         go.transform.localPosition = localPos;
         go.transform.localRotation = Quaternion.identity; // 필요하면 랜덤 틸트로 바꿔도 됨

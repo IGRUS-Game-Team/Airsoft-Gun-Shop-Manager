@@ -13,6 +13,6 @@ public class NpcComplainAlerterEvents : MonoBehaviour
     // 애니메이션 이벤트에서 호출 이름: OnComplainAnim
     public void OnComplainAnim()
     {
-        SettlementManager.Instance?.MarkNpcComplained(npc);
+        SettlementManager.Instance?.MarkNpcComplained(npc, ComplainReason.PaymentDelay);
     }
 }

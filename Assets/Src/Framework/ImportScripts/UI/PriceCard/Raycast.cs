@@ -8,7 +8,7 @@ public class Raycast : MonoBehaviour
     public static bool IsOverlayUIMode { get; set; } = false; //오버레이 ui 모드
 
     [Header("Raycast 설정")]
-    [SerializeField] private float range = 5f; //Ray 사거라
+    [SerializeField] private float range = 3f; //Ray 사거리
     [SerializeField] private LayerMask layer;// 감지할 레이어
 
     [Header("카메라 참조")]    
